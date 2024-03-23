@@ -47,13 +47,13 @@ public class App {
                 //Hs.add(H1);
 
                 Atome H2 = new Atome(11);
-                H2.position = new Vecteur2f(x*expacement - 0 - (TailleX/(2*Zoom)),y*expacement + 2.3 - (TailleY/(2*Zoom)));
-                H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 1.0 * Math.pow(10.0, 21.0), (Math.random() * 2.0 - 1.0) * 4.0 * Math.pow(10.0, 21.0));
+                H2.position = new Vecteur2f(x*expacement - 0 - (TailleX/(2*Zoom)),y*expacement + 2.54 - (TailleY/(2*Zoom)));
+                H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(H2);
 
                 Atome O = new Atome(17);
                 O.position = new Vecteur2f(x*expacement - (TailleX/(2*Zoom)),y*expacement - (TailleY/(2*Zoom)));
-                O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 1.0 * Math.pow(10.0, 21.0), (Math.random() * 2.0 - 1.0) * 4.0 * Math.pow(10.0, 21.0));
+                O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(O);
             }
         }
@@ -89,12 +89,12 @@ public class App {
             }
             System.err.println("Liés : " + 100.0*(double)lié/(double)Hs.size());*/
 
-            for (int N = 0; N < 1; N++) {                                                 //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 10; N++) {                                                 //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourForces(Hs, i, TailleX, TailleY, Zoom); //Mise à jour des forces
                 }
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourPos(5.0*Math.pow(10.0, -23.0)); //Mise à jour de la position. Change Delta t
+                    Hs.get(i).miseÀJourPos(1.0*Math.pow(10.0, -16.0)); //Mise à jour de la position. Change Delta t
                 }
             }
 

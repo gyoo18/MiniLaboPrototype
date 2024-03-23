@@ -23,7 +23,7 @@ public class Atome {
     public int doublets;
     public double rayonCovalent;
 
-    public double K = 8.987*Math.pow(10.0,54.0);
+    public double K = 8.987*Math.pow(10.0,39.0);
 
     private int[] cases;
 
@@ -104,65 +104,68 @@ public class Atome {
                 Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Atomes.get(i).position) );
                 double dist = Vecteur2f.distance(Atomes.get(i).position, position);
 
-                int nLiaisons = 0;
-                for (int j = 0; j < liaisonIndexe.length; j++) {
-                    if(liaisonIndexe[j] == i){
-                        nLiaisons++;
+                if(dist < 10.0*rayonCovalent){
+
+                    int nLiaisons = 0;
+                    for (int j = 0; j < liaisonIndexe.length; j++) {
+                        if(liaisonIndexe[j] == i){
+                            nLiaisons++;
+                        }
                     }
-                }
-                if(nLiaisons > 0){
-                    double l = rayonCovalent + Atomes.get(i).rayonCovalent;
-                    if(nLiaisons == 1){
-                        l = rayonsCovalents[NP-1] + rayonsCovalents[Atomes.get(i).NP-1];
-                    }else if(nLiaisons == 2){
-                        l = rayonsCovalents2[NP-1] + rayonsCovalents2[Atomes.get(i).NP-1];
-                    }else if(nLiaisons == 3){
-                        l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(i).NP-1];
+                    if(nLiaisons > 0){
+                        double l = rayonCovalent + Atomes.get(i).rayonCovalent;
+                        if(nLiaisons == 1){
+                            l = rayonsCovalents[NP-1] + rayonsCovalents[Atomes.get(i).NP-1];
+                        }else if(nLiaisons == 2){
+                            l = rayonsCovalents2[NP-1] + rayonsCovalents2[Atomes.get(i).NP-1];
+                        }else if(nLiaisons == 3){
+                            l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(i).NP-1];
+                        }
+                        l = l/100.0;
+                        double D = 40000.0; //*Math.pow(10.0,12.0);
+                        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
+                        double a = Math.sqrt(p/(2.0*D));
+                        double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
+                        //force.add( Vecteur2f.scale(dir, module) );
                     }
-                    l = l/100.0;
-                    double D = 460000.0*Math.pow(10.0,12.0);
-                    double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
-                    double a = Math.sqrt(p/(2.0*D));
-                    double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
-                    force.add( Vecteur2f.scale(dir, module) );
+                    force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
+                    force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
+
+                    force.add( Vecteur2f.scale(dir,(K*charge*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+
+                    /*for (int j = 0; j < Atomes.get(i).anglesDoublets.length; j++) {
+                        Vecteur2f aPos = new Vecteur2f(Atomes.get(i).anglesDoublets[j],Atomes.get(i).rayonCovalent,0);
+                        Vecteur2f pos = Vecteur2f.add(Atomes.get(i).position,aPos);
+                        dir = Vecteur2f.normalize( Vecteur2f.sub(pos,position) );
+                        dist = Vecteur2f.distance(position, pos);
+        
+                        //force.add( Vecteur2f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),12.0)/Math.pow(dist,12.0)) )); //force paulie
+                        //force.add( Vecteur2f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),6.0)/Math.pow(dist,6.0)) ));
+        
+                        //force.add( Vecteur2f.scale(dir,(K*-2.0*e*charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    }
+
+                    for (int j = 0; j < anglesDoublets.length; j++) {
+                        Vecteur2f aPos = new Vecteur2f(anglesDoublets[j],rayonCovalent,0);
+                        Vecteur2f pos = Vecteur2f.add(position,aPos);
+                        dir = Vecteur2f.normalize( Vecteur2f.sub(pos,Atomes.get(i).position) );
+                        dist = Vecteur2f.distance(Atomes.get(i).position, pos);
+
+                        Vecteur2f forceA = new Vecteur2f(0);
+        
+                        forceA.add( Vecteur2f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
+                        forceA.add( Vecteur2f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
+        
+                        forceA.add( Vecteur2f.scale(dir,(K*-2.0*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+
+                        Vecteur3f croix = Vecteur3f.croix(new Vecteur3f(forceA.x,forceA.y,0.0), new Vecteur3f(aPos.x,aPos.y,0));
+                        ForceAngleDoublets[j] -= croix.z;
+                    }*/
                 }
-                force.add( Vecteur2f.scale(dir,(Math.pow(10.0,13.0)*Math.pow(2.0*(rayonCovalent+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                force.add( Vecteur2f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow(2.0*(rayonCovalent+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
-
-                force.add( Vecteur2f.scale(dir,(K*4.0*charge*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
-
-                /*for (int j = 0; j < Atomes.get(i).anglesDoublets.length; j++) {
-                    Vecteur2f aPos = new Vecteur2f(Atomes.get(i).anglesDoublets[j],Atomes.get(i).rayonCovalent,0);
-                    Vecteur2f pos = Vecteur2f.add(Atomes.get(i).position,aPos);
-                    dir = Vecteur2f.normalize( Vecteur2f.sub(pos,position) );
-                    dist = Vecteur2f.distance(position, pos);
-    
-                    //force.add( Vecteur2f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                    //force.add( Vecteur2f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),6.0)/Math.pow(dist,6.0)) ));
-    
-                    //force.add( Vecteur2f.scale(dir,(K*-2.0*e*charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
-                }
-
-                for (int j = 0; j < anglesDoublets.length; j++) {
-                    Vecteur2f aPos = new Vecteur2f(anglesDoublets[j],rayonCovalent,0);
-                    Vecteur2f pos = Vecteur2f.add(position,aPos);
-                    dir = Vecteur2f.normalize( Vecteur2f.sub(pos,Atomes.get(i).position) );
-                    dist = Vecteur2f.distance(Atomes.get(i).position, pos);
-
-                    Vecteur2f forceA = new Vecteur2f(0);
-    
-                    forceA.add( Vecteur2f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                    forceA.add( Vecteur2f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
-    
-                    forceA.add( Vecteur2f.scale(dir,(K*-2.0*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
-
-                    Vecteur3f croix = Vecteur3f.croix(new Vecteur3f(forceA.x,forceA.y,0.0), new Vecteur3f(aPos.x,aPos.y,0));
-                    ForceAngleDoublets[j] -= croix.z;
-                }*/
             }
         }
 
-        force.add( Vecteur2f.scale(vélocité,-0.0000001));
+        force.add( Vecteur2f.scale(vélocité,-0.0000000000001));
         //force.add(new Vecteur2f(0,-9.8));
 
        if(Math.abs(position.y) > (double)TailleY/(2.0*Zoom)){
@@ -178,11 +181,11 @@ public class Atome {
     }
 
     public void miseÀJourPos(double deltaTemp){
-        vélocité.add(Vecteur2f.scale(m_force, deltaTemp/m));
-        vélocité = Vecteur2f.scale(Vecteur2f.normalize(vélocité), Math.min(vélocité.length(), Math.pow(10.0,22.0))); //Atome charger pas impacter par la force de pauli action reaction
         position.add(Vecteur2f.scale(vélocité, deltaTemp));
         position.add(Vecteur2f.scale(m_force,(deltaTemp*deltaTemp)/(2.0*m)));
-        position.add(new Vecteur2f(0.001f*2f*(Math.random()-0.5f),0.001f*2f*(Math.random()-0.5f)));
+        //position.add(new Vecteur2f(0.001f*2f*(Math.random()-0.5f),0.001f*2f*(Math.random()-0.5f)));
+        vélocité.add(Vecteur2f.scale(m_force, deltaTemp/m));
+       // vélocité = Vecteur2f.scale(Vecteur2f.normalize(vélocité), Math.min(vélocité.length(), Math.pow(10.0,22.0))); //Atome charger pas impacter par la force de pauli action reaction
 
         for(int i = 0; i < anglesDoublets.length; i++){
             vélAngleDoublets[i] += ForceAngleDoublets[i] * (deltaTemp/(2.0*mE*rayonCovalent*rayonCovalent));
