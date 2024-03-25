@@ -106,28 +106,6 @@ public class Atome {
 
                 if(dist < 10.0*rayonCovalent){
 
-                    int nLiaisons = 0;
-                    for (int j = 0; j < liaisonIndexe.length; j++) {
-                        if(liaisonIndexe[j] == i){
-                            nLiaisons++;
-                        }
-                    }
-                    if(nLiaisons > 0){
-                        double l = rayonCovalent + Atomes.get(i).rayonCovalent;
-                        if(nLiaisons == 1){
-                            l = rayonsCovalents[NP-1] + rayonsCovalents[Atomes.get(i).NP-1];
-                        }else if(nLiaisons == 2){
-                            l = rayonsCovalents2[NP-1] + rayonsCovalents2[Atomes.get(i).NP-1];
-                        }else if(nLiaisons == 3){
-                            l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(i).NP-1];
-                        }
-                        l = l/100.0;
-                        double D = 40000.0; //*Math.pow(10.0,12.0);
-                        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
-                        double a = Math.sqrt(p/(2.0*D));
-                        double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
-                        //force.add( Vecteur2f.scale(dir, module) );
-                    }
                     force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
                     force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
 
@@ -161,6 +139,42 @@ public class Atome {
                         Vecteur3f croix = Vecteur3f.croix(new Vecteur3f(forceA.x,forceA.y,0.0), new Vecteur3f(aPos.x,aPos.y,0));
                         ForceAngleDoublets[j] -= croix.z;
                     }*/
+                }
+            }
+        }
+
+        boolean[] liaisonTraitée = new boolean[liaisonIndexe.length];
+        for(int i = 0; i < liaisonIndexe.length; i++){
+            if(liaisonIndexe[i] != -1){
+                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Atomes.get(liaisonIndexe[i]).position) );
+                double dist = Vecteur2f.distance(Atomes.get(liaisonIndexe[i]).position, position);
+
+                int nLiaisons = 0;
+                for (int j = 0; j < liaisonIndexe.length; j++) {
+                    if(liaisonIndexe[j] == liaisonIndexe[i]){
+                        nLiaisons++;
+                        if(i != j){
+                            liaisonTraitée[j] = true;
+                        }
+                    }
+                }
+                if(nLiaisons > 0 && !liaisonTraitée[i]){
+                    double l = rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent;
+                    if(nLiaisons == 1){
+                        l = rayonsCovalents[NP-1] + rayonsCovalents[Atomes.get(liaisonIndexe[i]).NP-1];
+                    }else if(nLiaisons == 2){
+                        l = rayonsCovalents2[NP-1] + rayonsCovalents2[Atomes.get(liaisonIndexe[i]).NP-1];
+                    }else if(nLiaisons == 3){
+                        l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(liaisonIndexe[i]).NP-1];
+                    }
+                    l = l/100.0;
+                    double D = 40000.0; //*Math.pow(10.0,12.0);
+                    double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
+                    double a = Math.sqrt(p/(2.0*D));
+                    double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
+                    //force.add( Vecteur2f.scale(dir, module) );
+
+                    liaisonTraitée[i] = true;
                 }
             }
         }
