@@ -14,7 +14,7 @@ public class App {
     private static Graphics2D g;
     private static int TailleX = 512; //Taille de simulation 
     private static int TailleY = 512;
-    private static float Zoom = 5f;
+    private static float Zoom = 10f;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -38,22 +38,22 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double expacement = 10.0;
-        for(int x = 0; x < (TailleX/(Zoom*expacement)) - 1; x++){
-            for(int y = 0; y < (TailleY/(Zoom*expacement)) - 1; y++){
+        double espacement = 6.0;
+        for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
+            for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 Atome H1 = new Atome(1);
-                H1.position = new Vecteur2f(x*expacement + 1 - (TailleX/(2*Zoom)),y*expacement + 1 - (TailleY/(2*Zoom)));
+                H1.position = new Vecteur2f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)));
                 //H1.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                 //Hs.add(H1);
 
                 Atome H2 = new Atome(11);
-                H2.position = new Vecteur2f(x*expacement - 0 - (TailleX/(2*Zoom)),y*expacement + 3 - (TailleY/(2*Zoom)));
-                H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                H2.position = new Vecteur2f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)));
+                //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(H2);
 
                 Atome O = new Atome(17);
-                O.position = new Vecteur2f(x*expacement - (TailleX/(2*Zoom)),y*expacement - (TailleY/(2*Zoom)));
-                O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                O.position = new Vecteur2f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)));
+                //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(O);
             }
         }
@@ -83,7 +83,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterEuler((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, Math.pow(10.0,-15.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
+                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0*Math.pow(10.0,-16.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
             }
 
             for (int i = 0; i < Hs.size(); i++) {

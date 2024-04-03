@@ -97,16 +97,18 @@ public class Atome implements ObjetPhysique{
         évaluerValence();
     }
 
+    private Atome(){}
+
     public static void MettreÀJourEnvironnement(ArrayList<Atome> E){
         Environnement = E;
     }
 
-    public Vecteur2f ÉvaluerForces(int indexe, int TailleX, int TailleY, float Zoom){
-        Atome atome = (Atome)Environnement.get(indexe);
+    public Vecteur2f ÉvaluerForces(ObjetPhysique O,int TailleX, int TailleY, float Zoom){
+        Atome atome = (Atome) O;
 
         Vecteur2f force = new Vecteur2f(0);
         for (int i = 0; i < Environnement.size(); i++) {
-            if(i != indexe){
+            if(Environnement.get(i) != atome){
                 Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(atome.position,Environnement.get(i).position) );
                 double dist = Vecteur2f.distance(Environnement.get(i).position, atome.position);
 
@@ -151,13 +153,13 @@ public class Atome implements ObjetPhysique{
 
         boolean[] liaisonTraitée = new boolean[atome.liaisonIndexe.length];
         for(int i = 0; i < atome.liaisonIndexe.length; i++){
-            if(atome.liaisonIndexe[i] != -1){
-                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(atome.position,Environnement.get(atome.liaisonIndexe[i]).position) );
-                double dist = Vecteur2f.distance(Environnement.get(atome.liaisonIndexe[i]).position, atome.position);
+            if(liaisonIndexe[i] != -1){
+                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Environnement.get(liaisonIndexe[i]).position) );
+                double dist = Vecteur2f.distance(Environnement.get(liaisonIndexe[i]).position, position);
 
                 int nLiaisons = 0;
-                for (int j = 0; j < atome.liaisonIndexe.length; j++) {
-                    if(atome.liaisonIndexe[j] == atome.liaisonIndexe[i]){
+                for (int j = 0; j < liaisonIndexe.length; j++) {
+                    if(liaisonIndexe[j] == liaisonIndexe[i]){
                         nLiaisons++;
                         if(i != j){
                             liaisonTraitée[j] = true;
@@ -165,20 +167,20 @@ public class Atome implements ObjetPhysique{
                     }
                 }
                 if(nLiaisons > 0 && !liaisonTraitée[i]){
-                    double l = atome.rayonCovalent + Environnement.get(atome.liaisonIndexe[i]).rayonCovalent;
+                    double l = rayonCovalent + Environnement.get(liaisonIndexe[i]).rayonCovalent;
                     if(nLiaisons == 1){
-                        l = rayonsCovalents[atome.NP-1] + rayonsCovalents[Environnement.get(atome.liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents[NP-1] + rayonsCovalents[Environnement.get(liaisonIndexe[i]).NP-1];
                     }else if(nLiaisons == 2){
-                        l = rayonsCovalents2[atome.NP-1] + rayonsCovalents2[Environnement.get(atome.liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents2[NP-1] + rayonsCovalents2[Environnement.get(liaisonIndexe[i]).NP-1];
                     }else if(nLiaisons == 3){
-                        l = rayonsCovalents3[atome.NP-1] + rayonsCovalents3[Environnement.get(atome.liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents3[NP-1] + rayonsCovalents3[Environnement.get(liaisonIndexe[i]).NP-1];
                     }
                     l = l/100.0;
                     double D = 40000.0; //*Math.pow(10.0,12.0);
                     double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
                     double a = Math.sqrt(p/(2.0*D));
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
-                    //force.add( Vecteur2f.scale(dir, module) );
+                    force.add( Vecteur2f.scale(dir, module) );
 
                     liaisonTraitée[i] = true;
                 }
@@ -188,14 +190,14 @@ public class Atome implements ObjetPhysique{
         //force.add( Vecteur2f.scale(atome.vélocité,-0.0000000000001));
         //force.add(new Vecteur2f(0,-9.8));
 
-       /*if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
+       if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
             atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);
             atome.vélocité.y = -atome.vélocité.y;
         }
         if(Math.abs(atome.position.x) > (double)TailleX/(2.0*Zoom)){
             atome.position.x = Math.signum(atome.position.x)*(double)TailleX/(2.0*Zoom);
             atome.vélocité.x = -atome.vélocité.x;
-        }*/
+        }
 
         return force;
     }
@@ -507,7 +509,32 @@ public class Atome implements ObjetPhysique{
 
     public void prevPositionInit(double h){
         if(prevPosition == null){
-            prevPosition = Vecteur2f.add(position, Vecteur2f.scale(vélocité, -h/m));
+            prevPosition = Vecteur2f.add(position, Vecteur2f.scale(vélocité, -h/m)).copy();
         }
+    }
+
+    public Atome copy(){
+        Atome a = new Atome();
+        a.prevPosition = this.prevPosition==null?null:this.prevPosition.copy();
+        a.position = this.position.copy();
+        a.vélocité = this.vélocité.copy();
+        a.Force = this.Force.copy();
+        a.anglesDoublets = this.anglesDoublets.clone();
+        a.vélAngleDoublets = this.vélAngleDoublets.clone();
+        a.ForceAngleDoublets = this.ForceAngleDoublets.clone();
+        a.NP = this.NP;
+        a.NE = this.NE;
+        a.m = this.m;
+        a.charge = this.charge;
+
+        a.liaisonIndexe = this.liaisonIndexe.clone();
+        a.liaisonType = this.liaisonType.clone(); // sigma = faux, pi = vrai
+        a.distLiaison = this.distLiaison.clone();
+        a.doublets = this.doublets;
+        a.rayonCovalent = this.rayonCovalent;
+
+        a.cases = this.cases;
+
+        return a;
     }
 }

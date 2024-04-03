@@ -2,7 +2,7 @@ package com.MiniLabo.prototype;
 
 public interface ObjetPhysique {
 
-    public Vecteur2f ÉvaluerForces(int indexe, int TailleX, int TailleY, float Zoom);
+    public Vecteur2f ÉvaluerForces(ObjetPhysique O, int TailleX, int TailleY, float Zoom);
 
     public void changerPosition(Vecteur2f pos);
     public void ajouterPosition(Vecteur2f pos);
@@ -22,4 +22,6 @@ public interface ObjetPhysique {
     public Vecteur2f avoirForce();
 
     public double avoirMasse();
+
+    public ObjetPhysique copy();
 }
