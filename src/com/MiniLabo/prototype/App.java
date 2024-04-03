@@ -38,7 +38,7 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double expacement = 6.0;
+        double expacement = 10.0;
         for(int x = 0; x < (TailleX/(Zoom*expacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*expacement)) - 1; y++){
                 Atome H1 = new Atome(1);
@@ -47,7 +47,7 @@ public class App {
                 //Hs.add(H1);
 
                 Atome H2 = new Atome(11);
-                H2.position = new Vecteur2f(x*expacement - 0 - (TailleX/(2*Zoom)),y*expacement + 2.54 - (TailleY/(2*Zoom)));
+                H2.position = new Vecteur2f(x*expacement - 0 - (TailleX/(2*Zoom)),y*expacement + 3 - (TailleY/(2*Zoom)));
                 H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(H2);
 
@@ -77,25 +77,13 @@ public class App {
             g.setColor(new Color(150, 150, 150, 100));
             g.fillRect(0, 0, TailleX, TailleY);
 
-            double Ke = 0;
-            for (int i = 0; i < Hs.size(); i++) {
-                Ke += Hs.get(i).m*Math.pow( Hs.get(i).vélocité.length(), 2.0)*0.5f;
-            }
-            //System.out.println("Ke : " + Ke);
+            Atome.MettreÀJourEnvironnement(Hs);
 
-            /*int lié = 0;
-            for (int i = 0; i < Hs.size(); i++) {
-                if(Hs.get(i).liaison != -1){lié++;}
-            }
-            System.err.println("Liés : " + 100.0*(double)lié/(double)Hs.size());*/
-
-            for (int N = 0; N < 10; N++) {                                                 //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 10; N++) {          //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourForces(Hs, i, TailleX, TailleY, Zoom); //Mise à jour des forces
+                    Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourPos(1.0*Math.pow(10.0, -16.0)); //Mise à jour de la position. Change Delta t
-                }
+                Intégrateur.IterEuler((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, Math.pow(10.0,-15.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
             }
 
             for (int i = 0; i < Hs.size(); i++) {

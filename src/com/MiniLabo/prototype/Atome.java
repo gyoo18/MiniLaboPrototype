@@ -1,17 +1,18 @@
 package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
-public class Atome {
+public class Atome implements ObjetPhysique{
+    public Vecteur2f prevPosition = null;
     public Vecteur2f position = new Vecteur2f(100,0);
     public Vecteur2f vélocité = new Vecteur2f(0,0);
-    public Vecteur2f m_force = new Vecteur2f(0);
+    public Vecteur2f Force = new Vecteur2f(0);
     public double[] anglesDoublets;
     public double[] vélAngleDoublets;
     public double[] ForceAngleDoublets;
-    public double e = 1.602*Math.pow(10.0, -19.0);
-    public double mP = 1.0*1.672*Math.pow(10.0,-27.0);
-    public double mE = 1.0*9.109*Math.pow(10.0,-31.0);
-    public double Ag = Math.pow(10,-15);
+    public static double e = 1.602*Math.pow(10.0, -19.0);
+    public static double mP = 1.0*1.672*Math.pow(10.0,-27.0);
+    public static double mE = 1.0*9.109*Math.pow(10.0,-31.0);
+    public static double Ag = Math.pow(10,-15);
     public int NP;
     public int NE;
     public double m;
@@ -23,14 +24,16 @@ public class Atome {
     public int doublets;
     public double rayonCovalent;
 
-    public double K = 8.987*Math.pow(10.0,39.0);
+    public static double K = 8.987*Math.pow(10.0,39.0);
 
     private int[] cases;
 
     private int MAX_N = 4;
     private int MAX_CASE = (MAX_N*(MAX_N+1)*(2*MAX_N+1))/6 - 1;
 
-    private float[] électronégativité = {
+    private static ArrayList<Atome> Environnement = new ArrayList<>();
+
+    private static float[] électronégativité = {
         2.20f,                                                                                                0.00f,
         0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
         0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
@@ -42,7 +45,7 @@ public class Atome {
                     1.30f,1.30f
     };
 
-    private float[] rayonsCovalents = {
+    private static float[] rayonsCovalents = {
          32f,                                                                                 46f,
         133f,102f,                                                   85f, 75f, 71f, 63f, 64f, 67f,
         155f,139f,                                                  126f,116f,111f,103f, 99f, 96f,
@@ -54,7 +57,7 @@ public class Atome {
                   161f,157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
     };
 
-    private float[] rayonsCovalents2 = {
+    private static float[] rayonsCovalents2 = {
          0f,                                                                                   0f,
         124f, 90f,                                                   78f, 67f, 60f, 57f, 59f, 96f,
         160f,132f,                                                  113f,107f,102f, 94f, 95f,107f,
@@ -66,7 +69,7 @@ public class Atome {
                   141f,140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    private float[] rayonsCovalents3 = {
+    private static float[] rayonsCovalents3 = {
           0f,                                                                                  0f,
           0f, 85f,                                                   73f, 60f, 54f, 53f, 53f,  0f,
           0f,127f,                                                  111f,102f, 94f, 95f, 93f, 96f,
@@ -94,22 +97,25 @@ public class Atome {
         évaluerValence();
     }
 
-    public void miseÀJourForces(ArrayList<Atome> Atomes, int indexe, int TailleX, int TailleY, float Zoom){
+    public static void MettreÀJourEnvironnement(ArrayList<Atome> E){
+        Environnement = E;
+    }
 
-        miseÀJourLiens(Atomes, indexe);
+    public Vecteur2f ÉvaluerForces(int indexe, int TailleX, int TailleY, float Zoom){
+        Atome atome = (Atome)Environnement.get(indexe);
 
         Vecteur2f force = new Vecteur2f(0);
-        for (int i = 0; i < Atomes.size(); i++) {
-            if(Atomes.get(i) != this){
-                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Atomes.get(i).position) );
-                double dist = Vecteur2f.distance(Atomes.get(i).position, position);
+        for (int i = 0; i < Environnement.size(); i++) {
+            if(i != indexe){
+                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(atome.position,Environnement.get(i).position) );
+                double dist = Vecteur2f.distance(Environnement.get(i).position, atome.position);
 
-                if(dist < 10.0*rayonCovalent){
+                if(dist < 10.0*atome.rayonCovalent){
 
-                    force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
-                    force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
+                    force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
+                    force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
 
-                    force.add( Vecteur2f.scale(dir,(K*charge*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    force.add( Vecteur2f.scale(dir,(K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     /*for (int j = 0; j < Atomes.get(i).anglesDoublets.length; j++) {
                         Vecteur2f aPos = new Vecteur2f(Atomes.get(i).anglesDoublets[j],Atomes.get(i).rayonCovalent,0);
@@ -143,15 +149,15 @@ public class Atome {
             }
         }
 
-        boolean[] liaisonTraitée = new boolean[liaisonIndexe.length];
-        for(int i = 0; i < liaisonIndexe.length; i++){
-            if(liaisonIndexe[i] != -1){
-                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Atomes.get(liaisonIndexe[i]).position) );
-                double dist = Vecteur2f.distance(Atomes.get(liaisonIndexe[i]).position, position);
+        boolean[] liaisonTraitée = new boolean[atome.liaisonIndexe.length];
+        for(int i = 0; i < atome.liaisonIndexe.length; i++){
+            if(atome.liaisonIndexe[i] != -1){
+                Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(atome.position,Environnement.get(atome.liaisonIndexe[i]).position) );
+                double dist = Vecteur2f.distance(Environnement.get(atome.liaisonIndexe[i]).position, atome.position);
 
                 int nLiaisons = 0;
-                for (int j = 0; j < liaisonIndexe.length; j++) {
-                    if(liaisonIndexe[j] == liaisonIndexe[i]){
+                for (int j = 0; j < atome.liaisonIndexe.length; j++) {
+                    if(atome.liaisonIndexe[j] == atome.liaisonIndexe[i]){
                         nLiaisons++;
                         if(i != j){
                             liaisonTraitée[j] = true;
@@ -159,13 +165,13 @@ public class Atome {
                     }
                 }
                 if(nLiaisons > 0 && !liaisonTraitée[i]){
-                    double l = rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent;
+                    double l = atome.rayonCovalent + Environnement.get(atome.liaisonIndexe[i]).rayonCovalent;
                     if(nLiaisons == 1){
-                        l = rayonsCovalents[NP-1] + rayonsCovalents[Atomes.get(liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents[atome.NP-1] + rayonsCovalents[Environnement.get(atome.liaisonIndexe[i]).NP-1];
                     }else if(nLiaisons == 2){
-                        l = rayonsCovalents2[NP-1] + rayonsCovalents2[Atomes.get(liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents2[atome.NP-1] + rayonsCovalents2[Environnement.get(atome.liaisonIndexe[i]).NP-1];
                     }else if(nLiaisons == 3){
-                        l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(liaisonIndexe[i]).NP-1];
+                        l = rayonsCovalents3[atome.NP-1] + rayonsCovalents3[Environnement.get(atome.liaisonIndexe[i]).NP-1];
                     }
                     l = l/100.0;
                     double D = 40000.0; //*Math.pow(10.0,12.0);
@@ -179,26 +185,26 @@ public class Atome {
             }
         }
 
-        force.add( Vecteur2f.scale(vélocité,-0.0000000000001));
+        //force.add( Vecteur2f.scale(atome.vélocité,-0.0000000000001));
         //force.add(new Vecteur2f(0,-9.8));
 
-       if(Math.abs(position.y) > (double)TailleY/(2.0*Zoom)){
-            position.y = Math.signum(position.y)*(double)TailleY/(2.0*Zoom);
-            vélocité.y = -vélocité.y;
+       /*if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
+            atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);
+            atome.vélocité.y = -atome.vélocité.y;
         }
-        if(Math.abs(position.x) > (double)TailleX/(2.0*Zoom)){
-            position.x = Math.signum(position.x)*(double)TailleX/(2.0*Zoom);
-            vélocité.x = -vélocité.x;
-        }
+        if(Math.abs(atome.position.x) > (double)TailleX/(2.0*Zoom)){
+            atome.position.x = Math.signum(atome.position.x)*(double)TailleX/(2.0*Zoom);
+            atome.vélocité.x = -atome.vélocité.x;
+        }*/
 
-        m_force = force;
+        return force;
     }
 
     public void miseÀJourPos(double deltaTemp){
         position.add(Vecteur2f.scale(vélocité, deltaTemp));
-        position.add(Vecteur2f.scale(m_force,(deltaTemp*deltaTemp)/(2.0*m)));
+        position.add(Vecteur2f.scale(Force,(deltaTemp*deltaTemp)/(2.0*m)));
         //position.add(new Vecteur2f(0.001f*2f*(Math.random()-0.5f),0.001f*2f*(Math.random()-0.5f)));
-        vélocité.add(Vecteur2f.scale(m_force, deltaTemp/m));
+        vélocité.add(Vecteur2f.scale(Force, deltaTemp/m));
        // vélocité = Vecteur2f.scale(Vecteur2f.normalize(vélocité), Math.min(vélocité.length(), Math.pow(10.0,22.0))); //Atome charger pas impacter par la force de pauli action reaction
 
         for(int i = 0; i < anglesDoublets.length; i++){
@@ -341,7 +347,7 @@ public class Atome {
         System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
 
-    private void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
+    public void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
         //briser les liens
 
         for (int i = 0; i < liaisonIndexe.length; i++) {
@@ -433,6 +439,75 @@ public class Atome {
                     Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
                 }
             }
+        }
+    }
+
+    @Override
+    public void changerPosition(Vecteur2f pos) {
+        position = pos.copy();
+    }
+
+    @Override
+    public void ajouterPosition(Vecteur2f pos) {
+        position.add(pos);
+    }
+
+    public Vecteur2f avoirPosition(){
+        return position;
+    }
+
+    @Override
+    public void changerVitesse(Vecteur2f v) {
+        vélocité = v.copy();
+    }
+
+    @Override
+    public void ajouterVitesse(Vecteur2f v) {
+        vélocité.add(v);
+    }
+
+    @Override
+    public Vecteur2f avoirVitesse(){
+        return vélocité;
+    }
+
+    public double avoirMasse(){
+        return m;
+    }
+
+    @Override
+    public void changerForce(Vecteur2f f) {
+        Force = f.copy();
+    }
+
+    @Override
+    public void ajouterForce(Vecteur2f f) {
+        Force.add(f);
+    }
+
+    @Override
+    public Vecteur2f avoirForce() {
+        return Force;
+    }
+
+    @Override
+    public void changerPrevPosition(Vecteur2f pos) {
+        prevPosition = pos.copy();
+    }
+
+    @Override
+    public void ajouterPrevPosition(Vecteur2f pos) {
+        prevPosition.add(pos);
+    }
+
+    @Override
+    public Vecteur2f avoirPrevPosition() {
+        return prevPosition;
+    }
+
+    public void prevPositionInit(double h){
+        if(prevPosition == null){
+            prevPosition = Vecteur2f.add(position, Vecteur2f.scale(vélocité, -h/m));
         }
     }
 }
