@@ -1,4 +1,4 @@
-package MiniLabo.prototype;
+package com.MiniLabo.prototype;
 public class Vecteur2f {
     public double x;
     public double y;

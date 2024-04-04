@@ -1,4 +1,4 @@
-package MiniLabo.prototype;
+package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
 public class Atome implements ObjetPhysique{

@@ -1,4 +1,4 @@
-package MiniLabo.prototype;
+package com.MiniLabo.prototype;
 
 public interface ObjetPhysique {
 
