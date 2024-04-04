@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    private static int TailleX = 1240; //Taille de simulation 
+    private static int TailleX = 1440; //Taille de simulation 
     private static int TailleY = 824;
     private static float Zoom = 30f;
 
@@ -34,15 +34,15 @@ public class App {
         try{
             //Thread.sleep(3000);
         }catch(Exception e){
-            e.printStackTrace();
+            e.printStackTrace(); 
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double expacement = 4.0;
-        double Vinitial = (16000000000f*Math.pow(10.0, -4.0)/(32f/16f*Math.pow(10.0, -10.0)));
+        double expacement = 6.0;
+        double Vinitial = (100f*Math.pow(10.0, -4.0)/(1f/16f*Math.pow(10.0, -16.0)));
 
-        for(int x = 0; x < (TailleX/(Zoom*expacement)) - 1; x++){
-            for(int y = 0; y < (TailleY/(Zoom*expacement)) - 1; y++){
+        for(int x = 0; x < (TailleX/(Zoom*expacement)) - 0.3; x++){
+            for(int y = 0; y < (TailleY/(Zoom*expacement)) - 0.3; y++){
                 
                 /*Atome Air = new Atome(Math.random()<0.78?7:8);
                 Air.position = new Vecteur2f(4+x*expacement + 1.5*expacement/6 - (TailleX/(2*Zoom)),y*expacement + 1.24*expacement/6 - (TailleY/(2*Zoom))+2);
@@ -61,20 +61,31 @@ public class App {
                 H2.position = new Vecteur2f(4+x*expacement - 0/6*expacement - (TailleX/(2*Zoom)),y*expacement + expacement*1.8/6 - (TailleY/(2*Zoom))+2);
                 H2.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
                 Hs.add(H2);
+
+                if (Math.random() <0.7){
                 Atome H3 = new Atome(1);
                 H3.position = new Vecteur2f(4+x*expacement - expacement*1.8/6 - (TailleX/(2*Zoom)),y*expacement + expacement*1/6 - (TailleY/(2*Zoom))+2);
                 H3.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
                 Hs.add(H3);
+                    if (Math.random() <0.6){
+                    Atome H4 = new Atome(1);
+                    H4.position = new Vecteur2f(4+x*expacement - expacement*0/6 - (TailleX/(2*Zoom)),y*expacement - expacement*1.8/6 - (TailleY/(2*Zoom))+2);
+                    H4.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
+                    Hs.add(H4);
 
-                Atome H4 = new Atome(1);
-                H4.position = new Vecteur2f(4+x*expacement - expacement*0/6 - (TailleX/(2*Zoom)),y*expacement - expacement*1.8/6 - (TailleY/(2*Zoom))+2);
-                H4.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
-                Hs.add(H4);
+                    }
+            
+                } 
+                /*Atome CvO1 = new Atome(Math.random()<0.7?6:8);
+                CvO1.position = new Vecteur2f(4+x*expacement -expacement*0/6 - (TailleX/(2*Zoom)),y*expacement -expacement*0/6 - (TailleY/(2*Zoom))+2);
+                CvO1.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
+                Hs.add(CvO1);*/
 
                 Atome C1 = new Atome(6);
                 C1.position = new Vecteur2f(4+x*expacement -expacement*0/6 - (TailleX/(2*Zoom)),y*expacement -expacement*0/6 - (TailleY/(2*Zoom))+2);
                 C1.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
                 Hs.add(C1);
+
 
                 /*Atome C2 = new Atome(6);
                 C2.position = new Vecteur2f(x*expacement +1 -(TailleX/(2*Zoom)),y*expacement +1 - (TailleY/(2*Zoom)));
@@ -97,9 +108,9 @@ public class App {
                 Atome H2 = new Atome(1);
                 H2.position = new Vecteur2f(-1,1);
                 //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                Hs.add(H2);
+                Hs.add(H2);*/
 
-                Atome O = new Atome(8);
+                /*Atome O = new Atome(8);
                 O.position = new Vecteur2f(0,0);
                 //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                 Hs.add(O);*/
@@ -128,7 +139,7 @@ public class App {
                     Hs.get(i).miseÀJourForces(Hs, i, TailleX, TailleY, Zoom); //Mise à jour des forces
                 }
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourPos(1f/16f*Math.pow(10.0, -16.0)); //Mise à jour de la position. Change Delta t
+                    Hs.get(i).miseÀJourPos(2f*1f/16f*Math.pow(10.0, -16.0)); //Mise à jour de la position. Change Delta t
                 }
             }
 

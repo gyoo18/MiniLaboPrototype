@@ -24,7 +24,7 @@ public class Atome {
     public int doublets;
     public double rayonCovalent;
 
-    public double K = 8.987*Math.pow(10.0,39.0);
+    public double K = 8.987*Math.pow(10.0,9.0); //39
 
     private int[] cases;
 
@@ -79,7 +79,7 @@ public class Atome {
                     0f,131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    /*private float[] ÉnergieDeDissociation = {
+   /* private float[] ÉnergieDeDissociation = {
         432f,  0f,  0f, 
     };*/
 
@@ -105,7 +105,7 @@ public class Atome {
                 Vecteur2f dir = Vecteur2f.normalize( Vecteur2f.sub(position,Atomes.get(i).position) );
                 double dist = Vecteur2f.distance(Atomes.get(i).position, position);
 
-                if(dist < 10.0*rayonCovalent){
+                if(dist < 12*rayonCovalent){
 
                     int nLiaisons = 0;
                     for (int j = 0; j < liaisonIndexe.length; j++) {
@@ -123,14 +123,14 @@ public class Atome {
                             l = rayonsCovalents3[NP-1] + rayonsCovalents3[Atomes.get(i).NP-1];
                         }
                         l = l/100.0;
-                        double D = 40000; //*Math.pow(10.0,12.0);
-                        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.69))/l,2.0); // si je redui la largeur du lien sqrt de 0.99, plus stable//0.59 interessant//trouver fréquence
+                        double D = 23000; //*Math.pow(10.0,12.0);//40000
+                        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.9))/l,2.0); // si je redui la largeur du lien sqrt de 0.99, plus stable//0.59 interessant//trouver fréquence
                         double a = Math.sqrt(p/(2.0*D));
                         double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
                         force.add( Vecteur2f.scale(dir, module) );
                     }
-                    force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                    force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
+                    force.add( Vecteur2f.scale(dir,(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),13.0)/Math.pow(dist,13.0)) )); //force paulie
+                    force.add( Vecteur2f.scale(dir,-(80.0*Math.pow(1.0*(rayonCovalent+Atomes.get(i).rayonCovalent),7.0)/Math.pow(dist,7.0)) ));
 
                     force.add( Vecteur2f.scale(dir,(K*charge*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
@@ -140,8 +140,8 @@ public class Atome {
                         dir = Vecteur2f.normalize( Vecteur2f.sub(pos,position) );
                         dist = Vecteur2f.distance(position, pos);
         
-                        force.add( Vecteur2f.scale(dir,(80*Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                        force.add( Vecteur2f.scale(dir,-(80*Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),6.0)/Math.pow(dist,6.0)) ));
+                        force.add( Vecteur2f.scale(dir,(80*Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3),13.0)/Math.pow(dist,13.0)) )); //force paulie
+                        force.add( Vecteur2f.scale(dir,-(80*Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3),7.0)/Math.pow(dist,7.0)) ));
         
                         force.add( Vecteur2f.scale(dir,(K*-2.0*e*charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
                     }
@@ -154,8 +154,8 @@ public class Atome {
 
                         Vecteur2f forceA = new Vecteur2f(0);
         
-                        forceA.add( Vecteur2f.scale(dir,(80*Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                        forceA.add( Vecteur2f.scale(dir,-(80*Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
+                        forceA.add( Vecteur2f.scale(dir,(80*Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),13.0)/Math.pow(dist,13.0)) )); //force paulie
+                        forceA.add( Vecteur2f.scale(dir,-(80*Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),7.0)/Math.pow(dist,7.0)) ));
         
                         forceA.add( Vecteur2f.scale(dir,(K*-2.0*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
@@ -400,16 +400,25 @@ public class Atome {
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
                         Atomes.get(liaisonIndexe[i]).charge--;
                     }
-
-                    if(Math.random() < proportion){
+                    /*if(Math.random() < proportion){
+                        
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
                         Atomes.get(liaisonIndexe[i]).charge--;
 
-                        
                     }else{
+                        ajouterÉlectron();  //a vérifié
+                        charge--;
+                    } */
+                    if(Math.random() < proportion){
+                        
                         ajouterÉlectron();
                         charge--;
+
+                    }else{
+                        Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
+                        Atomes.get(liaisonIndexe[i]).charge--;
                     }
+                    
 
                     for (int j = 0; j < Atomes.get(liaisonIndexe[i]).liaisonIndexe.length; j++) {
                         if(Atomes.get(liaisonIndexe[i]).liaisonIndexe[j] == indexe){
