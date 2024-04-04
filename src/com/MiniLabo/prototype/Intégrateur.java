@@ -1,4 +1,4 @@
-package com.MiniLabo.prototype;
+package MiniLabo.prototype;
 
 import java.util.ArrayList;
 

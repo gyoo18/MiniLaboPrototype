@@ -1,4 +1,4 @@
-package com.MiniLabo.prototype;
+package MiniLabo.prototype;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -12,9 +12,9 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    private static int TailleX = 1440; //Taille de simulation 
-    private static int TailleY = 824;
-    private static float Zoom = 5f;
+    private static int TailleX = 512; //Taille de simulation 
+    private static int TailleY = 512;
+    private static float Zoom = 10f;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -38,40 +38,25 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double expacement = 6.0;
-        double Vinitial = (0f*Math.pow(10.0, -4.0)/(1f/16f*Math.pow(10.0, -16.0)));
-
-        for(int x = 0; x < (TailleX/(Zoom*expacement)) - 0.3; x++){
-            for(int y = 0; y < (TailleY/(Zoom*expacement)) - 0.3; y++){
-                
-                /*Atome Air = new Atome(Math.random()<0.78?7:8);
-                Air.position = new Vecteur2f(4+x*expacement + 1.5*expacement/6 - (TailleX/(2*Zoom)),y*expacement + 1.24*expacement/6 - (TailleY/(2*Zoom))+2);
-                //H1.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                Air.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
-                Hs.add(Air);*/
-
-                
+        double espacement = 6.0;
+        for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
+            for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 Atome H1 = new Atome(1);
-                H1.position = new Vecteur2f(4+x*expacement + expacement*1.8/6 - (TailleX/(2*Zoom)),y*expacement + expacement*1/6 - (TailleY/(2*Zoom))+2);
+                H1.position = new Vecteur2f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)));
                 //H1.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                H1.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
-                Hs.add(H1);
+                //Hs.add(H1);
 
-                Atome H2 = new Atome(1);
-                H2.position = new Vecteur2f(4+x*expacement - 0/6*expacement - (TailleX/(2*Zoom)),y*expacement + expacement*1.8/6 - (TailleY/(2*Zoom))+2);
-                H2.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
+                Atome H2 = new Atome(11);
+                H2.position = new Vecteur2f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)));
+                //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(H2);
 
-                if (Math.random() <0.7){
-                Atome H3 = new Atome(1);
-                H3.position = new Vecteur2f(4+x*expacement - expacement*1.8/6 - (TailleX/(2*Zoom)),y*expacement + expacement*1/6 - (TailleY/(2*Zoom))+2);
-                H3.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
-                Hs.add(H3);
-                    if (Math.random() <0.6){
-                    Atome H4 = new Atome(1);
-                    H4.position = new Vecteur2f(4+x*expacement - expacement*0/6 - (TailleX/(2*Zoom)),y*expacement - expacement*1.8/6 - (TailleY/(2*Zoom))+2);
-                    H4.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
-                    Hs.add(H4);
+                Atome O = new Atome(17);
+                O.position = new Vecteur2f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)));
+                //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                Hs.add(O);
+            }
+        }
 
                     }
             
@@ -125,10 +110,10 @@ public class App {
             Atome.MettreÀJourEnvironnement(Hs);
 
             for (int N = 0; N < 10; N++) {          //Sous-étapes. Répète N fois/image
-                for (int i = 0; i < Hs.size(); i++) {
+                /*for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
-                }
-                Intégrateur.IterEuler((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0*Math.pow(10.0,-17.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
+                }*/
+                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0f*Math.pow(10.0f,-18.0f), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
             }
 
             for (int i = 0; i < Hs.size(); i++) {
@@ -156,14 +141,7 @@ public class App {
         }
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(Zoom*A.position.x - PR) + (TailleX/2), (TailleY/2) - (int)(Zoom*A.position.y + PR), (int)(PR)*2,(int)(PR)*2);
-
-        double ER = 0.1*Zoom;
-        g.setColor(Color.YELLOW);
-        for (int i = 0; i < A.anglesDoublets.length; i++) {
-            Vecteur2f Epos = Vecteur2f.add(A.position,new Vecteur2f(A.anglesDoublets[i],A.rayonCovalent,0));
-            g.fillOval((int)(Zoom*Epos.x - ER) + (TailleX/2), (TailleY/2) - (int)(Zoom*Epos.y + ER), (int)(ER)*2,(int)(ER)*2);
         }
-
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
