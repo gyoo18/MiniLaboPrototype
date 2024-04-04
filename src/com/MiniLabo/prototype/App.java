@@ -12,15 +12,9 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-<<<<<<< HEAD
     private static int TailleX = 1440; //Taille de simulation 
     private static int TailleY = 824;
-    private static float Zoom = 30f;
-=======
-    private static int TailleX = 512; //Taille de simulation 
-    private static int TailleY = 512;
-    private static float Zoom = 10f;
->>>>>>> 79aafb167d13ea72baf5bacfc104adf7332b848c
+    private static float Zoom = 5f;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -44,9 +38,8 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-<<<<<<< HEAD
         double expacement = 6.0;
-        double Vinitial = (100f*Math.pow(10.0, -4.0)/(1f/16f*Math.pow(10.0, -16.0)));
+        double Vinitial = (0f*Math.pow(10.0, -4.0)/(1f/16f*Math.pow(10.0, -16.0)));
 
         for(int x = 0; x < (TailleX/(Zoom*expacement)) - 0.3; x++){
             for(int y = 0; y < (TailleY/(Zoom*expacement)) - 0.3; y++){
@@ -79,27 +72,6 @@ public class App {
                     H4.position = new Vecteur2f(4+x*expacement - expacement*0/6 - (TailleX/(2*Zoom)),y*expacement - expacement*1.8/6 - (TailleY/(2*Zoom))+2);
                     H4.vélocité = new Vecteur2f(Vinitial*((Math.random() - 0.5f)), Vinitial*((Math.random() - 0.5f)));
                     Hs.add(H4);
-=======
-        double espacement = 6.0;
-        for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
-            for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
-                Atome H1 = new Atome(1);
-                H1.position = new Vecteur2f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)));
-                //H1.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                //Hs.add(H1);
-
-                Atome H2 = new Atome(11);
-                H2.position = new Vecteur2f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)));
-                //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
-                Hs.add(H2);
-
-                Atome O = new Atome(17);
-                O.position = new Vecteur2f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)));
-                //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
-                Hs.add(O);
-            }
-        }
->>>>>>> 79aafb167d13ea72baf5bacfc104adf7332b848c
 
                     }
             
@@ -154,16 +126,9 @@ public class App {
 
             for (int N = 0; N < 10; N++) {          //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
-<<<<<<< HEAD
-                    Hs.get(i).miseÀJourForces(Hs, i, TailleX, TailleY, Zoom); //Mise à jour des forces
-                }
-                for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourPos(2f*1f/16f*Math.pow(10.0, -16.0)); //Mise à jour de la position. Change Delta t
-=======
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
->>>>>>> 79aafb167d13ea72baf5bacfc104adf7332b848c
                 }
-                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0*Math.pow(10.0,-16.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
+                Intégrateur.IterEuler((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0*Math.pow(10.0,-17.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
             }
 
             for (int i = 0; i < Hs.size(); i++) {
