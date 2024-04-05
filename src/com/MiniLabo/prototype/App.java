@@ -14,7 +14,7 @@ public class App {
     private static Graphics2D g;
     private static int TailleX = 512; //Taille de simulation 
     private static int TailleY = 512;
-    private static float Zoom = 10f;
+    private static float Zoom = 5f;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -48,12 +48,12 @@ public class App {
 
                 Atome H2 = new Atome(11);
                 H2.position = new Vecteur2f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)));
-                //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(H2);
 
                 Atome O = new Atome(17);
                 O.position = new Vecteur2f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)));
-                //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                 Hs.add(O);
             }
         }
@@ -73,24 +73,30 @@ public class App {
                 //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                 Hs.add(O);*/
         
+        double temps = 0.0;
+        long chorono = System.currentTimeMillis();
+        double dt = 7.0*Math.pow(10.0,-16.0); //Delta t
         while (true) {
             g.setColor(new Color(150, 150, 150, 100));
             g.fillRect(0, 0, TailleX, TailleY);
 
             Atome.MettreÀJourEnvironnement(Hs);
 
-            for (int N = 0; N < 10; N++) {          //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 20; N++) {          //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, 3.0*Math.pow(10.0,-16.0), TailleX, TailleY, Zoom); //Mise à jour de la position. Change Delta t
+                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, Zoom); //Mise à jour de la position.
+                temps += dt;
             }
 
             for (int i = 0; i < Hs.size(); i++) {
                 DessinerAtome(Hs.get(i),Hs);
             }
 
-            énoncerMolécules(Hs);
+            System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+
+            //énoncerMolécules(Hs);
 
             SwingUtilities.updateComponentTreeUI(frame);
             //Thread.sleep(1000);

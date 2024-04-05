@@ -187,10 +187,10 @@ public class Atome implements ObjetPhysique{
             }
         }
 
-        //force.add( Vecteur2f.scale(atome.vélocité,-0.0000000000001));
-        //force.add(new Vecteur2f(0,-9.8));
+        force.add( Vecteur2f.scale(atome.vélocité,-0.00000000000001));
+        force.add(new Vecteur2f(0,-0.1));
 
-       if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
+        if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
             atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);
             atome.vélocité.y = -atome.vélocité.y;
         }
@@ -536,5 +536,28 @@ public class Atome implements ObjetPhysique{
         a.cases = this.cases;
 
         return a;
+    }
+
+    public void copy(ObjetPhysique a){
+        Atome b = (Atome) a;
+        this.prevPosition = b.prevPosition;
+        this.position = b.position.copy();
+        this.vélocité = b.vélocité.copy();
+        this.Force = b.Force.copy();
+        this.anglesDoublets = b.anglesDoublets.clone();
+        this.vélAngleDoublets = b.vélAngleDoublets.clone();
+        this.ForceAngleDoublets = b.ForceAngleDoublets.clone();
+        this.NP = b.NP;
+        this.NE = b.NE;
+        this.m = b.m;
+        this.charge = b.charge;
+
+        this.liaisonIndexe = b.liaisonIndexe.clone();
+        this.liaisonType = b.liaisonType.clone(); // sigma = faux, pi = vrai
+        this.distLiaison = b.distLiaison.clone();
+        this.doublets = b.doublets;
+        this.rayonCovalent = b.rayonCovalent;
+
+        this.cases = b.cases;
     }
 }
