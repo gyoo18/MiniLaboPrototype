@@ -57,75 +57,107 @@ public class Intégrateur {
     }
 
     public static void IterRK4(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ,  float Zoom){
-        ArrayList<ObjetPhysique> K1o = new ArrayList<>();
-        ArrayList<ObjetPhysique> K2o = new ArrayList<>();
-        ArrayList<ObjetPhysique> K3o = new ArrayList<>();
-        ArrayList<ObjetPhysique> K4o = new ArrayList<>();
+        
+        ArrayList<Vecteur3f> K1v = new ArrayList<>();
+        ArrayList<Vecteur3f> K1a = new ArrayList<>();
+        ArrayList<Vecteur3f> K2v = new ArrayList<>();
+        ArrayList<Vecteur3f> K2a = new ArrayList<>();
+        ArrayList<Vecteur3f> K3v = new ArrayList<>();
+        ArrayList<Vecteur3f> K3a = new ArrayList<>();
+        ArrayList<Vecteur3f> K4v = new ArrayList<>();
+        ArrayList<Vecteur3f> K4a = new ArrayList<>();
 
-        for (ObjetPhysique o : O) {
-            ObjetPhysique k1 = o.copy();
-            k1.changerVitesse(o.avoirVitesse());
-            k1.changerForce(k1.ÉvaluerForces(o, TailleX, TailleY,TailleZ, Zoom));
-            K1o.add(k1);
-        }
 
+        ArrayList<ObjetPhysique> oTmp = new ArrayList<>();
         for (int i = 0; i < O.size(); i++) {
-            //Struct s2 = new Struct(s);
-            ObjetPhysique k2 = O.get(i).copy();
+            oTmp.add(O.get(i).copy());
+        }
+
+        /* k1v = v(x)
+         * k1a = f(v)
+         * k2v = v(x+k1vh/2)
+         * k2a = f(v+k1ah/2)
+         * k3v = v(x+k2vh/2)
+         * k3a = f(v+k2ah/2)
+         * k4v = v(x+k3vh)
+         * k4a = f(v+k3ah)
+         * x = x+(h/6)(k1v+2k2v+2k3v+k4v)
+         * v = v+(h/6)(k1a+2k2a+2k3a+k4a)
+         */
+
+         for (ObjetPhysique o : O) {
+            //float K1x = s.v;
+            Vecteur3f k1v = o.avoirVitesse().copy();
+            //float K1v = F(s);
+            Vecteur3f k1a = Vecteur3f.scale(o.ÉvaluerForces(o, TailleX, TailleY, TailleZ, Zoom),1.0/o.avoirMasse());
+
+            K1v.add(k1v);
+            K1a.add(k1a);
+        }
+        
+        for(int i = 0; i < O.size(); i++){
             //s2.x = s.x + (s.h/2f)*K1x;
-            k2.changerPosition(Vecteur3f.add( O.get(i).avoirPosition(), Vecteur3f.scale(K1o.get(i).avoirVitesse(), h/2.0)));
+            O.get(i).ajouterPosition(Vecteur3f.scale(K1v.get(i),h/2.0));
             //s2.v = s.v + (s.h/2f)*K1v;
+            Vecteur3f k2v = Vecteur3f.add(O.get(i).avoirVitesse(), Vecteur3f.scale(K1a.get(i),h/2.0));
             //float K2x = s2.v;
-            k2.changerVitesse(Vecteur3f.add( O.get(i).avoirVitesse(), Vecteur3f.scale(K1o.get(i).avoirForce(), h/(2.0*k2.avoirMasse()))));
-            //float K2v = F(s2);
-            //k2.changerForce(k2.ÉvaluerForces(k2, TailleX, TailleY, Zoom));
-            K2o.add(k2);
+            O.get(i).changerVitesse(k2v);
+            K2v.add(k2v);
         }
-        for (ObjetPhysique k2 : K2o) {
-            k2.changerForce(k2.ÉvaluerForces(k2, TailleX, TailleY,TailleZ, Zoom));
+        for (int i = 0; i < O.size(); i++) {
+             //float K2v = F(s2);
+             Vecteur3f k2a = Vecteur3f.scale(O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom),1.0/O.get(i).avoirMasse());
+             K2a.add(k2a);
         }
+
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s3 = new Struct(s);
-            ObjetPhysique k3 = O.get(i).copy();
+            O.get(i).copy(oTmp.get(i));
             //s3.x = s.x + (s.h/2f)*K2x;
-            k3.changerPosition(Vecteur3f.add( O.get(i).avoirPosition(), Vecteur3f.scale(K2o.get(i).avoirVitesse(), h/2.0)));
+            O.get(i).ajouterPosition(Vecteur3f.scale(K2v.get(i),h/2.0));
             //s3.v = s.v + (s.h/2f)*K2v;
+            Vecteur3f k3v = Vecteur3f.add(O.get(i).avoirVitesse(), Vecteur3f.scale(K2a.get(i),h/2.0));
             //float K3x = s3.v;
-            k3.changerVitesse(Vecteur3f.add( O.get(i).avoirVitesse(), Vecteur3f.scale(K2o.get(i).avoirForce(), h/(2.0*k3.avoirMasse()))));
+            O.get(i).changerVitesse(k3v);
+            K3v.add(k3v);
+        }
+        for (int i = 0; i < O.size(); i++) {
             //float K3v = F(s3);
-            //k3.changerForce(O.get(i).ÉvaluerForces(k3, TailleX, TailleY, Zoom));
-            K3o.add(k3);
+            Vecteur3f k3a = Vecteur3f.scale(O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom),1.0/O.get(i).avoirMasse());
+            K3a.add(k3a);
         }
-        for (ObjetPhysique k3 : K3o) {
-            k3.changerForce(k3.ÉvaluerForces(k3, TailleX, TailleY,TailleZ, Zoom));
-        }
-
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s4 = new Struct(s);
-            ObjetPhysique k4 = O.get(i).copy();
+            O.get(i).copy(oTmp.get(i));
             //s4.x = s.x + s.h*K3x;
-            k4.changerPosition(Vecteur3f.add( O.get(i).avoirPosition(), Vecteur3f.scale(K3o.get(i).avoirVitesse(), h)));
+            O.get(i).ajouterPosition(Vecteur3f.scale(K3v.get(i),h));
             //s4.v = s.v + s.h*K3v;
+            Vecteur3f k4v = Vecteur3f.add(O.get(i).avoirVitesse(), Vecteur3f.scale(K3a.get(i),h));
             //float K4x = s4.v;
-            k4.changerVitesse(Vecteur3f.add( O.get(i).avoirVitesse(), Vecteur3f.scale(K3o.get(i).avoirForce(), h/(k4.avoirMasse()))));
+            O.get(i).changerVitesse(k4v);
+            K4v.add(k4v);
+        }
+        for (int i = 0; i < O.size(); i++) {
             //float K4v= F(s4);
-            k4.changerForce(O.get(i).ÉvaluerForces(k4, TailleX, TailleY,TailleZ, Zoom));
-            K4o.add(k4);
+            Vecteur3f k4a = Vecteur3f.scale(O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom),1.0/O.get(i).avoirMasse());
+            K4a.add(k4a);
         }
 
         for (int i = 0; i < O.size(); i++) {
+            K2v.get(i).scale(2.0);
+            K2a.get(i).scale(2.0);
+            K3v.get(i).scale(2.0);
+            K3a.get(i).scale(2.0);
+            O.get(i).copy(oTmp.get(i));
             //s.x = s.x + (s.h/6f)*(K1x + 2f*K2x + 2f*K3x + K4x);
-            //O.get(i).ajouterPosition(Vecteur3f.scale(Vecteur3f.add(K1o.get(i).avoirVitesse(), Vecteur3f.add(K2o.get(i).avoirVitesse(), Vecteur3f.add(K2o.get(i).avoirVitesse(), K2o.get(i).avoirVitesse()))), h/6.0));
-            O.get(i).ajouterPosition(Vecteur3f.scale(K3o.get(i).avoirVitesse(), h));
-            //s.v = s.v + (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);
-            //O.get(i).ajouterVitesse(Vecteur3f.scale(Vecteur3f.add(K1o.get(i).avoirForce(), Vecteur3f.add(K2o.get(i).avoirForce(), Vecteur3f.add(K2o.get(i).avoirForce(), K2o.get(i).avoirForce()))), h/(6.0*O.get(i).avoirMasse())));
-            O.get(i).changerVitesse(K3o.get(i).avoirVitesse());//(Vecteur3f.scale(K2o.get(i).avoirForce(),h/(O.get(i).avoirMasse())));
+            O.get(i).ajouterPosition(Vecteur3f.scale(Vecteur3f.add(K1v.get(i), Vecteur3f.add(K2v.get(i), Vecteur3f.add(K3v.get(i), K4v.get(i)))), h/6.0));
+            //O.get(i).ajouterPosition(Vecteur3f.scale(K4v.get(i), h));
+            //s.v = (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);
+            O.get(i).ajouterVitesse(Vecteur3f.scale(Vecteur3f.add(K1a.get(i), Vecteur3f.add(K2a.get(i), Vecteur3f.add(K3a.get(i), K4a.get(i)))), h/6.0));
+            //O.get(i).ajouterVitesse(Vecteur3f.scale(K4a.get(i), h));
+            O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom);
         }
-
-        //s.E = E(s);
-
-        //return s;
     }
 }
