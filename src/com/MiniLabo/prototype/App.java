@@ -64,7 +64,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 7.0*Math.pow(10.0,-16.0); //Delta t
+        double dt = 6.0*Math.pow(10.0,-16.0); //Delta t
         while (true) {
             g.setColor(new Color(150, 150, 150, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -93,8 +93,9 @@ public class App {
     }
 
     public static void DessinerAtome(Atome A, ArrayList<Atome> B){
-        double septdix = 70;
-        double profz=(septdix*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + septdix));
+        double septdix = 160;
+        double septdixet = 280;
+        double profz=(septdix*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + septdixet));
         double PR = A.rayonCovalent*profz;
         g.setStroke(new BasicStroke());
         double col = 1.0-((A.position.z*2.0*Zoom/TailleZ) + 0.5)*0.5;
