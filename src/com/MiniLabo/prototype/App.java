@@ -109,7 +109,7 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*profz - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*profz + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = septdix*0.1*Zoom/(A.position.z+TailleZ/2*Zoom);
+        double ER = 0.1*profz;
         g.setColor(Color.YELLOW);
         for (int i = 0; i < A.anglesDoublets.length; i++) {
             Vecteur3f Epos = Vecteur3f.add(A.position,new Vecteur3f(A.anglesDoublets[i],A.rayonCovalent,0));
@@ -120,11 +120,11 @@ public class App {
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
-                g.drawLine(  (TailleX/2) + (int)(septdix*(A.position.x*Zoom)/(A.position.z+TailleZ/(2*Zoom))), (TailleY/2) - (int)(septdix*(A.position.y*Zoom)/(A.position.z+TailleZ/(2*Zoom))) , (TailleX/2) + (int)(septdix*(B.get(A.liaisonIndexe[i]).position.x*Zoom)/(A.position.z+TailleZ/(2*Zoom))) , (TailleY/2) - (int)(septdix*(B.get(A.liaisonIndexe[i]).position.y*Zoom)/(A.position.z+TailleZ/(2*Zoom))) );
+                g.drawLine(  (TailleX/2) + (int)((A.position.x)*profz), (TailleY/2) - (int)((A.position.y)*profz) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*profz) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*profz));
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
-                g.drawLine( (TailleX/2) + (int)(septdix*(A.position.x*Zoom + 2)/(A.position.z+TailleZ/(2*Zoom))), (TailleY/2) - (int)(septdix*(A.position.y*Zoom)/(A.position.z+TailleZ/(2*Zoom))) , (TailleX/2) + (int)(septdix*(B.get(A.liaisonIndexe[i]).position.x*Zoom+2)/(A.position.z+TailleZ/(2*Zoom))), (TailleY/2) - (int)(septdix*(B.get(A.liaisonIndexe[i]).position.y*Zoom)/(A.position.z+TailleZ/(2*Zoom))) );
+                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*profz), (TailleY/2) - (int)((A.position.y)*profz) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*profz) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*profz));
             }
         }
     }
