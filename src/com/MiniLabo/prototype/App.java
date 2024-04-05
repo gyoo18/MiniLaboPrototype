@@ -34,7 +34,7 @@ public class App {
         try{
             //Thread.sleep(3000);
         }catch(Exception e){
-            e.printStackTrace();
+            e.printStackTrace(); 
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
@@ -58,7 +58,7 @@ public class App {
             }
         }
 
-                /*Atome H1 = new Atome(1);
+                 /*Atome H1 = new Atome(1);
                 H1.position = new Vecteur2f(1,1);
                 //H1.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                 Hs.add(H1);
@@ -66,9 +66,9 @@ public class App {
                 Atome H2 = new Atome(1);
                 H2.position = new Vecteur2f(-1,1);
                 //H2.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                Hs.add(H2);
+                Hs.add(H2);*/
 
-                Atome O = new Atome(8);
+                /*Atome O = new Atome(8);
                 O.position = new Vecteur2f(0,0);
                 //O.vélocité = new Vecteur2f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                 Hs.add(O);*/
@@ -100,6 +100,7 @@ public class App {
 
             SwingUtilities.updateComponentTreeUI(frame);
             //Thread.sleep(1000);
+          
         }
     }
 
@@ -115,14 +116,6 @@ public class App {
         }
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(Zoom*A.position.x - PR) + (TailleX/2), (TailleY/2) - (int)(Zoom*A.position.y + PR), (int)(PR)*2,(int)(PR)*2);
-
-        double ER = 0.1*Zoom;
-        g.setColor(Color.YELLOW);
-        for (int i = 0; i < A.anglesDoublets.length; i++) {
-            Vecteur2f Epos = Vecteur2f.add(A.position,new Vecteur2f(A.anglesDoublets[i],A.rayonCovalent,0));
-            g.fillOval((int)(Zoom*Epos.x - ER) + (TailleX/2), (TailleY/2) - (int)(Zoom*Epos.y + ER), (int)(ER)*2,(int)(ER)*2);
-        }
-
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
