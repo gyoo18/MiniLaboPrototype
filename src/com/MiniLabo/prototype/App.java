@@ -15,7 +15,7 @@ public class App {
     private static int TailleX = 512; //Taille de simulation 
     private static int TailleY = 512;
     private static int TailleZ = 512 ;
-    private static float Zoom = 5f;
+    private static float Zoom = 10f;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -39,7 +39,7 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double espacement = 20.0;
+        double espacement = 10.0;
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
@@ -114,18 +114,18 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)((160*Zoom*A.position.x /(A.position.z+TailleZ/2)- PR) + (TailleX/2)), (int)((TailleY/2) - (int)(160*Zoom*A.position.y/(A.position.z+TailleZ/2) + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 270*0.1*Zoom/(A.position.z+TailleZ/2);
+        double ER = 160*0.1*Zoom/(A.position.z+TailleZ/2);
         g.setColor(Color.YELLOW);
         for (int i = 0; i < A.anglesDoublets.length; i++) {
             Vecteur3f Epos = Vecteur3f.add(A.position,new Vecteur3f(A.anglesDoublets[i],A.rayonCovalent,0));
-            g.fillOval((int)(Zoom*Epos.x - ER) + (TailleX/2), (TailleY/2) - (int)(Zoom*Epos.y + ER), (int)(ER)*2,(int)(ER)*2);
+            g.fillOval((int)(160*Zoom*Epos.x/(A.position.z+TailleZ/2) - ER) + (TailleX/2), (TailleY/2) - (int)(160*Zoom*Epos.y/(A.position.z+TailleZ/2) + ER), (int)(ER)*2,(int)(ER)*2);
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
-                g.drawLine(  (TailleX/2) + (int)(160*(A.position.x*Zoom)/(A.position.z+TailleZ/2)), (TailleY/2) - (int)(160*(A.position.y*Zoom)/(A.position.z+TailleZ/2)) , (TailleX/2) + (int)(160*(B.get(A.liaisonIndexe[i]).position.x*Zoom)/(A.position.z+TailleZ/2)) , (TailleY/2) - (int)(160*(B.get(A.liaisonIndexe[i]).position.y*Zoom)) );
+                g.drawLine(  (TailleX/2) + (int)(160*(A.position.x*Zoom)/(A.position.z+TailleZ/2)), (TailleY/2) - (int)(160*(A.position.y*Zoom)/(A.position.z+TailleZ/2)) , (TailleX/2) + (int)(160*(B.get(A.liaisonIndexe[i]).position.x*Zoom)/(A.position.z+TailleZ/2)) , (TailleY/2) - (int)(160*(B.get(A.liaisonIndexe[i]).position.y*Zoom)/(A.position.z+TailleZ/2)) );
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
