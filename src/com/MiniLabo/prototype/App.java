@@ -93,9 +93,9 @@ public class App {
     }
 
     public static void DessinerAtome(Atome A, ArrayList<Atome> B){
-        double septdix = 70;
-        double profz=(septdix*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + septdix));
-        double PR = A.rayonCovalent*profz;
+        double FOV = 70;
+        double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOV));
+        double PR = A.rayonCovalent*multPersZ;
         g.setStroke(new BasicStroke());
         double col = 1.0-((A.position.z*2.0*Zoom/TailleZ) + 0.5)*0.5;
         col = clamp(col, 0.0, 1.0);
@@ -107,24 +107,25 @@ public class App {
             g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 150));
         }
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
-        g.fillOval((int)(((A.position.x)*profz - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*profz + PR)),(int)((PR))*2,(int)(PR)*2);
+        g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 0.1*profz;
+        double ER = 0.1*multPersZ;
         g.setColor(Color.YELLOW);
         for (int i = 0; i < A.anglesDoublets.length; i++) {
             Vecteur3f Epos = Vecteur3f.add(A.position,new Vecteur3f(A.anglesDoublets[i],A.rayonCovalent,0));
-            g.fillOval((int)(Epos.x*profz - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*profz + ER), (int)(ER)*2,(int)(ER)*2);
+            g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
+            double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOV));
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
-                g.drawLine(  (TailleX/2) + (int)((A.position.x)*profz), (TailleY/2) - (int)((A.position.y)*profz) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*profz) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*profz));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
-                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*profz), (TailleY/2) - (int)((A.position.y)*profz) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*profz) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*profz));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
             }
         }
     }
