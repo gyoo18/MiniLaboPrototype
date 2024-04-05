@@ -541,4 +541,27 @@ public class Atome implements ObjetPhysique{
 
         return a;
     }
+
+    public void copy(ObjetPhysique a){
+        Atome b = (Atome) a;
+        this.prevPosition = b.prevPosition;
+        this.position = b.position.copy();
+        this.vélocité = b.vélocité.copy();
+        this.Force = b.Force.copy();
+        this.anglesDoublets = b.anglesDoublets.clone();
+        this.vélAngleDoublets = b.vélAngleDoublets.clone();
+        this.ForceAngleDoublets = b.ForceAngleDoublets.clone();
+        this.NP = b.NP;
+        this.NE = b.NE;
+        this.m = b.m;
+        this.charge = b.charge;
+
+        this.liaisonIndexe = b.liaisonIndexe.clone();
+        this.liaisonType = b.liaisonType.clone(); // sigma = faux, pi = vrai
+        this.distLiaison = b.distLiaison.clone();
+        this.doublets = b.doublets;
+        this.rayonCovalent = b.rayonCovalent;
+
+        this.cases = b.cases;
+    }
 }

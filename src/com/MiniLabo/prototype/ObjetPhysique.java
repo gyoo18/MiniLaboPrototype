@@ -24,4 +24,5 @@ public interface ObjetPhysique {
     public double avoirMasse();
 
     public ObjetPhysique copy();
+    public void copy(ObjetPhysique o);
 }
