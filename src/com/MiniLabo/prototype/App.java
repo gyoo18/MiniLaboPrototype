@@ -91,6 +91,169 @@ public class App {
             
 
             for (int i = 0; i < Hs.size(); i++) {
+    public static void DessinerBoite(){
+        double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));
+        double multPersZBoiteProche=(FOVBoite/(-TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));
+        g.setStroke(new BasicStroke());
+        g.setColor(Color.MAGENTA);
+            //Face de moue
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( -(TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( -(TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( -(TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                (int)( (-TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                (int)( -(TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+        
+                 );
+
+             //Arrete 
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                    (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+
+
+            //Face de beue
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+            
+
+
+
+
+
+
+
+    } 
+    
 
                 if (Hs.get(i).position.z > (10/8)*TailleZ/(2*Zoom)){
                     DessinerAtome(Hs.get(i),Hs);
