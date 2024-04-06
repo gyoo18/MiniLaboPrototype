@@ -12,11 +12,11 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    private static int TailleX = 1012; //Taille de simulation 
-    private static int TailleY = 812;
-    private static int TailleZ = 212 ;
-    private static float Zoom = 10f;
-    private static int FOV = 100;
+    private static int TailleX = 512; //Taille de simulation 
+    private static int TailleY = 512;
+    private static int TailleZ = 200 ;
+    private static float Zoom = 15f;
+    private static int FOV = 70;
     private static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
@@ -44,9 +44,10 @@ public class App {
         }
 
         ArrayList<Atome> Hs = new ArrayList<>();
-        double espacement = 10.0;
+        ArrayList<Integer> indexe = new ArrayList<>();
+        double espacement = 4.0;
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
-            for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
+            for(int y = 0; y < (TailleY/(1.5*Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
 
                     Atome H1 = new Atome(1);
@@ -55,16 +56,20 @@ public class App {
                     //Hs.add(H1);
 
                     Atome H2 = new Atome(11);
-                    H2.position = new Vecteur3f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement +2+ (TailleZ/(2*Zoom))));
+                    H2.position = new Vecteur3f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement*1.5 + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(H2);
 
                     Atome O = new Atome(17);
-                    O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement +2+ (TailleZ/(2*Zoom))));
+                    O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement*1.5 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     //O.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(O);
                 }
             }
+        }
+
+        for (int i = 0; i < Hs.size(); i++) {
+            indexe.add(i);
         }
         
         double temps = 0.0;
@@ -76,7 +81,7 @@ public class App {
 
             Atome.MettreÀJourEnvironnement(Hs);
 
-            for (int N = 0; N < 10; N++) {          //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 20; N++) {          //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
@@ -88,69 +93,17 @@ public class App {
 
             DessinerBoite();
 
-            
-
-            for (int i = 0; i < Hs.size(); i++) {
-
-                if (Hs.get(i).position.z > (10/8)*TailleZ/(2*Zoom)){
-                    DessinerAtome(Hs.get(i),Hs);
-                    System.out.print(133);
-                }else{
-                if (Hs.get(i).position.z > (8/8)*TailleZ/(2*Zoom)){
-                    DessinerAtome(Hs.get(i),Hs);
-                } else{
-                if (Hs.get(i).position.z > (7/8)*TailleZ/(2*Zoom)){
-                    DessinerAtome(Hs.get(i),Hs);
-                }else{
-                if (Hs.get(i).position.z > (6/8)*TailleZ/(2*Zoom)){
-                    DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > (5/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > (4/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > (3/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > (2/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > (1/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                } else {
-                if (Hs.get(i).position.z > 0 ){
-                    DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(1/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(2/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(3/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(4/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(5/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(6/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(7/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                }else {
-                if (Hs.get(i).position.z > -(8/8)*TailleZ/(2*Zoom)){
-                     DessinerAtome(Hs.get(i),Hs);
-                } else {
-                System.out.print(233);
-                }}}}}}}}}}}}}}}}}}
+            for (int i = 0; i < Hs.size()-1; i++) {
+                if(Hs.get(indexe.get(i)).position.z < Hs.get(indexe.get(i+1)).position.z){
+                    int a = indexe.get(i);
+                    indexe.set( i, indexe.get(i+1));
+                    indexe.set(i+1, a);
+                }
             }
 
+            for (int i = 0; i < indexe.size(); i++) {
+                DessinerAtome(Hs.get(indexe.get(i)), Hs);
+            }
             
 
             System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
@@ -333,11 +286,11 @@ public class App {
         double col = 1.0-((A.position.z*2.0*Zoom/TailleZ) + 0.5)*0.5;
         col = clamp(col, 0.0, 1.0);
         if(A.charge > 0.0){
-            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(A.charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(A.charge/2.0,1.0)), 250));
+            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(A.charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(A.charge/2.0,1.0)), 200));
         }else if(A.charge == 0.0){
-            g.setColor(new Color(255,255,255,150));
+            g.setColor(new Color(255,255,255,200));
         }else if(A.charge < 0.0){
-            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 250));
+            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 200));
         }
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
