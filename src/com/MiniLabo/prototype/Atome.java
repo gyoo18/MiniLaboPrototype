@@ -112,7 +112,7 @@ public class Atome implements ObjetPhysique{
                 Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(atome.position,Environnement.get(i).position) );
                 double dist = Vecteur3f.distance(Environnement.get(i).position, atome.position);
 
-                if(dist < 10.0*atome.rayonCovalent){
+                if(dist < 10*atome.rayonCovalent){
 
                     force.add( Vecteur3f.scale(dir,(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
                     force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));

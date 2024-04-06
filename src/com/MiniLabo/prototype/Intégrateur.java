@@ -27,6 +27,7 @@ public class Intégrateur {
         }
     }
 
+
     public static void IterVerletV(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
 
         for (ObjetPhysique o : O) {
@@ -159,5 +160,20 @@ public class Intégrateur {
             //O.get(i).ajouterVitesse(Vecteur3f.scale(K4a.get(i), h));
             O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom);
         }
+    }
+    public static void IterVerletVBC(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+         for (ObjetPhysique o : O) {
+            o.ajouterVitesse(Vecteur3f.scale(o.avoirForce(), h/(2.0*o.avoirMasse())));
+        }
+
+        for (ObjetPhysique o : O) {
+            o.ajouterPosition(Vecteur3f.add(Vecteur3f.scale(o.avoirVitesse(),h), Vecteur3f.scale(o.avoirForce(), h*h/(2.0*o.avoirMasse()))));
+        }
+
+        for (ObjetPhysique o : O) {
+            o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
+            o.ajouterVitesse(Vecteur3f.scale( o.avoirForce(), h/(2.0*o.avoirMasse())));
+        }
+
     }
 }

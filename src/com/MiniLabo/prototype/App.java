@@ -12,10 +12,15 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    private static int TailleX = 512; //Taille de simulation 
-    private static int TailleY = 512;
-    private static int TailleZ = 512 ;
+    private static int TailleX = 1012; //Taille de simulation 
+    private static int TailleY = 812;
+    private static int TailleZ = 212 ;
     private static float Zoom = 10f;
+    private static int FOV = 100;
+    private static int FOVet = FOV;
+    private static int FOVBoite = FOV;
+    private static int FOVetBoite = FOV;
+
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
@@ -50,12 +55,12 @@ public class App {
                     //Hs.add(H1);
 
                     Atome H2 = new Atome(11);
-                    H2.position = new Vecteur3f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)), (-z*espacement + (TailleZ/(2*Zoom))));
+                    H2.position = new Vecteur3f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement +2+ (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(H2);
 
                     Atome O = new Atome(17);
-                    O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), (-z*espacement + (TailleZ/(2*Zoom))));
+                    O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement +2+ (TailleZ/(2*Zoom))));
                     //O.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(O);
                 }
@@ -66,7 +71,7 @@ public class App {
         long chorono = System.currentTimeMillis();
         double dt = 6.0*Math.pow(10.0,-16.0); //Delta t
         while (true) {
-            g.setColor(new Color(150, 150, 150, 100));
+            g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
 
             Atome.MettreÀJourEnvironnement(Hs);
@@ -77,11 +82,76 @@ public class App {
                 }
                 Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
                 temps += dt;
+
+
             }
 
+            DessinerBoite();
+
+            
+
             for (int i = 0; i < Hs.size(); i++) {
-                DessinerAtome(Hs.get(i),Hs);
+
+                if (Hs.get(i).position.z > (10/8)*TailleZ/(2*Zoom)){
+                    DessinerAtome(Hs.get(i),Hs);
+                    System.out.print(133);
+                }else{
+                if (Hs.get(i).position.z > (8/8)*TailleZ/(2*Zoom)){
+                    DessinerAtome(Hs.get(i),Hs);
+                } else{
+                if (Hs.get(i).position.z > (7/8)*TailleZ/(2*Zoom)){
+                    DessinerAtome(Hs.get(i),Hs);
+                }else{
+                if (Hs.get(i).position.z > (6/8)*TailleZ/(2*Zoom)){
+                    DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > (5/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > (4/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > (3/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > (2/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > (1/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                } else {
+                if (Hs.get(i).position.z > 0 ){
+                    DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(1/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(2/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(3/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(4/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(5/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(6/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(7/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                }else {
+                if (Hs.get(i).position.z > -(8/8)*TailleZ/(2*Zoom)){
+                     DessinerAtome(Hs.get(i),Hs);
+                } else {
+                System.out.print(233);
+                }}}}}}}}}}}}}}}}}}
             }
+
+            
 
             System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
 
@@ -91,21 +161,183 @@ public class App {
             //Thread.sleep(1000);
         }
     }
+    public static void DessinerBoite(){
+        double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));
+        double multPersZBoiteProche=(FOVBoite/(-TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));
+        g.setStroke(new BasicStroke());
+        g.setColor(Color.MAGENTA);
+            //Face de moue
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( -(TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( -(TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( -(TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                (int)( (-TailleX/2)*multPersZBoiteLoin  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteLoin   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                (int)( -(TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+        
+                 );
+
+             //Arrete 
+
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+                g.drawLine( 
+            
+                    (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+                g.drawLine( 
+            
+                    (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                    (int)( (-TailleX/2)*multPersZBoiteLoin + (TailleX/2)    ) ,
+
+                    (int)( (-TailleY/2)*multPersZBoiteLoin + (TailleY/2)   )       
+            
+                );
+
+
+
+            //Face de beue
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+                g.drawLine( 
+            
+                (int)( (-TailleX/2)*multPersZBoiteProche  +(TailleX/2)    ) ,
+
+                (int)( (TailleY/2)*multPersZBoiteProche   + (TailleY/2)    ) ,
+
+                (int)( (-TailleX/2)*multPersZBoiteProche + (TailleX/2)    ) ,
+
+                (int)( (-TailleY/2)*multPersZBoiteProche + (TailleY/2)   )       
+        
+                );
+
+            
+
+
+
+
+
+
+
+    } 
+    
 
     public static void DessinerAtome(Atome A, ArrayList<Atome> B){
-        double FOV = 70;
-        double FOVet = 160;
+
         double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet));
         double PR = A.rayonCovalent*multPersZ;
         g.setStroke(new BasicStroke());
         double col = 1.0-((A.position.z*2.0*Zoom/TailleZ) + 0.5)*0.5;
         col = clamp(col, 0.0, 1.0);
         if(A.charge > 0.0){
-            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(A.charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(A.charge/2.0,1.0)), 150));
+            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(A.charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(A.charge/2.0,1.0)), 250));
         }else if(A.charge == 0.0){
             g.setColor(new Color(255,255,255,150));
         }else if(A.charge < 0.0){
-            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 150));
+            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 250));
         }
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
@@ -118,12 +350,14 @@ public class App {
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
-            double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
+            
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
                 g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
                 g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
