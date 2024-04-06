@@ -187,7 +187,7 @@ public class Atome implements ObjetPhysique{
             }
         }
 
-        //force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
+        force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
         //force.add(new Vecteur3f(0,-9.8));
 
        if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
