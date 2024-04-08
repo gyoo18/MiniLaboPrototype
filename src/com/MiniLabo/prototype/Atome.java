@@ -17,6 +17,7 @@ public class Atome implements ObjetPhysique{
     public int NE;
     public double m;
     public double charge = 0;
+    public float électronégativité = 0;
 
     public int[] liaisonIndexe;
     public boolean[] liaisonType; // sigma = faux, pi = vrai
@@ -33,7 +34,7 @@ public class Atome implements ObjetPhysique{
 
     private static ArrayList<Atome> Environnement = new ArrayList<>();
 
-    private static float[] électronégativité = {
+    private static float[] AffinitéÉlectronique = {
         2.20f,                                                                                                0.00f,
         0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
         0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
@@ -89,6 +90,7 @@ public class Atome implements ObjetPhysique{
         NP = nombreProton;
         m = (double)NP*2.0*mP;
         rayonCovalent = rayonsCovalents[NP-1]/100f;
+        électronégativité = AffinitéÉlectronique[NP-1];
 
         cases = new int[MAX_CASE+1];
         for (int i = 0; i < NP; i++) {
@@ -188,7 +190,7 @@ public class Atome implements ObjetPhysique{
         }
 
         force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
-        //force.add(new Vecteur3f(0,-9.8));
+        force.add(new Vecteur3f(0,-0.1,0.0));
 
        if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
             atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);
@@ -361,7 +363,7 @@ public class Atome implements ObjetPhysique{
                 double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position);
                 if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
                     //distribution des électrons
-                    float proportion = (float)électronégativité[NP-1]/(float)(électronégativité[NP-1]+électronégativité[Atomes.get(liaisonIndexe[i]).NP-1]);
+                    float proportion = électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité);
                     charge -= 1.0-2.0*proportion;
                     Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);            //revision de charge
                     retirerÉlectron();
@@ -440,7 +442,7 @@ public class Atome implements ObjetPhysique{
                         liaisonType[i] = true;   
                     }
 
-                    float proportion = (float)électronégativité[NP-1]/(float)(électronégativité[NP-1]+électronégativité[Atomes.get(indexePot).NP-1]);
+                    float proportion = électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité);
                     charge += 1.0-2.0*proportion;
                     Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
                 }
