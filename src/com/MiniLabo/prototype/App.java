@@ -51,7 +51,7 @@ public class App {
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
 
                     Atome H1 = new Atome(1);
-                    H1.position = new3 Vecteur3f(x*espacement + 1- (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)),(TailleZ/(2*Zoom))); //z*espacement + 1 - (TailleZ/(2*Zoom)
+                    H1.position = new Vecteur3f(x*espacement + 1- (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)),(TailleZ/(2*Zoom))); //z*espacement + 1 - (TailleZ/(2*Zoom)
                     //H1.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                     //Hs.add(H1);
 
