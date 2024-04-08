@@ -114,7 +114,7 @@ public class Atome implements ObjetPhysique{
                 Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(atome.position,Environnement.get(i).position) );
                 double dist = Vecteur3f.distance(Environnement.get(i).position, atome.position);
 
-                if(dist < 10*atome.rayonCovalent){
+                if(dist < 20*atome.rayonCovalent){
 
                     force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
                     force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
@@ -189,8 +189,8 @@ public class Atome implements ObjetPhysique{
             }
         }
 
-        force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
-        force.add(new Vecteur3f(0,-0.1,0.0));
+        //force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
+        //force.add(new Vecteur3f(0,-0.1,0.0));
 
        if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
             atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);

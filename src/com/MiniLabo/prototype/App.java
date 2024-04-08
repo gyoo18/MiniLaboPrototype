@@ -305,15 +305,18 @@ public class App {
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
             
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
+
                 double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
                 g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+            
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
+                
                 double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
-                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
             }
         }
     }
