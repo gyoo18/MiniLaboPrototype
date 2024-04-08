@@ -116,10 +116,10 @@ public class Atome implements ObjetPhysique{
 
                 if(dist < 10*atome.rayonCovalent){
 
-                    force.add( Vecteur3f.scale(dir,(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
+                    force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
                     force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
 
-                    force.add( Vecteur3f.scale(dir,(K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    force.add( Vecteur3f.scale(dir,(1*K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     /*for (int j = 0; j < Atomes.get(i).anglesDoublets.length; j++) {
                         Vecteur3f aPos = new Vecteur3f(Atomes.get(i).anglesDoublets[j],Atomes.get(i).rayonCovalent,0);

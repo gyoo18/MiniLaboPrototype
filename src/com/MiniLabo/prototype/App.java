@@ -51,16 +51,21 @@ public class App {
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
 
                     Atome H1 = new Atome(1);
-                    H1.position = new Vecteur3f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)),(TailleZ/(2*Zoom))); //z*espacement + 1 - (TailleZ/(2*Zoom)
+                    H1.position = new3 Vecteur3f(x*espacement + 1- (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)),(TailleZ/(2*Zoom))); //z*espacement + 1 - (TailleZ/(2*Zoom)
                     //H1.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
                     //Hs.add(H1);
 
-                    Atome H2 = new Atome(11);
-                    H2.position = new Vecteur3f(x*espacement - 0 - (TailleX/(2*Zoom)),y*espacement*1.5 + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    Atome H2 = new Atome(1);
+                    H2.position = new Vecteur3f(x*espacement  - (TailleX/(2*Zoom)),y*espacement*1.5 + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(H2);
 
-                    Atome O = new Atome(17);
+                    Atome H3 = new Atome(1);
+                    H3.position = new Vecteur3f(x*espacement  -1- (TailleX/(2*Zoom)),y*espacement + 1.54 - (TailleY/(2*Zoom)), ((-z)*espacement +1+ (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                    Hs.add(H3);
+
+                    Atome O = new Atome(6);
                     O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement*1.5 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     //O.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
                     Hs.add(O);
@@ -74,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 6.0*Math.pow(10.0,-16.0); //Delta t
+        double dt = 1.0*Math.pow(10.0,-17.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -85,7 +90,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterRK4((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
+                Intégrateur.IterVerletVB((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
                 temps += dt;
 
 
