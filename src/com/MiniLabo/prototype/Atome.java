@@ -92,6 +92,7 @@ public class Atome implements ObjetPhysique{
         84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
     };
 //lalal
+//blabla
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP;
