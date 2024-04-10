@@ -40,10 +40,9 @@ public class Atome implements ObjetPhysique{
         0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
         0.82f,1.00f,1.36f,1.54f,1.63f,1.66f,1.55f,1.83f,1.88f,1.91f,1.90f,1.65f,1.81f,2.01f,2.18f,2.55f,2.96f,3.00f,
         0.82f,0.95f,1.22f,1.33f,1.60f,2.16f,1.90f,2.20f,2.28f,2.20f,1.93f,1.69f,1.78f,1.96f,2.05f,2.10f,2.66f,2.60f,
-        0.79f,0.89f,      1.10f,1.12f,1.13f,1.14f,0.00f,1.20f,0.00f,1.22f,1.23f,1.24f,1.25f,0.00f,
-                    1.27f,1.30f,1.50f,2.36f,1.90f,2.20f,2.20f,2.28f,2.54f,2.00f,1.62f,2.33f,2.02f,2.00f,2.20f,2.20f,
-        0.70f,0.90f,      1.10f,1.30f,1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,
-                    1.30f,1.30f
+        0.79f,0.89f,      1.10f,1.12f,1.13f,1.14f,0.00f,1.20f,0.00f,1.22f,1.23f,1.24f,1.25f,0.00f,1.27f,1.30f,1.50f,
+                    2.36f,1.90f,2.20f,2.20f,2.28f,2.54f,2.00f,1.62f,2.33f,2.02f,2.00f,2.20f,2.20f,0.70f,0.90f,      
+        1.10f,1.30f,      1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f
     };
 
     private static float[] rayonsCovalents = {
@@ -52,10 +51,10 @@ public class Atome implements ObjetPhysique{
         155f,139f,                                                  126f,116f,111f,103f, 99f, 96f,
         196f,171f,148f,136f,134f,122f,119f,116f,111f,110f,112f,118f,124f,121f,121f,116f,114f,117f,
         210f,185f,163f,154f,147f,138f,128f,125f,125f,120f,128f,136f,142f,140f,140f,136f,133f,131f,
-        232f,196f,     180f,163f,176f,174f,173f,172f,168f,169f,168f,167f,166f,165f,164f,170f,
-                  162f,152f,146f,137f,131f,129f,122f,123f,124f,133f,144f,144f,151f,145f,147f,142f,     
-        223f,201f,     186f,175f,169f,170f,171f,172f,166f,166f,168f,168f,165f,167f,173f,176f,
-                  161f,157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
+        232f,196f,     180f,163f,176f,174f,173f,172f,168f,169f,168f,167f,166f,165f,164f,170f,162f,
+                  152f,146f,137f,131f,129f,122f,123f,124f,133f,144f,144f,151f,145f,147f,142f,     
+        223f,201f,     186f,175f,169f,170f,171f,172f,166f,166f,168f,168f,165f,167f,173f,176f,161f,
+                  157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
     };
 
     private static float[] rayonsCovalents2 = {
@@ -64,10 +63,10 @@ public class Atome implements ObjetPhysique{
         160f,132f,                                                  113f,107f,102f, 94f, 95f,107f,
         193f,147f,116f,117f,112f,111f,105f,109f,103f,101f,115f,120f,117f,111f,114f,107f,109f,121f,
         202f,157f,130f,127f,125f,121f,120f,114f,110f,117f,139f,144f,136f,130f,133f,128f,129f,135f,
-        209f,161f,     139f,137f,138f,137f,135f,134f,134f,135f,135f,133f,133f,133f,131f,129f,
-                  131f,128f,126f,120f,119f,116f,115f,112f,121f,142f,142f,135f,141f,135f,138f,145f,
-        218f,173f,     153f,143f,138f,134f,136f,135f,135f,136f,139f,140f,140f,  0f,139f,159f,
-                  141f,140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
+        209f,161f,     139f,137f,138f,137f,135f,134f,134f,135f,135f,133f,133f,133f,131f,129f,131f,
+                  128f,126f,120f,119f,116f,115f,112f,121f,142f,142f,135f,141f,135f,138f,145f,
+        218f,173f,     153f,143f,138f,134f,136f,135f,135f,136f,139f,140f,140f,  0f,139f,159f,141f,
+                  140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
     private static float[] rayonsCovalents3 = {
@@ -76,27 +75,36 @@ public class Atome implements ObjetPhysique{
           0f,127f,                                                  111f,102f, 94f, 95f, 93f, 96f,
           0f,133f,114f,108f,106f,103f,103f,102f, 96f,101f,120f,  0f,121f,114f,106f,107f,110f,108f,
           0f,139f,124f,121f,116f,113f,110f,103f,106f,112f,137f,  0f,146f,132f,127f,121f,125f,122f,
-          0f,149f,     139f,131f,128f,  0f,  0f,  0f,  0f,132f,  0f,  0f,  0f,  0f,  0f,  0f,
-                  131f,122f,119f,115f,110f,109f,107f,110f,123f,  0f,150f,137f,135f,129f,138f,133f,
-          0f,159f,     140f,136f,129f,118f,116f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,
-                    0f,131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
+          0f,149f,     139f,131f,128f,  0f,  0f,  0f,  0f,132f,  0f,  0f,  0f,  0f,  0f,  0f,131f,
+                  122f,119f,115f,110f,109f,107f,110f,123f,  0f,150f,137f,135f,129f,138f,133f,
+          0f,159f,     140f,136f,129f,118f,116f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,
+                  131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    /*private float[] ÉnergieDeDissociation = {
-        432f,  0f,  0f, 
-    };*/
+    private double ConstanteÉcran[] = {
+        0.000,                                                                                                0.300,
+        1.700,2.050,                                                            2.400,2.750,3.100,3.450,3.800,4.2515,
+        8.800,9.150,                                                            9.500,9.850,10.20,10.55,10.90,11.25,
+        16.80,17.15,18.00,18.85,19.70,20.55,21.40,22.25,23.10,23.95,24.80,25.65,26.00,26.35,26.70,27.05,27.40,27.75,
+        34.80,35.15,36.00,36.85,37.70,38.55,39.40,40.25,41.10,41.95,42.80,43.65,44.00,44.35,44.70,45.05,45.40,45.75,
+        52.80,53.15,      53.50,53.85,54.20,54.55,54.90,55.25,55.60,55.95,56.30,56.65,57.00,57.35,57.70,58.05,58.74,
+                    58.75,59.10,59.45,59.80,60.15,60.50,60.85,61.20,61.55,76.00,76.35,76.70,77.05,77.4,77.75,
+        84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
+    };
 
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP;
         rayonCovalent = rayonsCovalents[NP-1]/100f;
-        électronégativité = AffinitéÉlectronique[NP-1];
 
         cases = new int[MAX_CASE+1];
         for (int i = 0; i < NP; i++) {
             ajouterÉlectron();
         }
+        charge = 0;
         évaluerValence();
+
+        //calculerÉlectronégativitée();
     }
 
     private Atome(){}
@@ -208,7 +216,7 @@ public class Atome implements ObjetPhysique{
         return force;
     }
 
-    public void miseÀJourPos(double deltaTemp){
+    /*public void miseÀJourPos(double deltaTemp){
         position.add(Vecteur3f.scale(vélocité, deltaTemp));
         position.add(Vecteur3f.scale(Force,(deltaTemp*deltaTemp)/(2.0*m)));
         //position.add(new Vecteur3f(0.001f*2f*(Math.random()-0.5f),0.001f*2f*(Math.random()-0.5f)));
@@ -221,7 +229,7 @@ public class Atome implements ObjetPhysique{
             anglesDoublets[i] += vélAngleDoublets[i] * deltaTemp + ForceAngleDoublets[i] * ((deltaTemp*deltaTemp)/(2.0*mE*rayonCovalent*rayonCovalent));
             ForceAngleDoublets[i] = 0;
         }
-    }
+    }*/
 
     private void ajouterÉlectron(){
         int Qn = 1;
@@ -231,6 +239,7 @@ public class Atome implements ObjetPhysique{
         int casesIndexe = 0;
         NE++;
         m += mE;
+        charge --;
 
         for (int i = 0; i < MAX_N; i++) {
             Qs = false;
@@ -259,6 +268,8 @@ public class Atome implements ObjetPhysique{
             }
             Qn++;
         }
+
+        calculerÉlectronégativitée();
     }
 
     private void retirerÉlectron(){
@@ -269,6 +280,7 @@ public class Atome implements ObjetPhysique{
         int cas = 0;
         NE--;
         m -= mE;
+        charge ++;
 
         for (int i = 0; i < MAX_N; i++) {
             Ql = Qn-1;
@@ -300,6 +312,8 @@ public class Atome implements ObjetPhysique{
             }
             Qn--;
         }
+
+        calculerÉlectronégativitée();
     }
 
     private void évaluerValence(){
@@ -352,9 +366,23 @@ public class Atome implements ObjetPhysique{
         for (int i = 0; i < anglesDoublets.length; i++) {
             anglesDoublets[i] = Math.random();
         }
-        System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
+        //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
 
+    private void calculerÉlectronégativitée(){
+
+        double sigma;
+        if(NE > 0 ){
+            sigma = ConstanteÉcran[NE-1];
+        }else{
+            sigma = 0.0; //TODO #3 Régler problème d'NP négatif
+        }
+
+        double Zeff = (double)NP-sigma;
+        //TODO #2 Maika, ajoute les rayons atomiques absoluts de l'article [Ghosh et al. 2009] (dans Teams), puis change l'équation pour celle qui est commentée.
+        électronégativité = (float)(0.359*Zeff/rayonCovalent)+0.744f; //(float)(0.359*Zeff/(rayonCovalent*rayonCovalent))+0.744f
+    }
+    
     public void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
         //briser les liens
 
@@ -363,28 +391,26 @@ public class Atome implements ObjetPhysique{
                 double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position);
                 if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
                     //distribution des électrons
-                    float proportion = électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité);
+                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),15.0);
                     charge -= 1.0-2.0*proportion;
-                    Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);            //revision de charge
+                    Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);            //révision de charge
                     retirerÉlectron();
-                    charge++;
+                    //charge++;
                     Atomes.get(liaisonIndexe[i]).retirerÉlectron();
-                    Atomes.get(liaisonIndexe[i]).charge++;
+                    //Atomes.get(liaisonIndexe[i]).charge++;
 
                     if(Math.random() < proportion){
                         ajouterÉlectron();
-                        charge--;
                     }else{
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
-                        Atomes.get(liaisonIndexe[i]).charge--;
                     }
+                    
+                    proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),15.0);
 
                     if(Math.random() < proportion){
                         ajouterÉlectron();
-                        charge--;
                     }else{
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
-                        Atomes.get(liaisonIndexe[i]).charge--;
                     }
 
                     for (int j = 0; j < Atomes.get(liaisonIndexe[i]).liaisonIndexe.length; j++) {
@@ -442,12 +468,16 @@ public class Atome implements ObjetPhysique{
                         liaisonType[i] = true;   
                     }
 
-                    float proportion = électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité);
+                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),15.0);
                     charge += 1.0-2.0*proportion;
                     Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
                 }
             }
         }
+    }
+
+    private double sigmoid(double x, double facteur){
+        return Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5)));
     }
 
     @Override
