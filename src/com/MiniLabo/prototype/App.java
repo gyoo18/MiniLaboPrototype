@@ -300,11 +300,10 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 0.1*multPersZ;
+        double ER = 1.0*multPersZ;
         g.setColor(Color.YELLOW);
-        for (int i = 0; i < A.anglesDoublets.length; i++) {
-            Vecteur3f Epos = Vecteur3f.add(A.position,new Vecteur3f(A.anglesDoublets[i],A.rayonCovalent,0));
-            g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
+        for (int i = 0; i < A.positionDoublet.length; i++) {
+            g.fillOval((int)(A.positionDoublet[i].x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(A.positionDoublet[i].y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {

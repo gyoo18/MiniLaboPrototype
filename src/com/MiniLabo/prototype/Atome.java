@@ -6,9 +6,9 @@ public class Atome implements ObjetPhysique{
     public Vecteur3f position = new Vecteur3f(100,0,0);
     public Vecteur3f vélocité = new Vecteur3f(0,0,0);
     public Vecteur3f Force = new Vecteur3f(0);
-    public double[] anglesDoublets;
-    public double[] vélAngleDoublets;
-    public double[] ForceAngleDoublets;
+    public Vecteur3f[] positionDoublet;
+    public Vecteur3f[] vélDoublet;
+    public Vecteur3f[] forceDoublet;
     public static double e = 1.602*Math.pow(10.0, -19.0);
     public static double mP = 1.0*1.672*Math.pow(10.0,-27.0);
     public static double mE = 1.0*9.109*Math.pow(10.0,-31.0);
@@ -91,6 +91,7 @@ public class Atome implements ObjetPhysique{
                     58.75,59.10,59.45,59.80,60.15,60.50,60.85,61.20,61.55,76.00,76.35,76.70,77.05,77.4,77.75,
         84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
     };
+
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP;
@@ -128,34 +129,7 @@ public class Atome implements ObjetPhysique{
 
                     force.add( Vecteur3f.scale(dir,(1*K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
-                    /*for (int j = 0; j < Atomes.get(i).anglesDoublets.length; j++) {
-                        Vecteur3f aPos = new Vecteur3f(Atomes.get(i).anglesDoublets[j],Atomes.get(i).rayonCovalent,0);
-                        Vecteur3f pos = Vecteur3f.add(Atomes.get(i).position,aPos);
-                        dir = Vecteur3f.normalize( Vecteur3f.sub(pos,position) );
-                        dist = Vecteur3f.distance(position, pos);
-        
-                        //force.add( Vecteur3f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                        //force.add( Vecteur3f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((rayonCovalent+3.0),6.0)/Math.pow(dist,6.0)) ));
-        
-                        //force.add( Vecteur3f.scale(dir,(K*-2.0*e*charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
-                    }
-
-                    for (int j = 0; j < anglesDoublets.length; j++) {
-                        Vecteur3f aPos = new Vecteur3f(anglesDoublets[j],rayonCovalent,0);
-                        Vecteur3f pos = Vecteur3f.add(position,aPos);
-                        dir = Vecteur3f.normalize( Vecteur3f.sub(pos,Atomes.get(i).position) );
-                        dist = Vecteur3f.distance(Atomes.get(i).position, pos);
-
-                        Vecteur3f forceA = new Vecteur3f(0);
-        
-                        forceA.add( Vecteur3f.scale(dir,(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),12.0)/Math.pow(dist,12.0)) )); //force paulie
-                        forceA.add( Vecteur3f.scale(dir,-(Math.pow(10.0,13.0)*Math.pow((3.0+Atomes.get(i).rayonCovalent),6.0)/Math.pow(dist,6.0)) ));
-        
-                        forceA.add( Vecteur3f.scale(dir,(K*-2.0*e*Atomes.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
-
-                        Vecteur3f croix = Vecteur3f.croix(new Vecteur3f(forceA.x,forceA.y,0.0), new Vecteur3f(aPos.x,aPos.y,0));
-                        ForceAngleDoublets[j] -= croix.z;
-                    }*/
+                    //TODO Vincent faire intégration numérique électrons
                 }
             }
         }
@@ -359,11 +333,11 @@ public class Atome implements ObjetPhysique{
             Qn--;
         }
         //charge += (double)doublets*2.0;
-        anglesDoublets = new double[doublets];
-        vélAngleDoublets = new double[doublets];
-        ForceAngleDoublets = new double[doublets];
-        for (int i = 0; i < anglesDoublets.length; i++) {
-            anglesDoublets[i] = Math.random();
+        positionDoublet = new Vecteur3f[doublets];
+        vélDoublet = new Vecteur3f[doublets];
+        forceDoublet = new Vecteur3f[doublets];
+        for (int i = 0; i < positionDoublet.length; i++) {
+            positionDoublet[i] = new Vecteur3f(0,0,1);
         }
         //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
@@ -554,9 +528,9 @@ public class Atome implements ObjetPhysique{
         a.position = this.position.copy();
         a.vélocité = this.vélocité.copy();
         a.Force = this.Force.copy();
-        a.anglesDoublets = this.anglesDoublets.clone();
-        a.vélAngleDoublets = this.vélAngleDoublets.clone();
-        a.ForceAngleDoublets = this.ForceAngleDoublets.clone();
+        a.positionDoublet = this.positionDoublet.clone();
+        a.vélDoublet = this.vélDoublet.clone();
+        a.forceDoublet = this.forceDoublet.clone();
         a.NP = this.NP;
         a.NE = this.NE;
         a.m = this.m;
@@ -579,9 +553,9 @@ public class Atome implements ObjetPhysique{
         this.position = b.position.copy();
         this.vélocité = b.vélocité.copy();
         this.Force = b.Force.copy();
-        this.anglesDoublets = b.anglesDoublets.clone();
-        this.vélAngleDoublets = b.vélAngleDoublets.clone();
-        this.ForceAngleDoublets = b.ForceAngleDoublets.clone();
+        this.positionDoublet = b.positionDoublet.clone();
+        this.vélDoublet = b.vélDoublet.clone();
+        this.forceDoublet = b.forceDoublet.clone();
         this.NP = b.NP;
         this.NE = b.NE;
         this.m = b.m;
