@@ -3,24 +3,32 @@ package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
 public class Intégrateur {
-    public static void IterEuler(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
-        for (ObjetPhysique o : O) {
+    public static void IterEuler(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+        for (Atome o : O) {
             o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.ajouterVitesse(Vecteur3f.scale(o.avoirForce(),h/o.avoirMasse()));
             o.ajouterPosition(Vecteur3f.scale(o.avoirVitesse(), h));
+
+            /*Vecteur3f[] doubletsForces = o.avoirDoubletForce();
+            if(doubletsForces != null){
+                for (int i = 0; i < doubletsForces.length; i++) {
+                    o.avoirDoubletVél()[i].add(Vecteur3f.scale(doubletsForces[i],h/Atome.mE));
+                    o.avoirDoubletPos()[i].add(Vecteur3f.scale(o.avoirDoubletVél()[i],h/Atome.mE));
+                }
+            }*/
         }
     }
 
-    public static void IterVerlet(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
-        for (ObjetPhysique o : O) {
+    public static void IterVerlet(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+        for (Atome o : O) {
             o.prevPositionInit(h);
             o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             Vecteur3f prevPos = o.avoirPosition();
             o.changerPosition(Vecteur3f.add(Vecteur3f.scale(o.avoirPosition(), 2.0), Vecteur3f.add(Vecteur3f.scale(o.avoirPrevPosition(), -1.0), Vecteur3f.scale(o.avoirForce(), h*h/o.avoirMasse()))));
             o.changerPrevPosition(prevPos);
@@ -28,36 +36,36 @@ public class Intégrateur {
     }
 
 
-    public static void IterVerletV(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+    public static void IterVerletV(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.ajouterPosition(Vecteur3f.add(Vecteur3f.scale(o.avoirVitesse(),h), Vecteur3f.scale(o.avoirForce(), h*h/(2.0*o.avoirMasse()))));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             Vecteur3f force = o.avoirForce();
             o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
             o.ajouterVitesse(Vecteur3f.scale(Vecteur3f.add(force, o.avoirForce()), h/(2.0*o.avoirMasse())));
         }
     }
 
-    public static void IterVerletVB(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+    public static void IterVerletVB(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.ajouterVitesse(Vecteur3f.scale(o.avoirForce(), h/(2.0*o.avoirMasse())));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.ajouterPosition(Vecteur3f.add(Vecteur3f.scale(o.avoirVitesse(),h), Vecteur3f.scale(o.avoirForce(), h*h/(2.0*o.avoirMasse()))));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
             o.ajouterVitesse(Vecteur3f.scale( o.avoirForce(), h/(2.0*o.avoirMasse())));
         }
     }
 
-    public static void IterRK4(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ,  float Zoom){
+    public static void IterRK4(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ,  float Zoom){
         
         ArrayList<Vecteur3f> K1v = new ArrayList<>();
         ArrayList<Vecteur3f> K1a = new ArrayList<>();
@@ -69,7 +77,7 @@ public class Intégrateur {
         ArrayList<Vecteur3f> K4a = new ArrayList<>();
 
 
-        ArrayList<ObjetPhysique> oTmp = new ArrayList<>();
+        ArrayList<Atome> oTmp = new ArrayList<>();
         for (int i = 0; i < O.size(); i++) {
             oTmp.add(O.get(i).copy());
         }
@@ -86,7 +94,7 @@ public class Intégrateur {
          * v = v+(h/6)(k1a+2k2a+2k3a+k4a)
          */
 
-         for (ObjetPhysique o : O) {
+         for (Atome o : O) {
             //float K1x = s.v;
             Vecteur3f k1v = o.avoirVitesse().copy();
             //float K1v = F(s);
@@ -161,16 +169,17 @@ public class Intégrateur {
             O.get(i).ÉvaluerForces(O.get(i), TailleX, TailleY, TailleZ, Zoom);
         }
     }
-    public static void IterVerletVBC(ArrayList<ObjetPhysique> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
-         for (ObjetPhysique o : O) {
+    
+    public static void IterVerletVBC(ArrayList<Atome> O, double h, int TailleX, int TailleY, int TailleZ, float Zoom){
+         for (Atome o : O) {
             o.ajouterVitesse(Vecteur3f.scale(o.avoirForce(), h/(2.0*o.avoirMasse())));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.ajouterPosition(Vecteur3f.add(Vecteur3f.scale(o.avoirVitesse(),h), Vecteur3f.scale(o.avoirForce(), h*h/(2.0*o.avoirMasse()))));
         }
 
-        for (ObjetPhysique o : O) {
+        for (Atome o : O) {
             o.changerForce(o.ÉvaluerForces(o,TailleX, TailleY,TailleZ, Zoom));
             o.ajouterVitesse(Vecteur3f.scale( o.avoirForce(), h/(2.0*o.avoirMasse())));
         }

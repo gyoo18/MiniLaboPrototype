@@ -15,7 +15,7 @@ public class App {
     private static int TailleX = 512; //Taille de simulation 
     private static int TailleY = 512;
     private static int TailleZ = 200 ;
-    private static float Zoom = 20f;
+    private static float Zoom = 30f;
     private static int FOV = 70;
     private static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -50,24 +50,24 @@ public class App {
 
         ArrayList<Atome> Hs = new ArrayList<>();
         ArrayList<Integer> indexe = new ArrayList<>();
-        double espacement = 4.0;
+        double espacement = 6.0;
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
 
                     Atome C = new Atome(6);
-                    C.position = new Vecteur3f(x*espacement + 1.0 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    C.position = new Vecteur3f(x*espacement + 1.5 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    //C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
-                    Atome H2 = new Atome(1);
-                    H2.position = new Vecteur3f(x*espacement + 2.0 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    Atome H2 = new Atome(8);
+                    H2.position = new Vecteur3f(x*espacement + 3.0 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H2);
 
-                    Atome H3 = new Atome(1);
+                    Atome H3 = new Atome(8);
                     H3.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement +1+ (TailleZ/(2*Zoom))));
-                    H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    //H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H3);
                 }
             }
@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 1.0*Math.pow(10.0,-17.0); //Delta t
+        double dt = 1.0*Math.pow(10.0,-18.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -90,7 +90,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterVerletVBC((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
+                Intégrateur.IterEuler(Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
                 temps += dt;
 
 
@@ -300,10 +300,11 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 1.0*multPersZ;
+        double ER = 0.1*multPersZ;
         g.setColor(Color.YELLOW);
         for (int i = 0; i < A.positionDoublet.length; i++) {
-            g.fillOval((int)(A.positionDoublet[i].x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(A.positionDoublet[i].y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
+            Vecteur3f Epos = Vecteur3f.add(A.position, A.positionDoublet[i]);
+            g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {

@@ -1,12 +1,13 @@
 package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
-public class Atome implements ObjetPhysique{
+public class Atome{
     public Vecteur3f prevPosition = null;
     public Vecteur3f position = new Vecteur3f(100,0,0);
     public Vecteur3f vélocité = new Vecteur3f(0,0,0);
     public Vecteur3f Force = new Vecteur3f(0);
     public Vecteur3f[] positionDoublet;
+    public Vecteur3f[] prevPosDoublet;
     public Vecteur3f[] vélDoublet;
     public Vecteur3f[] forceDoublet;
     public static double e = 1.602*Math.pow(10.0, -19.0);
@@ -93,114 +94,14 @@ public class Atome implements ObjetPhysique{
     };
     
     private double Radii [] = {
-        0.5292,
-        0.3113,
-        1.6283,
-        1.0855,
-        0.8141,
-        0.6513,
-        0.5428,
-        0.4652,
-        0.4071,
-        0.3676,
-        2.165,
-        1.6711,
-        1.3608,
-        1.1477,
-        0.9922,
-        0.8739,
-        0.7808,
-        0.7056,
-        3.293,
-        2.5419,
-        2.4149,
-        2.2998,
-        2.1953,
-        2.1,
-        2.0124,
-        1.9319,
-        1.8575,
-        1.7888,
-        1.725,
-        1.6654,
-        1.4489,
-        1.2823,
-        1.145,
-        1.0424,
-        0.9532,
-        0.8782,
-        3.8487,
-        2.9709,
-        2.8224,
-        2.688,
-        2.5658,
-        2.4543,
-        2.352,
-        2.2579,
-        2.1711,
-        2.0907,
-        2.016,
-        1.9465,
-        1.6934,
-        1.4986,
-        1.344,
-        1.2183,
-        1.1141,
-        1.0263,
-        4.2433,
-        3.2753,
-        2.6673,
-        2.2494,
-        1.9447,
-        1.7129,
-        1.5303,
-        1.383,
-        1.2615,
-        1.1596,
-        1.073,
-        0.9984,
-        0.9335,
-        0.8765,
-        0.8261,
-        0.7812,
-        0.7409,
-        0.7056,
-        0.6716,
-        0.6416,
-        0.6141,
-        0.589,
-        0.5657,
-        0.5443,
-        0.5244,
-        0.506,
-        1.867,
-        1.6523,
-        1.4818,
-        1.3431,
-        1.2283,
-        1.1315,
-        4.4479,
-        3.4332,
-        3.2615,
-        3.1061,
-        2.2756,
-        1.9767,
-        1.7473,
-        1.4496,
-        1.2915,
-        1.296,
-        1.1247,
-        1.0465,
-        0.9785,
-        0.9188,
-        0.8659,
-        0.8188,
-        0.8086,
-
-
-
-
-
+        0.5292,                                                                                                                0.3113,
+        1.6283,1.08550,                                                                     0.8141,0.6513,0.5428,0.4652,0.4071,0.3676,
+        2.1650,1.67110,                                                                     1.3608,1.1477,0.9922,0.8739,0.7808,0.7056,
+        3.2930,2.5419,2.4149,2.2998,2.1953,2.1000,2.0124,1.9319,1.8575,1.7888,1.7250,1.6654,1.4489,1.2823,1.1450,1.0424,0.9532,0.8782,
+        3.8487,2.9709,2.8224,2.6880,2.5658,2.4543,2.3520,2.2579,2.1711,2.0907,2.0160,1.9465,1.6934,1.4986,1.3440,1.2183,1.1141,1.0263,
+        4.2433,3.2753,       2.6673,2.2494,1.9447,1.7129,1.5303,1.3830,1.2615,1.1596,1.0730,0.9984,0.9335,0.8765,0.8261,0.7812,0.7409,
+                      0.7056,0.6716,0.6416,0.6141,0.5890,0.5657,0.5443,0.5244,0.5060,1.8670,1.6523,1.4818,1.3431,1.2283,1.1315,
+        4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
     };
 
     public Atome(int nombreProton){
@@ -224,8 +125,7 @@ public class Atome implements ObjetPhysique{
         Environnement = E;
     }
 
-    public Vecteur3f ÉvaluerForces(ObjetPhysique O,int TailleX, int TailleY, int TailleZ, float Zoom){
-        Atome atome = (Atome) O;
+    public Vecteur3f ÉvaluerForces(Atome atome,int TailleX, int TailleY, int TailleZ, float Zoom){
 
         Vecteur3f force = new Vecteur3f(0);
         for (int i = 0; i < Environnement.size(); i++) {
@@ -238,9 +138,15 @@ public class Atome implements ObjetPhysique{
                     force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
                     force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(atome.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
 
-                    force.add( Vecteur3f.scale(dir,(1*K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    force.add( Vecteur3f.scale(dir,(K*atome.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
-                    //TODO Vincent faire intégration numérique électrons
+                    for (int j = 0; j < atome.positionDoublet.length; j++) {
+                        Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(atome.positionDoublet[j], atome.position),Environnement.get(i).position));
+                        double eDist = Vecteur3f.distance(Vecteur3f.add(atome.position,atome.positionDoublet[j]), Environnement.get(i).position);
+
+                        atome.forceDoublet[j] = new Vecteur3f(0);
+                        atome.forceDoublet[j].add(Vecteur3f.scale(eDir,(K*2.0*e*Environnement.get(i).charge*e/Math.pow(eDist,2.0))));
+                    }
                 }
             }
         }
@@ -284,7 +190,7 @@ public class Atome implements ObjetPhysique{
         //force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
         //force.add(new Vecteur3f(0,-0.1,0.0));
 
-       if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
+        if(Math.abs(atome.position.y) > (double)TailleY/(2.0*Zoom)){
             atome.position.y = Math.signum(atome.position.y)*(double)TailleY/(2.0*Zoom);
             atome.vélocité.y = -atome.vélocité.y;
         }
@@ -445,10 +351,12 @@ public class Atome implements ObjetPhysique{
         }
         //charge += (double)doublets*2.0;
         positionDoublet = new Vecteur3f[doublets];
+        prevPosDoublet = new Vecteur3f[doublets];
         vélDoublet = new Vecteur3f[doublets];
         forceDoublet = new Vecteur3f[doublets];
         for (int i = 0; i < positionDoublet.length; i++) {
-            positionDoublet[i] = new Vecteur3f(0,0,1);
+            positionDoublet[i] = new Vecteur3f(0,rayonCovalent,0);
+            prevPosDoublet[i] = new Vecteur3f(0,rayonCovalent,0);
         }
         //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
@@ -563,12 +471,10 @@ public class Atome implements ObjetPhysique{
         return Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5)));
     }
 
-    @Override
     public void changerPosition(Vecteur3f pos) {
         position = pos.copy();
     }
 
-    @Override
     public void ajouterPosition(Vecteur3f pos) {
         position.add(pos);
     }
@@ -577,17 +483,14 @@ public class Atome implements ObjetPhysique{
         return position;
     }
 
-    @Override
     public void changerVitesse(Vecteur3f v) {
         vélocité = v.copy();
     }
 
-    @Override
     public void ajouterVitesse(Vecteur3f v) {
         vélocité.add(v);
     }
 
-    @Override
     public Vecteur3f avoirVitesse(){
         return vélocité;
     }
@@ -596,32 +499,26 @@ public class Atome implements ObjetPhysique{
         return m;
     }
 
-    @Override
     public void changerForce(Vecteur3f f) {
         Force = f.copy();
     }
 
-    @Override
     public void ajouterForce(Vecteur3f f) {
         Force.add(f);
     }
 
-    @Override
     public Vecteur3f avoirForce() {
         return Force;
     }
 
-    @Override
     public void changerPrevPosition(Vecteur3f pos) {
         prevPosition = pos.copy();
     }
 
-    @Override
     public void ajouterPrevPosition(Vecteur3f pos) {
         prevPosition.add(pos);
     }
 
-    @Override
     public Vecteur3f avoirPrevPosition() {
         return prevPosition;
     }
@@ -639,6 +536,7 @@ public class Atome implements ObjetPhysique{
         a.vélocité = this.vélocité.copy();
         a.Force = this.Force.copy();
         a.positionDoublet = this.positionDoublet.clone();
+        a.prevPosDoublet = this.prevPosDoublet.clone();
         a.vélDoublet = this.vélDoublet.clone();
         a.forceDoublet = this.forceDoublet.clone();
         a.NP = this.NP;
@@ -657,13 +555,14 @@ public class Atome implements ObjetPhysique{
         return a;
     }
 
-    public void copy(ObjetPhysique a){
+    public void copy(Atome a){
         Atome b = (Atome) a;
         this.prevPosition = b.prevPosition;
         this.position = b.position.copy();
         this.vélocité = b.vélocité.copy();
         this.Force = b.Force.copy();
         this.positionDoublet = b.positionDoublet.clone();
+        this.prevPosDoublet = b.prevPosDoublet.clone();
         this.vélDoublet = b.vélDoublet.clone();
         this.forceDoublet = b.forceDoublet.clone();
         this.NP = b.NP;
@@ -678,5 +577,21 @@ public class Atome implements ObjetPhysique{
         this.rayonCovalent = b.rayonCovalent;
 
         this.cases = b.cases;
+    }
+
+    public Vecteur3f[] avoirDoubletPos() {
+        return positionDoublet;
+    }
+
+    public Vecteur3f[] avoirDoubletPrevPos() {
+        return prevPosDoublet;
+    }
+
+    public Vecteur3f[] avoirDoubletVél() {
+        return vélDoublet;
+    }
+
+    public Vecteur3f[] avoirDoubletForce() {
+        return forceDoublet;
     }
 }
