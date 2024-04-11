@@ -90,7 +90,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterRK4(Hs, dt); //Mise à jour de la position.
                 temps += dt;
 
 

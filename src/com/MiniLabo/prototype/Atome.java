@@ -148,6 +148,9 @@ public class Atome{
                         Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(A.positionDoublet[j], A.position),Environnement.get(i).position));
                         double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(eDist,13.0)) )); //force paulie
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(eDist,7.0)) ));
+
                         A.forceDoublet[j].add( Vecteur3f.scale(eDir,(K*-2.0*e*Environnement.get(i).charge*e/Math.pow(eDist,2.0))) );
                     }
                 }
@@ -192,6 +195,8 @@ public class Atome{
 
         //A.Force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
         //A.Force.add(new Vecteur3f(0,-0.1,0.0));
+
+        A.ÉvaluerContraintes();
     }
 
     public void ÉvaluerContraintes(){
@@ -212,7 +217,7 @@ public class Atome{
             positionDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(positionDoublet[i]), rayonCovalent);
             prevPosDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(prevPosDoublet[i]), rayonCovalent);
             if(vélDoublet[i].length() > 0){
-                vélDoublet[i] = Vecteur3f.scale(vélDoublet[i], 1.0/(Vecteur3f.scal(vélDoublet[i], position)/position.longueur()));
+                vélDoublet[i] = Vecteur3f.sub(vélDoublet[i], Vecteur3f.scale( positionDoublet[i], Vecteur3f.scal(vélDoublet[i], positionDoublet[i])/(positionDoublet[i].longueur()*positionDoublet[i].longueur()) ) );
             }
         }
     }

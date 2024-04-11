@@ -125,19 +125,28 @@ public class Intégrateur {
 
         //TODO Vincent intégrer les doublets dans RK4 
         
-        ArrayList<Vecteur3f> K1v = new ArrayList<>();
-        ArrayList<Vecteur3f> K1a = new ArrayList<>();
-        ArrayList<Vecteur3f> K2v = new ArrayList<>();
-        ArrayList<Vecteur3f> K2a = new ArrayList<>();
-        ArrayList<Vecteur3f> K3v = new ArrayList<>();
-        ArrayList<Vecteur3f> K3a = new ArrayList<>();
-        ArrayList<Vecteur3f> K4v = new ArrayList<>();
-        ArrayList<Vecteur3f> K4a = new ArrayList<>();
+        Vecteur3f[] K1v = new Vecteur3f[O.size()];
+        Vecteur3f[] K1a = new Vecteur3f[O.size()];
+        Vecteur3f[] K2v = new Vecteur3f[O.size()];
+        Vecteur3f[] K2a = new Vecteur3f[O.size()];
+        Vecteur3f[] K3v = new Vecteur3f[O.size()];
+        Vecteur3f[] K3a = new Vecteur3f[O.size()];
+        Vecteur3f[] K4v = new Vecteur3f[O.size()];
+        Vecteur3f[] K4a = new Vecteur3f[O.size()];
+
+        Vecteur3f[][] K1vd = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K1ad = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K2vd = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K2ad = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K3vd = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K3ad = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K4vd = new Vecteur3f[O.size()][];
+        Vecteur3f[][] K4ad = new Vecteur3f[O.size()][];
 
 
-        ArrayList<Atome> oTmp = new ArrayList<>();
+        Atome[] oTmp = new Atome[O.size()];
         for (int i = 0; i < O.size(); i++) {
-            oTmp.add(O.get(i).copy());
+            oTmp[i] = O.get(i).copy();
         }
 
         /* k1v = v(x)
@@ -147,85 +156,151 @@ public class Intégrateur {
          * k3v = v(x+k2vh/2)
          * k3a = f(v+k2ah/2)
          * k4v = v(x+k3vh)
-         * k4a = f(v+k3ah)
+         * k4a = f(v+k3ah)+
          * x = x+(h/6)(k1v+2k2v+2k3v+k4v)
          * v = v+(h/6)(k1a+2k2a+2k3a+k4a)
          */
 
-         for (Atome o : O) {
+         for (int i = 0; i < oTmp.length; i++) {
             //float K1x = s.v;
-            Vecteur3f k1v = o.vélocité.copy();
+            K1v[i] = O.get(i).vélocité.copy();
             //float K1v = F(s);
-            Atome.ÉvaluerForces(o);
-            Vecteur3f k1a = Vecteur3f.scale(o.Force,1.0/o.m);
+            Atome.ÉvaluerForces(O.get(i));
+            K1a[i] = Vecteur3f.scale(O.get(i).Force,1.0/O.get(i).m);
 
-            K1v.add(k1v);
-            K1a.add(k1a);
+            K1vd[i] = O.get(i).vélDoublet.clone();
+            K1ad[i] = O.get(i).forceDoublet.clone();
+
+            for (int j = 0; j < K1ad[i].length; j++) {
+                //float K1x = s.v;
+                //K1vd[i][j] = O.get(i).vélDoublet[j].copy();
+                //float K1v = F(s);
+                K1ad[i][j] = Vecteur3f.scale(K1ad[i][j],1.0/(2.0*Atome.mE));
+            }
         }
         
         for(int i = 0; i < O.size(); i++){
             //s2.x = s.x + (s.h/2f)*K1x;
-            O.get(i).position.add(Vecteur3f.scale(K1v.get(i),h/2.0));
+            O.get(i).position.add(Vecteur3f.scale(K1v[i],h/2.0));
             //s2.v = s.v + (s.h/2f)*K1v;
-            Vecteur3f k2v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K1a.get(i),h/2.0));
+            Vecteur3f k2v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K1a[i],h/2.0));
             //float K2x = s2.v;
             O.get(i).vélocité = k2v;
-            K2v.add(k2v);
+            K2v[i] = k2v;
+
+            K2vd[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+            for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+                //s2.x = s.x + (s.h/2f)*K1x;
+                O.get(i).positionDoublet[j].add(Vecteur3f.scale(K1vd[i][j],h/2.0));
+                //float K1x = s.v;
+                K2vd[i][j] = O.get(i).vélDoublet[j].copy();
+            }
         }
         for (int i = 0; i < O.size(); i++) {
              //float K2v = F(s2);
-             Vecteur3f k2a = Vecteur3f.scale(Atome.ÉvaluerForces(O.get(i)),1.0/O.get(i).m);
-             K2a.add(k2a);
-        }
+             Atome.ÉvaluerForces(O.get(i));
+             Vecteur3f k2a = Vecteur3f.scale(O.get(i).Force,1.0/O.get(i).m);
+             K2a[i] = k2a;
 
+             K2ad[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+             for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+                K2ad[i][j] = Vecteur3f.scale( O.get(i).forceDoublet[j].copy(), 0.5/Atome.mE );
+             }
+        }
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s3 = new Struct(s);
-            O.get(i).copy(oTmp.get(i));
+            O.get(i).copy(oTmp[i]);
             //s3.x = s.x + (s.h/2f)*K2x;
-            O.get(i).position.add(Vecteur3f.scale(K2v.get(i),h/2.0));
+            O.get(i).position.add(Vecteur3f.scale(K2v[i],h/2.0));
             //s3.v = s.v + (s.h/2f)*K2v;
-            Vecteur3f k3v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K2a.get(i),h/2.0));
+            Vecteur3f k3v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K2a[i],h/2.0));
             //float K3x = s3.v;
             O.get(i).vélocité = k3v;
-            K3v.add(k3v);
+            K3v[i] = k3v;
+
+            K3vd[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+            for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+                //s2.x = s.x + (s.h/2f)*K1x;
+                O.get(i).positionDoublet[j].add(Vecteur3f.scale(K2vd[i][j],h/2.0));
+                //float K1x = s.v;
+                K3vd[i][j] = O.get(i).vélDoublet[j].copy();
+            }
         }
         for (int i = 0; i < O.size(); i++) {
             //float K3v = F(s3);
-            Vecteur3f k3a = Vecteur3f.scale(Atome.ÉvaluerForces(O.get(i)),1.0/O.get(i).m);
-            K3a.add(k3a);
+            Atome.ÉvaluerForces(O.get(i));
+            Vecteur3f k3a = Vecteur3f.scale(O.get(i).Force,1.0/O.get(i).m);
+            K3a[i] = k3a;
+
+            K3ad[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+            for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+               K3ad[i][j] = Vecteur3f.scale( O.get(i).forceDoublet[j].copy(), 0.5/Atome.mE );
+            }
         }
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s4 = new Struct(s);
-            O.get(i).copy(oTmp.get(i));
+            O.get(i).copy(oTmp[i]);
             //s4.x = s.x + s.h*K3x;
-            O.get(i).position.add(Vecteur3f.scale(K3v.get(i),h));
+            O.get(i).position.add(Vecteur3f.scale(K3v[i],h));
             //s4.v = s.v + s.h*K3v;
-            Vecteur3f k4v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K3a.get(i),h));
+            Vecteur3f k4v = Vecteur3f.add(O.get(i).vélocité, Vecteur3f.scale(K3a[i],h));
             //float K4x = s4.v;
             O.get(i).vélocité = k4v;
-            K4v.add(k4v);
+            K4v[i] = k4v;
+
+            K4vd[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+            for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+                //s2.x = s.x + (s.h/2f)*K1x;
+                O.get(i).positionDoublet[j].add(Vecteur3f.scale(K2vd[i][j],h/2.0));
+                //float K1x = s.v;
+                K4vd[i][j] = O.get(i).vélDoublet[j].copy();
+            }
         }
         for (int i = 0; i < O.size(); i++) {
             //float K4v= F(s4);
-            Vecteur3f k4a = Vecteur3f.scale(Atome.ÉvaluerForces(O.get(i)),1.0/O.get(i).m);
-            K4a.add(k4a);
+            Atome.ÉvaluerForces(O.get(i));
+            Vecteur3f k4a = Vecteur3f.scale(O.get(i).Force,1.0/O.get(i).m);
+            K4a[i] = k4a;
+
+            K4ad[i] = new Vecteur3f[oTmp[i].positionDoublet.length];
+
+            for (int j = 0; j < oTmp[i].positionDoublet.length; j++) {
+               K4ad[i][j] = Vecteur3f.scale( O.get(i).forceDoublet[j].copy(), 0.5/Atome.mE );
+            }
         }
 
         for (int i = 0; i < O.size(); i++) {
-            K2v.get(i).scale(2.0);
-            K2a.get(i).scale(2.0);
-            K3v.get(i).scale(2.0);
-            K3a.get(i).scale(2.0);
-            O.get(i).copy(oTmp.get(i));
+            K2v[i].scale(2.0);
+            K2a[i].scale(2.0);
+            K3v[i].scale(2.0);
+            K3a[i].scale(2.0);
+            O.get(i).copy(oTmp[i]);
             //s.x = s.x + (s.h/6f)*(K1x + 2f*K2x + 2f*K3x + K4x);
-            O.get(i).position.add(Vecteur3f.scale(Vecteur3f.add(K1v.get(i), Vecteur3f.add(K2v.get(i), Vecteur3f.add(K3v.get(i), K4v.get(i)))), h/6.0));
-            //O.get(i).ajouterPosition(Vecteur3f.scale(K4v.get(i), h));
+            O.get(i).position.add(Vecteur3f.scale(Vecteur3f.add(K1v[i], Vecteur3f.add(K2v[i], Vecteur3f.add(K3v[i], K4v[i]))), h/6.0));
             //s.v = (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);
-            O.get(i).vélocité.add(Vecteur3f.scale(Vecteur3f.add(K1a.get(i), Vecteur3f.add(K2a.get(i), Vecteur3f.add(K3a.get(i), K4a.get(i)))), h/6.0));
-            //O.get(i).ajouterVitesse(Vecteur3f.scale(K4a.get(i), h));
-            //Atome.ÉvaluerForces(O.get(i));
+            O.get(i).vélocité.add(Vecteur3f.scale(Vecteur3f.add(K1a[i], Vecteur3f.add(K2a[i], Vecteur3f.add(K3a[i], K4a[i]))), h/6.0));
+            
+            for (int j = 0; j < O.get(i).positionDoublet.length; j++) {
+                K2vd[i][j].scale(2.0);
+                K2ad[i][j].scale(2.0);
+                K3vd[i][j].scale(2.0);
+                K3ad[i][j].scale(2.0);
+                //s.x = s.x + (s.h/6f)*(K1x + 2f*K2x + 2f*K3x + K4x);
+                O.get(i).positionDoublet[j].add(Vecteur3f.scale(Vecteur3f.add(K1vd[i][j], Vecteur3f.add(K2vd[i][j], Vecteur3f.add(K3vd[i][j], K4vd[i][j]))), h/6.0));
+                //O.get(i).positionDoublet[j].add(Vecteur3f.scale(K1vd[i][j], h));
+                //s.v = (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);
+                O.get(i).vélDoublet[j].add(Vecteur3f.scale(Vecteur3f.add(K1ad[i][j], Vecteur3f.add(K2ad[i][j], Vecteur3f.add(K3ad[i][j], K4ad[i][j]))), h/6.0));
+                //O.get(i).vélDoublet[j].add(Vecteur3f.scale(K1ad[i][j], h));
+            }
+            
+            O.get(i).ÉvaluerContraintes();
         }
     }
     
