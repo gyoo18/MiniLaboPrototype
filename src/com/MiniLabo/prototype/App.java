@@ -12,12 +12,12 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    private static int TailleX = 512; //Taille de simulation 
-    private static int TailleY = 512;
-    private static int TailleZ = 1000 ;
-    private static float Zoom = 15f;
-    private static int FOV = 7;
-    private static int FOVet = FOV;
+    public static int TailleX = 512; //Taille de simulation 
+    public static int TailleY = 512;
+    public static int TailleZ = 512 ;
+    public static float Zoom = 30f;
+    public static int FOV = 30;
+    public static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
 
@@ -43,32 +43,32 @@ public class App {
             e.printStackTrace();
         }
 
+        /*for (int i = 1; i < 16; i++) {
+            Atome H = new Atome(i);
+            System.out.println(i + " " + H.électronégativité);
+        }*/
+
         ArrayList<Atome> Hs = new ArrayList<>();
         ArrayList<Integer> indexe = new ArrayList<>();
         double espacement = 6.0;
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
-            for(int y = 0; y < (TailleY/(1.5*Zoom*espacement)) - 1; y++){
+            for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
 
-                    Atome H1 = new Atome(1);
-                    H1.position = new Vecteur3f(x*espacement + 1- (TailleX/(2*Zoom)),y*espacement + 1 - (TailleY/(2*Zoom)),(TailleZ/(2*Zoom))); //z*espacement + 1 - (TailleZ/(2*Zoom)
-                    //H1.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0), (Math.random() * 2.0 - 1.0) * 5.0 * Math.pow(10.0, 20.0));
-                    //Hs.add(H1);
+                    Atome C = new Atome(6);
+                    C.position = new Vecteur3f(x*espacement + 1.5 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    Hs.add(C);
 
-                    Atome H2 = new Atome(11);
-                    H2.position = new Vecteur3f(x*espacement  - (TailleX/(2*Zoom)),y*espacement*1.5 + 2.54 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
+                    Atome H2 = new Atome(1);
+                    H2.position = new Vecteur3f(x*espacement + 3.0 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H2);
 
                     Atome H3 = new Atome(1);
-                    H3.position = new Vecteur3f(x*espacement  -1- (TailleX/(2*Zoom)),y*espacement + 1.54 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    H3.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
-                    //Hs.add(H3);
-
-                    Atome O = new Atome(17);
-                    O.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement*1.5 - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    O.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 13.0));
-                    Hs.add(O);
+                    H3.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    Hs.add(H3);
                 }
             }
         }
@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 1.0*Math.pow(10.0,-17.0); //Delta t
+        double dt = 3.0*Math.pow(10.0,-18.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -90,7 +90,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterVerletVB((ArrayList<ObjetPhysique>)(ArrayList<?>)Hs, dt, TailleX, TailleY, TailleZ, Zoom); //Mise à jour de la position.
+                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
                 temps += dt;
 
 
@@ -300,25 +300,28 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 0.1*multPersZ;
+        double ER = 0.2*multPersZ;
         g.setColor(Color.YELLOW);
-        for (int i = 0; i < A.anglesDoublets.length; i++) {
-            Vecteur3f Epos = Vecteur3f.add(A.position,new Vecteur3f(A.anglesDoublets[i],A.rayonCovalent,0));
+        for (int i = 0; i < A.positionDoublet.length; i++) {
+            Vecteur3f Epos = Vecteur3f.add(A.position, A.positionDoublet[i]);
             g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
         }
 
         for (int i = 0; i < A.liaisonIndexe.length; i++) {
             
             if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
+
                 double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);
                 g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+            
             }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
+
                 double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);
-                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.01f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.01f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
             }
         }
     }
