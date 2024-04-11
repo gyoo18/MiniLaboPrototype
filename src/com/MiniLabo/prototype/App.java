@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 1.0*Math.pow(10.0,-17.0); //Delta t
+        double dt = 5.0*Math.pow(10.0,-18.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);

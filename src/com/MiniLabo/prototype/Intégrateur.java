@@ -12,6 +12,8 @@ public class Intégrateur {
             o.vélocité.add( Vecteur3f.scale(o.Force,h/o.m) );
             o.position.add( Vecteur3f.scale(o.vélocité, h) );
 
+            o.ÉvaluerContraintes();
+
             /*Vecteur3f[] doubletsForces = o.avoirDoubletForce();
             if(doubletsForces != null){
                 for (int i = 0; i < doubletsForces.length; i++) {
@@ -32,9 +34,9 @@ public class Intégrateur {
             Vecteur3f pPos = o.position.copier();
             o.position = (Vecteur3f.add(Vecteur3f.scale(o.position, 2.0), Vecteur3f.add(Vecteur3f.scale(o.prevPosition, -1.0), Vecteur3f.scale(o.Force, h*h/o.m))));
             o.prevPosition = pPos.copier();
+            o.ÉvaluerContraintes();
         }
     }
-
 
     public static void IterVerletV(ArrayList<Atome> O, double h){
 
@@ -46,6 +48,7 @@ public class Intégrateur {
             Vecteur3f force = o.Force;
             o.Force = Atome.ÉvaluerForces(o);
             o.vélocité.add(Vecteur3f.scale(Vecteur3f.add(force, o.Force), h/(2.0*o.m)));
+            o.ÉvaluerContraintes();
         }
     }
 
@@ -62,6 +65,7 @@ public class Intégrateur {
         for (Atome o : O) {
             o.Force = Atome.ÉvaluerForces(o);
             o.vélocité.add(Vecteur3f.scale( o.Force, h/(2.0*o.m)));
+            o.ÉvaluerContraintes();
         }
     }
 
@@ -166,7 +170,7 @@ public class Intégrateur {
             //s.v = (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);
             O.get(i).vélocité.add(Vecteur3f.scale(Vecteur3f.add(K1a.get(i), Vecteur3f.add(K2a.get(i), Vecteur3f.add(K3a.get(i), K4a.get(i)))), h/6.0));
             //O.get(i).ajouterVitesse(Vecteur3f.scale(K4a.get(i), h));
-            Atome.ÉvaluerForces(O.get(i));
+            //Atome.ÉvaluerForces(O.get(i));
         }
     }
     

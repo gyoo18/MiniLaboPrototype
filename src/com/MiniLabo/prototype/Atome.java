@@ -190,20 +190,22 @@ public class Atome{
         //force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
         //force.add(new Vecteur3f(0,-0.1,0.0));
 
-        if(Math.abs(A.position.y) > (double)App.TailleY/(2.0*App.Zoom)){
-            A.position.y = Math.signum(A.position.y)*(double)App.TailleY/(2.0*App.Zoom);
-            A.vélocité.y = -A.vélocité.y;
-        }
-        if(Math.abs(A.position.x) > (double)App.TailleX/(2.0*App.Zoom)){
-            A.position.x = Math.signum(A.position.x)*(double)App.TailleX/(2.0*App.Zoom);
-            A.vélocité.x = -A.vélocité.x;
-        }
-        if(Math.abs(A.position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
-            A.position.z = Math.signum(A.position.z)*(double)App.TailleZ/(2.0*App.Zoom);
-            A.vélocité.z = -A.vélocité.z;
-        }
-
         return force;
+    }
+
+    public void ÉvaluerContraintes(){
+        if(Math.abs(position.y) > (double)App.TailleY/(2.0*App.Zoom)){
+            position.y = Math.signum(position.y)*(double)App.TailleY/(2.0*App.Zoom);
+            vélocité.y = -vélocité.y;
+        }
+        if(Math.abs(position.x) > (double)App.TailleX/(2.0*App.Zoom)){
+            position.x = Math.signum(position.x)*(double)App.TailleX/(2.0*App.Zoom);
+            vélocité.x = -vélocité.x;
+        }
+        if(Math.abs(position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
+            position.z = Math.signum(position.z)*(double)App.TailleZ/(2.0*App.Zoom);
+            vélocité.z = -vélocité.z;
+        }
     }
 
     /*public void miseÀJourPos(double deltaTemp){
@@ -377,12 +379,14 @@ public class Atome{
     public void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
         //briser les liens
 
+        double forceSigmoide = 10.0;
+
         for (int i = 0; i < liaisonIndexe.length; i++) {
             if(liaisonIndexe[i] != -1){
                 double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position);
                 if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
                     //distribution des électrons
-                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),15.0);
+                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
                     charge -= 1.0-2.0*proportion;
                     Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);            //révision de charge
                     retirerÉlectron();
@@ -396,7 +400,7 @@ public class Atome{
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
                     }
                     
-                    proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),15.0);
+                    proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
 
                     if(Math.random() < proportion){
                         ajouterÉlectron();
@@ -459,7 +463,7 @@ public class Atome{
                         liaisonType[i] = true;   
                     }
 
-                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),15.0);
+                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),forceSigmoide);
                     charge += 1.0-2.0*proportion;
                     Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
                 }
@@ -468,7 +472,8 @@ public class Atome{
     }
 
     private double sigmoid(double x, double facteur){
-        return Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5)));
+        double fNorm = 0.5/ Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5)));
+        return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
     }
 
     public Atome copy(){
