@@ -3,37 +3,49 @@ package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
 public class Intégrateur {
+
     public static void IterEuler(ArrayList<Atome> O, double h){
         for (Atome o : O) {
-            o.Force = Atome.ÉvaluerForces(o);
+            Atome.ÉvaluerForces(o);
         }
 
         for (Atome o : O) {
             o.vélocité.add( Vecteur3f.scale(o.Force,h/o.m) );
             o.position.add( Vecteur3f.scale(o.vélocité, h) );
 
-            o.ÉvaluerContraintes();
-
-            /*Vecteur3f[] doubletsForces = o.avoirDoubletForce();
-            if(doubletsForces != null){
-                for (int i = 0; i < doubletsForces.length; i++) {
-                    o.avoirDoubletVél()[i].add(Vecteur3f.scale(doubletsForces[i],h/Atome.mE));
-                    o.avoirDoubletPos()[i].add(Vecteur3f.scale(o.avoirDoubletVél()[i],h/Atome.mE));
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale(o.forceDoublet[i],h/Atome.mE));
+                    o.positionDoublet[i].add(Vecteur3f.scale(o.vélDoublet[i],h));
                 }
-            }*/
+            }
+
+            o.ÉvaluerContraintes();
         }
     }
 
     public static void IterVerlet(ArrayList<Atome> O, double h){
+
+        //TODO #5 Vincent Les doublets sont trop rapides
+
         for (Atome o : O) {
             o.prevPositionInit(h);
-            o.Force = Atome.ÉvaluerForces(o);
+            Atome.ÉvaluerForces(o);
         }
 
         for (Atome o : O) {
             Vecteur3f pPos = o.position.copier();
             o.position = (Vecteur3f.add(Vecteur3f.scale(o.position, 2.0), Vecteur3f.add(Vecteur3f.scale(o.prevPosition, -1.0), Vecteur3f.scale(o.Force, h*h/o.m))));
             o.prevPosition = pPos.copier();
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    pPos = o.positionDoublet[i].copier();
+                    o.positionDoublet[i] = (Vecteur3f.add(Vecteur3f.scale(o.positionDoublet[i], 2.0), Vecteur3f.add(Vecteur3f.scale(o.prevPosDoublet[i], -1.0), Vecteur3f.scale(o.forceDoublet[i], h*h/Atome.mE))));
+                    o.prevPosDoublet[i] = pPos;
+                }
+            }
+
             o.ÉvaluerContraintes();
         }
     }
@@ -42,12 +54,33 @@ public class Intégrateur {
 
         for (Atome o : O) {
             o.position.add(Vecteur3f.add(Vecteur3f.scale(o.vélocité,h), Vecteur3f.scale(o.Force, h*h/(2.0*o.m))));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
+                }
+            }
         }
 
         for (Atome o : O) {
+
+            Vecteur3f[] eForce = new Vecteur3f[o.forceDoublet.length];
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    eForce[i] = o.forceDoublet[i].copier();
+                }
+            }
+
             Vecteur3f force = o.Force;
-            o.Force = Atome.ÉvaluerForces(o);
+            Atome.ÉvaluerForces(o);
             o.vélocité.add(Vecteur3f.scale(Vecteur3f.add(force, o.Force), h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale(Vecteur3f.add(eForce[i], o.forceDoublet[i]), h/(4.0*Atome.mE)));
+                }
+            }
+
             o.ÉvaluerContraintes();
         }
     }
@@ -56,20 +89,41 @@ public class Intégrateur {
 
         for (Atome o : O) {
             o.vélocité.add(Vecteur3f.scale(o.Force, h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale(o.forceDoublet[i], h/(4.0*Atome.mE)));
+                }
+            }
         }
 
         for (Atome o : O) {
             o.position.add(Vecteur3f.add(Vecteur3f.scale(o.vélocité,h), Vecteur3f.scale(o.Force, h*h/(2.0*o.m))));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
+                }
+            }
         }
 
         for (Atome o : O) {
-            o.Force = Atome.ÉvaluerForces(o);
+            Atome.ÉvaluerForces(o);
             o.vélocité.add(Vecteur3f.scale( o.Force, h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale( o.forceDoublet[i], h/(4.0*Atome.mE)));
+                }
+            }
+
             o.ÉvaluerContraintes();
         }
     }
 
     public static void IterRK4(ArrayList<Atome> O, double h){
+
+        //TODO Vincent intégrer les doublets dans RK4 
         
         ArrayList<Vecteur3f> K1v = new ArrayList<>();
         ArrayList<Vecteur3f> K1a = new ArrayList<>();
@@ -102,7 +156,8 @@ public class Intégrateur {
             //float K1x = s.v;
             Vecteur3f k1v = o.vélocité.copy();
             //float K1v = F(s);
-            Vecteur3f k1a = Vecteur3f.scale(Atome.ÉvaluerForces(o),1.0/o.m);
+            Atome.ÉvaluerForces(o);
+            Vecteur3f k1a = Vecteur3f.scale(o.Force,1.0/o.m);
 
             K1v.add(k1v);
             K1a.add(k1a);
@@ -175,18 +230,38 @@ public class Intégrateur {
     }
     
     public static void IterVerletVBC(ArrayList<Atome> O, double h){
-         for (Atome o : O) {
+         
+        for (Atome o : O) {
             o.vélocité.add(Vecteur3f.scale(o.Force, h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale(o.forceDoublet[i], h/(4.0*Atome.mE)));
+                }
+            }
         }
 
         for (Atome o : O) {
             o.position.add(Vecteur3f.add(Vecteur3f.scale(o.vélocité,h), Vecteur3f.scale(o.Force, h*h/(2.0*o.m))));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
+                }
+            }
         }
 
         for (Atome o : O) {
-            o.Force = Atome.ÉvaluerForces(o);
+            Atome.ÉvaluerForces(o);
             o.vélocité.add(Vecteur3f.scale( o.Force, h/(2.0*o.m)));
-        }
 
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.length; i++) {
+                    o.vélDoublet[i].add(Vecteur3f.scale( o.forceDoublet[i], h/(4.0*Atome.mE)));
+                }
+            }
+
+            o.ÉvaluerContraintes();
+        }
     }
 }

@@ -14,9 +14,9 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 200 ;
+    public static int TailleZ = 512 ;
     public static float Zoom = 30f;
-    public static int FOV = 70;
+    public static int FOV = 30;
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 5.0*Math.pow(10.0,-18.0); //Delta t
+        double dt = 3.0*Math.pow(10.0,-18.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -300,7 +300,7 @@ public class App {
         //g.fillOval((int)(A.position.x*Math.pow(10.0,0) - PR) + (TailleX/2), (TailleY/2) - (int)(A.position.y*Math.pow(10.0,0) + PR), (int)(PR)*2,(int)(PR)*2 );
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
 
-        double ER = 0.1*multPersZ;
+        double ER = 0.2*multPersZ;
         g.setColor(Color.YELLOW);
         for (int i = 0; i < A.positionDoublet.length; i++) {
             Vecteur3f Epos = Vecteur3f.add(A.position, A.positionDoublet[i]);
