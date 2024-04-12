@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 200;
-    public static float Zoom = 30f;
+    public static float Zoom = 40f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -43,7 +43,7 @@ public class App {
         //Initialiser les atomes
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        double espacement = 6.0;                        //Espacement entre les atomes
+        double espacement = 1.5;                        //Espacement entre les atomes
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1/espacement; z++){
