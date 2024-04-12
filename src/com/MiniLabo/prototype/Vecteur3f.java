@@ -75,14 +75,22 @@ public class Vecteur3f {
     }
 
     public void norm(){
-        x = x/ longueur();
-        y = y/ longueur();
-        z = z/ longueur();
+        if(longueur() > 0){
+            x = x/ longueur();
+            y = y/ longueur();
+            z = z/ longueur();
+        }else{
+            System.err.println("Normalisation de vecteur nul. Les composantes resteront 0");
+        }
     }
     public void normalize(){
-        x = x/ length();
-        y = y/ length();
-        z = z/ length();
+        if(longueur() > 0){
+            x = x/ length();
+            y = y/ length();
+            z = z/ length();
+        }else{
+            System.err.println("Normalisation de vecteur nul. Les composantes resteront 0");
+        }
     }
 
 
@@ -135,7 +143,7 @@ public class Vecteur3f {
         return (a.x*b.x)+(a.y*b.y)+(a.z*b.z);
     }
     public static Vecteur3f scale(Vecteur3f a, double s){
-        return new Vecteur3f(a.x * s, a.y*s, a.z * s );
+        return new Vecteur3f(a.x*s, a.y*s, a.z*s );
     }
 
     /* |i  j  k |

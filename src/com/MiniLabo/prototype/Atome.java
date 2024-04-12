@@ -127,11 +127,6 @@ public class Atome{
 
     public static void ÉvaluerForces(Atome A){
 
-        for (int j = 0; j < A.forceDoublet.length; j++) {
-            A.forceDoublet[j] = new Vecteur3f(0);
-        }
-
-        A.Force = new Vecteur3f(0);
         for (int i = 0; i < Environnement.size(); i++) {
             if(Environnement.get(i) != A){
                 Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(A.position,Environnement.get(i).position) );
@@ -148,11 +143,15 @@ public class Atome{
                         Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(A.positionDoublet[j], A.position),Environnement.get(i).position));
                         double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(eDist,13.0)) )); //force paulie
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(eDist,7.0)) ));
+
                         A.forceDoublet[j].add( Vecteur3f.scale(eDir,(K*-2.0*e*Environnement.get(i).charge*e/Math.pow(eDist,2.0))) );
                     }
                 }
             }
         }
+
 
         boolean[] liaisonTraitée = new boolean[A.liaisonIndexe.length];
         for(int i = 0; i < A.liaisonIndexe.length; i++){
@@ -179,19 +178,112 @@ public class Atome{
                         l = rayonsCovalents3[A.NP-1] + rayonsCovalents3[Environnement.get(A.liaisonIndexe[i]).NP-1];
                     }
                     l = l/100.0;
-                    double D = 40000.0; //*Math.pow(10.0,12.0);
+                    double D = 80000.0; //*Math.pow(10.0,12.0);
                     double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
                     double a = Math.sqrt(p/(2.0*D));
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
                     A.Force.add( Vecteur3f.scale(dir, module) );
+
+                    int nLiens = 0;
+                    boolean[] traité = new boolean[A.liaisonIndexe.length];
+                    for (int j = 0; j < A.liaisonIndexe.length; j++) {
+                        if(A.liaisonIndexe[j] != -1 && !traité[j]){
+                            nLiens++;
+                            traité[j] = true;
+                        }
+                    }
+
+                    for(int j = i+1; j < A.liaisonIndexe.length; j++){
+                        if(A.liaisonIndexe[j] != -1 && A.liaisonIndexe[i] != A.liaisonIndexe[j]){
+                            Vecteur3f lDir = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, Environnement.get(A.liaisonIndexe[j]).position);
+
+                            Vecteur3f IAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, A.position );
+                            Vecteur3f IDir = Vecteur3f.sub( lDir, Vecteur3f.scale( IAxe, Vecteur3f.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
+                            IDir.norm();
+
+                            Vecteur3f JAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[j]).position, A.position );
+                            Vecteur3f JDir = Vecteur3f.sub( lDir.opposé(), Vecteur3f.scale( JAxe, Vecteur3f.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
+                            JDir.norm();
+
+                            double angle = Math.acos(Vecteur3f.scal(IAxe, JAxe)/(IAxe.length()*JAxe.length()));
+                            double angle0;
+
+                            //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                            switch(nLiens+A.liaisonIndexe.length){
+                                case 2:
+                                    angle0 = Math.PI;
+                                    break;
+                                case 3:
+                                    angle0 = 2.0*Math.PI/3.0;
+                                    break;
+                                case 4:
+                                    angle0 = 73.0*Math.PI/120.0;
+                                    break;
+                                default:
+                                    angle0 = angle;
+                                    System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                                    break;
+                            }
+
+                            double Kij = 1000.0;
+                            double D0 = angle0-angle;
+                            
+                            Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
+                            Atome.Environnement.get(A.liaisonIndexe[j]).Force.add(Vecteur3f.scale(JDir, D0*Kij));
+
+                        }
+                    }
+
+                    for(int j = 0; j < A.positionDoublet.length; j++){
+                        Vecteur3f lDir = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, Vecteur3f.add(A.positionDoublet[j],A.position));
+
+                        Vecteur3f IAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, A.position );
+                        Vecteur3f IDir = Vecteur3f.sub( lDir, Vecteur3f.scale( IAxe, Vecteur3f.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
+                        IDir.norm();
+
+                        Vecteur3f JAxe = A.positionDoublet[j];
+                        Vecteur3f JDir = Vecteur3f.sub( lDir.opposé(), Vecteur3f.scale( JAxe, Vecteur3f.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
+                        JDir.norm();
+
+                        double angle = Math.acos(Vecteur3f.scal(IAxe, JAxe)/(IAxe.length()*JAxe.length()));
+                        double angle0;
+
+                        //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                        switch(nLiens+A.liaisonIndexe.length){
+                            case 2:
+                                angle0 = Math.PI;
+                                break;
+                            case 3:
+                                angle0 = 2.0*Math.PI/3.0;
+                                break;
+                            case 4:
+                                angle0 = 73.0*Math.PI/120.0;
+                                break;
+                            default:
+                                angle0 = angle;
+                                System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                                break;
+                        }
+
+                        double Kij = 1000.0;
+                        double D0 = angle0-angle;
+                        
+                        Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
+                        Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
+                        A.forceDoublet[j].add(forceDoublet);
+
+                        A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
+                    }
 
                     liaisonTraitée[i] = true;
                 }
             }
         }
 
-        //A.Force.add( Vecteur3f.scale(atome.vélocité,-0.0000000000001));
+        A.Force.add( Vecteur3f.scale(A.vélocité,-0.000000000001));
         //A.Force.add(new Vecteur3f(0,-0.1,0.0));
+
+        //A.ÉvaluerContraintes();
     }
 
     public void ÉvaluerContraintes(){
@@ -212,7 +304,8 @@ public class Atome{
             positionDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(positionDoublet[i]), rayonCovalent);
             prevPosDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(prevPosDoublet[i]), rayonCovalent);
             if(vélDoublet[i].length() > 0){
-                vélDoublet[i] = Vecteur3f.scale(vélDoublet[i], 1.0/(Vecteur3f.scal(vélDoublet[i], position)/position.longueur()));
+                vélDoublet[i] = Vecteur3f.sub(vélDoublet[i], Vecteur3f.scale( positionDoublet[i], Vecteur3f.scal(vélDoublet[i], positionDoublet[i])/(positionDoublet[i].longueur()*positionDoublet[i].longueur()) ) );
+                vélDoublet[i] = Vecteur3f.scale(Vecteur3f.norm(vélDoublet[i]), Math.min(vélDoublet[i].length(), 10000000000000.0));
             }
         }
     }
