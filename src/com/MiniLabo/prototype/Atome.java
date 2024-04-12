@@ -104,6 +104,14 @@ public class Atome{
         4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
     };
 
+    private int Table2 [][] = { 
+        { 0 } , // tableau [0] de int
+        { 0 } , // tableau [1] de int
+        { 0 } , // tableau [2] de int
+        { 0 } , // tableau [3] de int
+    };
+    
+
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP;
@@ -118,6 +126,7 @@ public class Atome{
 
         //calculerÉlectronégativitée();
     }
+
 
     private Atome(){}
 
@@ -221,7 +230,7 @@ public class Atome{
                                     break;
                                 default:
                                     angle0 = angle;
-                                    System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                                   // System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
                                     break;
                             }
 
@@ -261,7 +270,7 @@ public class Atome{
                                 break;
                             default:
                                 angle0 = angle;
-                                System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                              //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
                                 break;
                         }
 

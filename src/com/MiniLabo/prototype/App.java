@@ -55,7 +55,7 @@ public class App {
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1/espacement; z++){
 
-                    Atome C = new Atome(8);
+                    Atome C = new Atome(6);
                     C.position = new Vecteur3f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 1.0*Math.pow(10.0,-17.0); //Delta t
+        double dt = 1.0*Math.pow(10.0,-18.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -90,7 +90,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i); //Mise à jour des liens
                 }
-                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerlet(Hs, dt); //Mise à jour de la position.
                 temps += dt;
 
 

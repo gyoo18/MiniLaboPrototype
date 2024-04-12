@@ -52,19 +52,42 @@ public class Intégrateur {
         }
 
         for (Atome o : O) {
+            
             Vecteur3f pPos = o.position.copier();
+            if(Math.abs(o.position.y) > (double)App.TailleY/(2.0*App.Zoom)){
+                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(0,2*(o.position.y-o.prevPosition.y),0) );
+            }
+            if(Math.abs(o.position.x) > (double)App.TailleX/(2.0*App.Zoom)){
+                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(2*(o.position.x-o.prevPosition.x),0,0) );
+            }
+            if(Math.abs(o.position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
+                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(0,0,2*(o.position.z-o.prevPosition.z)) );
+            }
             o.position = (Vecteur3f.add(Vecteur3f.scale(o.position, 2.0), Vecteur3f.add(Vecteur3f.scale(o.prevPosition, -1.0), Vecteur3f.scale(o.Force, h*h/o.m))));
+            
             o.prevPosition = pPos.copier();
 
+            
+            
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.length; i++) {
                     pPos = o.positionDoublet[i].copier();
+                    if(Math.abs(o.prevPosDoublet[i].y) > (double)App.TailleY/(2.0*App.Zoom)){
+                        o.prevPosDoublet[i] = Vecteur3f.add(o.prevPosDoublet[i], new Vecteur3f(0,2*(o.positionDoublet[i].y-o.prevPosDoublet[i].y),0) );
+                    }
+                    if(Math.abs(o.positionDoublet[i].x) > (double)App.TailleX/(2.0*App.Zoom)){
+                        o.prevPosDoublet[i] =Vecteur3f.add(o.prevPosDoublet[i], new Vecteur3f(2*(o.positionDoublet[i].x-o.prevPosDoublet[i].x),0,0) );
+                    }
+                    if(Math.abs(o.positionDoublet[i].z) > (double)App.TailleZ/(2.0*App.Zoom)){
+                        o.prevPosDoublet[i] =Vecteur3f.add(o.prevPosDoublet[i], new Vecteur3f(0,0,2*(o.positionDoublet[i].z-o.prevPosDoublet[i].z)) );
+                    }
                     o.positionDoublet[i] = (Vecteur3f.add(Vecteur3f.scale(o.positionDoublet[i], 2.0), Vecteur3f.add(Vecteur3f.scale(o.prevPosDoublet[i], -1.0), Vecteur3f.scale(o.forceDoublet[i], h*h/Atome.mE))));
                     o.prevPosDoublet[i] = pPos;
                 }
             }
 
-            o.ÉvaluerContraintes();
+            
+            
         }
     }
 
