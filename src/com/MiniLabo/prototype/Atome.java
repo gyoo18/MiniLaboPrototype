@@ -164,11 +164,11 @@ public class Atome{
                     //Si A' se situe à moins de 25 rayons covalents de A
                     
                     //Appliquer la force de Pauli
-                    A.Force.add( Vecteur3f.scale(dir, (80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) ));
+                    A.Force.add( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer les forces de Van der Walls
-                    A.Force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0 )/Math.pow(dist,7.0 )) ));
+                    A.Force.add( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer la force électrique
-                    A.Force.add( Vecteur3f.scale(dir,(K*A.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    A.Force.add( ForceElectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     //Forces des autres atomes sur les doublets
                     for (int j = 0; j < A.forceDoublet.length; j++) {
@@ -180,12 +180,13 @@ public class Atome{
                         double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
                         //Appliquer la force de Pauli
-                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),13.0)/Math.pow(eDist,13.0)) )); //force paulie
+                        A.forceDoublet[j].add( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir)); //force paulie
                         //Apliquer les force de Van der Walls
-                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),7.0)/Math.pow(eDist,7.0)) ));
+                        A.forceDoublet[j].add(  ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
 
                         //Appliquer la force électrique
-                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(K*-2.0*e*Environnement.get(i).charge*e/Math.pow(eDist,2.0))) );
+                        A.forceDoublet[j].add(  ForceElectrique(-2, Environnement.get(i).charge,eDist,eDir) );
+                        
                     }
                 }
             }
@@ -349,6 +350,20 @@ public class Atome{
         //A.ÉvaluerContraintes();
     }
 
+    
+    private static Vecteur3f ForceElectrique(double q1, double q2, double r, Vecteur3f dir){
+        return ( Vecteur3f.scale(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
+    }
+    private static Vecteur3f ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
+        return ( Vecteur3f.scale(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+    }
+    private static Vecteur3f ForceVandervall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
+        return ( Vecteur3f.scale(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
+    }
+
+
+
+    
     //Applique des contraintes de mouvement, comme des bords de domaines.
     public void ÉvaluerContraintes(){
         //Appliquer des bords de domaine
