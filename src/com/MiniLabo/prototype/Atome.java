@@ -114,7 +114,14 @@ public class Atome{
         4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
     };
 
-    //Initialisation de l'atome
+    private int Table2 [][] = { 
+        { 0 } , // tableau [0] de int
+        { 0 } , // tableau [1] de int
+        { 0 } , // tableau [2] de int
+        { 0 } , // tableau [3] de int
+    };
+    
+
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP; //Calculer la masse de l'atome. La masse des électrons est négligeable.
@@ -129,6 +136,7 @@ public class Atome{
 
         //calculerÉlectronégativitée();
     }
+
 
     //Initialisation de l'atome uniquement utilisée lorsqu'on le copie
     private Atome(){}
@@ -275,7 +283,7 @@ public class Atome{
                                     break;
                                 default:
                                     angle0 = angle;
-                                    System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                                   // System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
                                     break;
                             }
 
@@ -315,7 +323,7 @@ public class Atome{
                                 break;
                             default:
                                 angle0 = angle;
-                                System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                              //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
                                 break;
                         }
 
@@ -350,6 +358,9 @@ public class Atome{
             position.y = Math.signum(position.y)*(double)App.TailleY/(2.0*App.Zoom);
             //Inverser la vitesse
             vélocité.y = -vélocité.y;
+            if(prevPosition != null){
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,2*(position.y-prevPosition.y),0) );
+            }
         }
         //Rebondir en X
         if(Math.abs(position.x) > (double)App.TailleX/(2.0*App.Zoom)){
@@ -357,6 +368,9 @@ public class Atome{
             position.x = Math.signum(position.x)*(double)App.TailleX/(2.0*App.Zoom);
             //Inverser la vitesse
             vélocité.x = -vélocité.x;
+            if(prevPosition != null)
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(2*(position.x-prevPosition.x),0,0));
+            
         }
         //Rebondir en Z
         if(Math.abs(position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
@@ -364,6 +378,8 @@ public class Atome{
             position.z = Math.signum(position.z)*(double)App.TailleZ/(2.0*App.Zoom);
             //Inverser la vitesse
             vélocité.z = -vélocité.z;
+            if(prevPosition != null)
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,0,2*(position.z-prevPosition.z)) );
         }
 
         //Conserver la même distance entre les doublets et l'atome
