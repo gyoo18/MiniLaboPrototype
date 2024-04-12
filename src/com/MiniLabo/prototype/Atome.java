@@ -189,7 +189,7 @@ public class Atome{
                     }
                     l = l/100.0;
                     double D = 40000.0; //*Math.pow(10.0,12.0);
-                    double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
+                    double p = 2*D*Math.pow(Math.log(1-Math.sqrt(1-Math.random()))/l,2.0);
                     double a = Math.sqrt(p/(2.0*D));
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
                     A.Force.add( Vecteur3f.scale(dir, module) );

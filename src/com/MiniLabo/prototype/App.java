@@ -72,7 +72,7 @@ public class App {
         
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 1*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -83,7 +83,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i);    //Mise à jour des liens
                 }
-                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerlet(Hs, dt); //Mise à jour de la position.
                 temps += dt;
             }
 
