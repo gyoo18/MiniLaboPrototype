@@ -10,10 +10,12 @@ public class Intégrateur {
             for (int j = 0; j < o.forceDoublet.length; j++) {
                 o.forceDoublet[j] = new Vecteur3f(0);
             }
+            o.ÉvaluerContraintes();
         }
 
         for (Atome o : O) {
             Atome.ÉvaluerForces(o);
+            o.ÉvaluerContraintes();
         }
 
         for (Atome o : O) {
@@ -38,6 +40,7 @@ public class Intégrateur {
             for (int j = 0; j < o.forceDoublet.length; j++) {
                 o.forceDoublet[j] = new Vecteur3f(0);
             }
+            
         }
 
         //TODO #5 Vincent Les doublets sont trop rapides
@@ -45,6 +48,7 @@ public class Intégrateur {
         for (Atome o : O) {
             o.prevPositionInit(h);
             Atome.ÉvaluerForces(o);
+            
         }
 
         for (Atome o : O) {
@@ -81,6 +85,7 @@ public class Intégrateur {
                     o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
                 }
             }
+            
         }
 
         for (Atome o : O) {
@@ -123,6 +128,7 @@ public class Intégrateur {
                     o.vélDoublet[i].add(Vecteur3f.scale(o.forceDoublet[i], h/(4.0*Atome.mE)));
                 }
             }
+            o.ÉvaluerContraintes();
         }
 
         for (Atome o : O) {
@@ -133,6 +139,7 @@ public class Intégrateur {
                     o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
                 }
             }
+            o.ÉvaluerContraintes();
         }
 
         for (Atome o : O) {
@@ -183,7 +190,7 @@ public class Intégrateur {
             o.ÉvaluerContraintes();
         }
     }
-
+    
     public static void IterRK4(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
@@ -371,49 +378,6 @@ public class Intégrateur {
             }
             
             O.get(i).ÉvaluerContraintes();
-        }
-    }
-    
-    public static void IterVerletVBC(ArrayList<Atome> O, double h){
-
-        for (Atome o : O) {
-            o.Force = new Vecteur3f(0);
-            for (int j = 0; j < o.forceDoublet.length; j++) {
-                o.forceDoublet[j] = new Vecteur3f(0);
-            }
-        }
-         
-        for (Atome o : O) {
-            o.vélocité.add(Vecteur3f.scale(o.Force, h/(2.0*o.m)));
-
-            if(o.forceDoublet != null){
-                for (int i = 0; i < o.forceDoublet.length; i++) {
-                    o.vélDoublet[i].add(Vecteur3f.scale(o.forceDoublet[i], h/(4.0*Atome.mE)));
-                }
-            }
-        }
-
-        for (Atome o : O) {
-            o.position.add(Vecteur3f.add(Vecteur3f.scale(o.vélocité,h), Vecteur3f.scale(o.Force, h*h/(2.0*o.m))));
-
-            if(o.forceDoublet != null){
-                for (int i = 0; i < o.forceDoublet.length; i++) {
-                    o.positionDoublet[i].add(Vecteur3f.add(Vecteur3f.scale(o.vélDoublet[i],h), Vecteur3f.scale(o.forceDoublet[i], h*h/(4.0*Atome.mE))));
-                }
-            }
-        }
-
-        for (Atome o : O) {
-            Atome.ÉvaluerForces(o);
-            o.vélocité.add(Vecteur3f.scale( o.Force, h/(2.0*o.m)));
-
-            if(o.forceDoublet != null){
-                for (int i = 0; i < o.forceDoublet.length; i++) {
-                    o.vélDoublet[i].add(Vecteur3f.scale( o.forceDoublet[i], h/(4.0*Atome.mE)));
-                }
-            }
-
-            o.ÉvaluerContraintes();
         }
     }
 }

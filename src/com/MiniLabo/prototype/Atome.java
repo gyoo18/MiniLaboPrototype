@@ -132,10 +132,10 @@ public class Atome{
                 Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(A.position,Environnement.get(i).position) );
                 double dist = Vecteur3f.distance(Environnement.get(i).position, A.position);
 
-                if(dist < 20*A.rayonCovalent){
+                if(dist < 25*A.rayonCovalent){
 
-                    A.Force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
-                    A.Force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(dist,7.0)) ));
+                    A.Force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),13.0)/Math.pow(dist,13.0)) )); //force paulie
+                    A.Force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),7.0)/Math.pow(dist,7.0)) ));
 
                     A.Force.add( Vecteur3f.scale(dir,(K*A.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
@@ -143,8 +143,8 @@ public class Atome{
                         Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(A.positionDoublet[j], A.position),Environnement.get(i).position));
                         double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
-                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(eDist,13.0)) )); //force paulie
-                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0)/Math.pow(eDist,7.0)) ));
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),13.0)/Math.pow(eDist,13.0)) )); //force paulie
+                        A.forceDoublet[j].add( Vecteur3f.scale(eDir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),7.0)/Math.pow(eDist,7.0)) ));
 
                         A.forceDoublet[j].add( Vecteur3f.scale(eDir,(K*-2.0*e*Environnement.get(i).charge*e/Math.pow(eDist,2.0))) );
                     }
@@ -228,7 +228,7 @@ public class Atome{
                             double Kij = 1000.0;
                             double D0 = angle0-angle;
                             
-                            Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
+                           Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
                             Atome.Environnement.get(A.liaisonIndexe[j]).Force.add(Vecteur3f.scale(JDir, D0*Kij));
 
                         }
@@ -269,8 +269,8 @@ public class Atome{
                         double D0 = angle0-angle;
                         
                         Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
-                        Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
-                        A.forceDoublet[j].add(forceDoublet);
+                       Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
+                       A.forceDoublet[j].add(forceDoublet);
 
                         A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
                     }
@@ -280,7 +280,7 @@ public class Atome{
             }
         }
 
-        A.Force.add( Vecteur3f.scale(A.vélocité,-0.000000000001));
+        //A.Force.add( Vecteur3f.scale(A.vélocité,-0.000000000001));
         //A.Force.add(new Vecteur3f(0,-0.1,0.0));
 
         //A.ÉvaluerContraintes();
