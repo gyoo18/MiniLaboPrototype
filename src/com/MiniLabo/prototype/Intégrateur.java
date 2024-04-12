@@ -6,6 +6,13 @@ public class Intégrateur {
 
     public static void IterEuler(ArrayList<Atome> O, double h){
         for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
+
+        for (Atome o : O) {
             Atome.ÉvaluerForces(o);
         }
 
@@ -25,6 +32,13 @@ public class Intégrateur {
     }
 
     public static void IterVerlet(ArrayList<Atome> O, double h){
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
 
         //TODO #5 Vincent Les doublets sont trop rapides
 
@@ -51,6 +65,13 @@ public class Intégrateur {
     }
 
     public static void IterVerletV(ArrayList<Atome> O, double h){
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
 
         for (Atome o : O) {
             o.position.add(Vecteur3f.add(Vecteur3f.scale(o.vélocité,h), Vecteur3f.scale(o.Force, h*h/(2.0*o.m))));
@@ -88,6 +109,13 @@ public class Intégrateur {
     public static void IterVerletVB(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
+
+        for (Atome o : O) {
             o.vélocité.add(Vecteur3f.scale(o.Force, h/(2.0*o.m)));
 
             if(o.forceDoublet != null){
@@ -122,6 +150,13 @@ public class Intégrateur {
     }
 
     public static void IterRK4(ArrayList<Atome> O, double h){
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
 
         //TODO Vincent intégrer les doublets dans RK4 
         
@@ -305,6 +340,13 @@ public class Intégrateur {
     }
     
     public static void IterVerletVBC(ArrayList<Atome> O, double h){
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3f(0);
+            for (int j = 0; j < o.forceDoublet.length; j++) {
+                o.forceDoublet[j] = new Vecteur3f(0);
+            }
+        }
          
         for (Atome o : O) {
             o.vélocité.add(Vecteur3f.scale(o.Force, h/(2.0*o.m)));
