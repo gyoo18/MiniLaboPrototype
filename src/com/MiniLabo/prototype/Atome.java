@@ -302,16 +302,23 @@ public class Atome{
         if(Math.abs(position.y) > (double)App.TailleY/(2.0*App.Zoom)){
             position.y = Math.signum(position.y)*(double)App.TailleY/(2.0*App.Zoom);
             vélocité.y = -vélocité.y;
+            if(prevPosition != null){
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,2*(position.y-prevPosition.y),0) );
+            }
         }
         if(Math.abs(position.x) > (double)App.TailleX/(2.0*App.Zoom)){
             position.x = Math.signum(position.x)*(double)App.TailleX/(2.0*App.Zoom);
             vélocité.x = -vélocité.x;
+            if(prevPosition != null)
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(2*(position.x-prevPosition.x),0,0));
+            
         }
         if(Math.abs(position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
             position.z = Math.signum(position.z)*(double)App.TailleZ/(2.0*App.Zoom);
             vélocité.z = -vélocité.z;
+            if(prevPosition != null)
+                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,0,2*(position.z-prevPosition.z)) );
         }
-
         for (int i = 0; i < forceDoublet.length; i++) {
             positionDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(positionDoublet[i]), rayonCovalent);
             prevPosDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(prevPosDoublet[i]), rayonCovalent);
