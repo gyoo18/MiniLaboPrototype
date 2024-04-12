@@ -25,7 +25,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
 
-        BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin
+        BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
         g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
 
         JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
@@ -81,7 +81,7 @@ public class App {
 
             for (int N = 0; N < 20; N++) {              //Sous-étapes. Répète N fois/image
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourLiens(Hs, i);    //Mise à jour des liens
+                    Hs.get(i).miseÀJourLiens(Hs, i);    //Créer/Détruire les liens.
                 }
                 Intégrateur.IterVerlet(Hs, dt);       //Mise à jour de la position.
                 temps += dt;
