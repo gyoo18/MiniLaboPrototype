@@ -143,12 +143,13 @@ public class Atome{
 
                 if(dist < 25*A.rayonCovalent){
 
-                    A.Force.add( Vecteur3f.scale(dir,(1*80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),13.0)/Math.pow(dist,13.0)) )); //force paulie
-                    A.Force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),7.0)/Math.pow(dist,7.0)) ));
+                    A.Force.add( Vecteur3f.scale(dir, (80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),11.0)/Math.pow(dist,13.0)) )); //force paulie
+                    A.Force.add( Vecteur3f.scale(dir,-(80.0*Math.pow(1.0*(A.rayonCovalent+Environnement.get(i).rayonCovalent),5.0 )/Math.pow(dist,7.0 )) ));
 
                     A.Force.add( Vecteur3f.scale(dir,(K*A.charge*e*Environnement.get(i).charge*e/Math.pow(dist,2.0)) )); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     for (int j = 0; j < A.forceDoublet.length; j++) {
+                        //TODO #8 YuriSlayer ajouter effet des électrons sur les atomes et interraction électrons-électrons
                         Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(A.positionDoublet[j], A.position),Environnement.get(i).position));
                         double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
@@ -187,7 +188,7 @@ public class Atome{
                         l = rayonsCovalents3[A.NP-1] + rayonsCovalents3[Environnement.get(A.liaisonIndexe[i]).NP-1];
                     }
                     l = l/100.0;
-                    double D = 80000.0; //*Math.pow(10.0,12.0);
+                    double D = 40000.0; //*Math.pow(10.0,12.0);
                     double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
                     double a = Math.sqrt(p/(2.0*D));
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));    //force du lien, potentiel de morse
@@ -201,6 +202,8 @@ public class Atome{
                             traité[j] = true;
                         }
                     }
+
+                    //TODO #7 améliorer la stabilité de la force de torsion
 
                     for(int j = i+1; j < A.liaisonIndexe.length; j++){
                         if(A.liaisonIndexe[j] != -1 && A.liaisonIndexe[i] != A.liaisonIndexe[j]){
@@ -218,7 +221,7 @@ public class Atome{
                             double angle0;
 
                             //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
-                            switch(nLiens+A.liaisonIndexe.length){
+                            switch(nLiens+A.positionDoublet.length){
                                 case 2:
                                     angle0 = Math.PI;
                                     break;
@@ -237,8 +240,8 @@ public class Atome{
                             double Kij = 1000.0;
                             double D0 = angle0-angle;
                             
-                           Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
-                            Atome.Environnement.get(A.liaisonIndexe[j]).Force.add(Vecteur3f.scale(JDir, D0*Kij));
+                            //Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
+                            //Atome.Environnement.get(A.liaisonIndexe[j]).Force.add(Vecteur3f.scale(JDir, D0*Kij));
 
                         }
                     }
@@ -258,7 +261,7 @@ public class Atome{
                         double angle0;
 
                         //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
-                        switch(nLiens+A.liaisonIndexe.length){
+                        switch(nLiens+A.positionDoublet.length){
                             case 2:
                                 angle0 = Math.PI;
                                 break;
@@ -277,11 +280,11 @@ public class Atome{
                         double Kij = 1000.0;
                         double D0 = angle0-angle;
                         
-                        Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
-                       Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
-                       A.forceDoublet[j].add(forceDoublet);
+                        //Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
+                        //Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
+                        //A.forceDoublet[j].add(forceDoublet);
 
-                        A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
+                        //A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
                     }
 
                     liaisonTraitée[i] = true;
