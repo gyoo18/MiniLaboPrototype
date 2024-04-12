@@ -46,7 +46,7 @@ public class App {
         double espacement = 6.0;                        //Espacement entre les atomes
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
-                for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
+                for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1/espacement; z++){
 
                     Atome C = new Atome(6);
                     C.position = new Vecteur3f(x*espacement + 0 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
