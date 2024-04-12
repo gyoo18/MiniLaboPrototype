@@ -395,22 +395,7 @@ public class Atome{
         }
     }
 
-    /*public void miseÀJourPos(double deltaTemp){
-        position.add(Vecteur3f.scale(vélocité, deltaTemp));
-        position.add(Vecteur3f.scale(Force,(deltaTemp*deltaTemp)/(2.0*m)));
-        //position.add(new Vecteur3f(0.001f*2f*(Math.random()-0.5f),0.001f*2f*(Math.random()-0.5f)));
-        vélocité.add(Vecteur3f.scale(Force, deltaTemp/m));
-       // vélocité = Vecteur3f.scale(Vecteur3f.normalize(vélocité), Math.min(vélocité.length(), Math.pow(10.0,22.0))); //Atome charger pas impacter par la force de pauli action reaction
-
-        for(int i = 0; i < anglesDoublets.length; i++){
-            vélAngleDoublets[i] += ForceAngleDoublets[i] * (deltaTemp/(2.0*mE*rayonCovalent*rayonCovalent));
-            //vélAngleDoublets[i] = Math.min(Math.abs(vélAngleDoublets[i]), Math.pow(10.0,23.0))*Math.signum(vélAngleDoublets[i]);
-            anglesDoublets[i] += vélAngleDoublets[i] * deltaTemp + ForceAngleDoublets[i] * ((deltaTemp*deltaTemp)/(2.0*mE*rayonCovalent*rayonCovalent));
-            ForceAngleDoublets[i] = 0;
-        }
-    }*/
-
-    //Ajouter un électron aux cases quantiques
+    //Ajouter un électron aux cases quantiques (en mode hybridé)
     private void ajouterÉlectron(){
         int Qn = 1; //Nombre quantique principal n
         int Ql = 0; //Nombre quantique azimutal l
@@ -438,12 +423,12 @@ public class Atome{
                         if(cases[casesIndexe] == j3 && Ql != 2){
                             //Si la case n'est pas remplie et qu'elle est égale à 0 si on est au premier tours, ou à 1 au deuxième tour,
                             cases[casesIndexe]++; //Ajouter l'électron dans la case
+                            //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: " + Qs); //Debug
                             //Sortir de la boucle
                             i = 4;
                             j = 2*Qn;
                             j2 = 2*Ql;
                             j3 = 3;
-                            //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: " + Qs); //Debug
                             break;
                         }
                         //Sinon,
@@ -461,7 +446,7 @@ public class Atome{
         calculerÉlectronégativitée();
     }
 
-    //Retirer un électron aux cases quantiques
+    //Retirer un électron aux cases quantiques (en mode hybridé)
     private void retirerÉlectron(){
         int Qn = MAX_N; //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence au MAX_N
         int Ql = Qn-1;  //Nombre quantique azimutal l.
@@ -473,140 +458,173 @@ public class Atome{
         charge ++;      //Modifie la charge
 
         for (int i = 0; i < MAX_N; i++) {
-            //Traverse tout les n de MAX_N à 0
+            //Traverse tout les n de MAX_N à 1
             Ql = Qn-1;
-            int indexeDébut = casesIndexe;
-            cas = cases[casesIndexe];
+            int indexeDébut = casesIndexe;  //Conserver l'indexe de la première case de la couche
+            cas = cases[casesIndexe];       //Évaluer dans quel cas nous nous trouvons
             if(cas == 2){
+                //Si la case est pleine, c'est la première case pleine et c'est celle à laquelle il faut retirer un électron
                 cases[casesIndexe]--;
-                //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: -1!");
+                //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: -1!"); //Debug
+                //Sortir de la boucle
                 i = 4; break;
             }else{
+                //Si la case n'est pas pleine, il faut évaluer toutes les autres cases de la couche
+                //pour évaluer si nous avons A) une couche vide B) une couche contenant des spin up
+                // C) une couche pleine de spin up D) une couche contenant des spin down
                 for (int j = 0; j < Qn; j++) {
+                    //Traverser les l de n-1 à 0
                     Qm = Ql;
                     for (int j2 = 0; j2 < 2*Ql+1; j2++) {
+                        //Traverser les m de l à -l
                         if(cases[casesIndexe] == cas+1){
-                            cases[casesIndexe]--;
+                            //Si la première case était vide et que celle-ci a un électron
+                            //ou que la première avait un électron et que celle-ci en a deux
+                            cases[casesIndexe]--;   //Retirer un électron de cette case
+                            //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: -1!");    //Debug
+                            //Sortir de la boucle
                             cas = 0;
-                            //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: -1!");
                             i = 4; j = 2*Qn; break;
                         }
-                        casesIndexe--;
-                        Qm--;
+                        //Sinon,
+                        casesIndexe--;  //Prochaine case
+                        Qm--;           //Rpochain m
                     }
-                    Ql--;
+                    Ql--;   //Prochain l
                 }
                 if(cas == 1){
-                    cases[indexeDébut]--;
+                    //Si on a passé à travers tous les l sans retirer d'électrons et que la première case n'avait qu'un électron
+                    cases[indexeDébut]--; //Retirer un électron à la première case
                     //System.out.println("n: " + Qn + ", l: " + Ql + ", m: " + Qm + ", s: -1!");
                 }
             }
-            Qn--;
+            Qn--; //Prochain n
         }
 
         calculerÉlectronégativitée();
     }
 
+    //Extrait certaines informations de la couche de valence
     private void évaluerValence(){
+        //Évalue le nombre liaisons possibles
         int n = 0;
         for (int i = 0; i < cases.length; i++) {
+            //Pour toutes les cases
             if(cases[i] == 1){
+                //S'il n'y a qu'un électron dans la case, elle peut former un lien
                 n++;
             }
         }
-        liaisonIndexe = new int[n];
-        liaisonType = new boolean[n];
+        liaisonIndexe = new int[n];     //Initialiser la liste des indexes de liaisons
+        liaisonType = new boolean[n];   //Initialiser la liste des types de liaisons
+        //Remplir les listes
         for (int i = 0; i < liaisonIndexe.length; i++) {
             liaisonIndexe[i] = -1;
             liaisonType[i] = false;
         }
 
-        int Qn = MAX_N;
-        int Ql = 0;
-        int Qm = 0;
-        boolean trouvéNiveau = false;
-        int casesIndexe = MAX_CASE;
+        //Évaluer le nombre de doublets
+        int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
+        int Ql = 0;         //Nombre quantique azimutal l.
+        int Qm = 0;         //Nombre quantique magnétique m.
+        boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
+        int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
         for (int i = 0; i < MAX_N; i++) {
+            //Traverser n de MAX_N à 1
             Ql = Qn-1;
             for (int j = 0; j < Qn; j++) {
+                //Traverser l de n-1 à 0
                 Qm = Ql;
                 for(int j2 = 0; j2 < 2*Ql+1; j2++){
+                    //Traverser m de l à -l
                     if(cases[casesIndexe] != 0){
+                        //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
                         trouvéNiveau = true;
                     }
                     if (cases[casesIndexe] == 2 && trouvéNiveau) {
-                        doublets++;
+                        //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
+                        doublets++; //Ajouter un doublet
                     }
-                    casesIndexe--;
-                    Qm--;
+                    casesIndexe--; //Prochaine case
+                    Qm--;          //Prochain m
                 }
-                Ql--;
-                if(trouvéNiveau){
-                    i = 4;
-                    break;
-                }
+                Ql--; //Prochain l
             }
-            Qn--;
+            if(trouvéNiveau){
+                //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
+                i = 4;
+                break;
+            }
+            //Sinon,
+            Qn--; //Prochain n
         }
-        //charge += (double)doublets*2.0;
-        positionDoublet = new Vecteur3f[doublets];
-        prevPosDoublet = new Vecteur3f[doublets];
-        vélDoublet = new Vecteur3f[doublets];
-        forceDoublet = new Vecteur3f[doublets];
+        
+        //charge += (double)doublets*2.0; //Ajuste la charge de l'atome en fonction des doublets. Ils seront traités séparéments.
+        positionDoublet = new Vecteur3f[doublets]; //Initialiser la liste des positions des doublets
+        prevPosDoublet = new Vecteur3f[doublets];  //Initialiser la liste des positions précédentes des doublets
+        vélDoublet = new Vecteur3f[doublets];      //Initialiser la liste des vélocités des doublets
+        forceDoublet = new Vecteur3f[doublets];    //Initialiser la liste des forces des doublets
+        //Remplir les listes
         for (int i = 0; i < positionDoublet.length; i++) {
             forceDoublet[i] = new Vecteur3f(0);
             vélDoublet[i] = new Vecteur3f(0);
-            positionDoublet[i] = new Vecteur3f(Math.random(),Math.random(),Math.random());
-            prevPosDoublet[i] = positionDoublet[i].copier();
+            positionDoublet[i] = new Vecteur3f(Math.random(),Math.random(),Math.random()); //Donner une position de départ aléatoire entre (0,0,0) et (1,1,1). Elle serat ramenée au rayon de l'atome plus tard.
+            prevPosDoublet[i] = positionDoublet[i].copier(); //Donner la position initiale comme position précédente initiale.
         }
-        //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
+        System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
 
     private void calculerÉlectronégativitée(){
-
+        //Implémente l'électronégativité d'Allred-Rochow, avec la règle de Slater.
         double sigma;
         if(NE > 0 ){
             sigma = ConstanteÉcran[NE-1];
         }else{
-            sigma = 0.0; //TODO #3 Régler problème d'NP négatif
+            sigma = 0.0;
         }
+        //TODO #3 Régler problème d'NP négatif
 
         double Zeff = (double)NP-sigma;
         électronégativité = (float)(0.359*Zeff/(Radii[NP-1]*Radii[NP-1]))+0.744f;
     }
     
     public void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
-        //briser les liens
 
         double forceSigmoide = 5.0;
 
+        //Briser les liens
         for (int i = 0; i < liaisonIndexe.length; i++) {
+            //Pour toutes les possibilités de liaisons
             if(liaisonIndexe[i] != -1){
-                double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position);
+                //S'il y a une liaison
+                double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position); //Évaluer la distance entre les deux atomes
                 if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
-                    //distribution des électrons
-                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
-                    charge -= 1.0-2.0*proportion;
-                    Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);            //révision de charge
-                    retirerÉlectron();
-                    //charge++;
-                    Atomes.get(liaisonIndexe[i]).retirerÉlectron();
-                    //Atomes.get(liaisonIndexe[i]).charge++;
+                    //Si la distance est 2 fois la longueur de liaison,
+                    //Distribuer les électrons entre les deux atomes
+                    //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
+                    float proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
+                    charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
+                    Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
+                    retirerÉlectron();                              //Retirer un électron à A
+                    Atomes.get(liaisonIndexe[i]).retirerÉlectron(); //Retirer un électron à A'
 
+                    //Donner aléatoirement un électron à un atome. Plus l'atome est électronégatif, plus il a de chances d'obtenir l'électron
                     if(Math.random() < proportion){
                         ajouterÉlectron();
                     }else{
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
                     }
                     
-                    proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
-
+                    //Recalculer les proportions, car l'électronégativité est affectée par la charge.
+                    proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
+                    //Donner aléatoirment un électron à un atome.
                     if(Math.random() < proportion){
                         ajouterÉlectron();
                     }else{
                         Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
                     }
 
+                    //Retirer les références à A'
                     for (int j = 0; j < Atomes.get(liaisonIndexe[i]).liaisonIndexe.length; j++) {
                         if(Atomes.get(liaisonIndexe[i]).liaisonIndexe[j] == indexe){
                             Atomes.get(liaisonIndexe[i]).liaisonIndexe[j] = -1;
@@ -619,18 +637,24 @@ public class Atome{
             }
         }
 
-        //créer les liens
+        //Créer les liens
 
         for (int i = 0; i < liaisonIndexe.length; i++) {
+            //Pour toutes les possibilités de liens
             double min_dist = Double.MAX_VALUE;
             if (liaisonIndexe[i] == -1) {
-                int indexePot = -1;
-                int nLiaisons = 0;
-                int placeLibre = -1;
+                //S'il n'y a pas de lien déjà en place
+                int indexePot = -1; //Indexe du candidat potentiel pour créer un lien
+                int nLiaisons = 0;  //Nombre de liaisons déjà créées avec ce candidat
+                int placeLibre = -1;//Nombre de liaisons que A' peut encore créer
                 for (int j = 0; j < Atomes.size(); j++) {
+                    //Pour tout les atomes
                     if(indexe != j){
-                        double dist = Vecteur3f.distance(position, Atomes.get(j).position);
+                        //Si ce n'est pas cet atome (A)
+                        double dist = Vecteur3f.distance(position, Atomes.get(j).position); //Calculer la distance entre A et A'
                         if(dist < min_dist && dist < 2.0*(rayonCovalent + Atomes.get(j).rayonCovalent)){
+                            //Si la distance est de moins de 2 longueurs de liaisons
+                            //Évaluer le nombres de liaisons que A' peut encore créer
                             placeLibre = -1;
                             for (int k = 0; k < Atomes.get(j).liaisonIndexe.length; k++) {
                                 if(Atomes.get(j).liaisonIndexe[k] == -1){
@@ -639,6 +663,7 @@ public class Atome{
                                 }
                             }
                             if(placeLibre != -1){
+                                //S'il y a au moins une place libre
                                 nLiaisons = 0;
                                 for (int k = 0; k < liaisonIndexe.length; k++) {
                                     if(j == liaisonIndexe[k]){
@@ -660,7 +685,7 @@ public class Atome{
                         liaisonType[i] = true;   
                     }
 
-                    float proportion = (float)sigmoid(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),forceSigmoide);
+                    float proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),forceSigmoide);
                     charge += 1.0-2.0*proportion;
                     Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
                 }
@@ -668,7 +693,7 @@ public class Atome{
         }
     }
 
-    private double sigmoid(double x, double facteur){
+    private double sigmoide(double x, double facteur){
         double fNorm = 0.5/ ( Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5))) - 0.5);
         return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
     }

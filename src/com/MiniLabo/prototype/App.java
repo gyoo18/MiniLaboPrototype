@@ -53,10 +53,10 @@ public class App {
                     C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
-                    Atome H2 = new Atome(17);
+                    /*Atome H2 = new Atome(17);
                     H2.position = new Vecteur3f(x*espacement + 2.54 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
                     H2.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H2);
+                    //Hs.add(H2);*/
 
                     /*Atome H3 = new Atome(1);
                     H3.position = new Vecteur3f(x*espacement - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
@@ -83,7 +83,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens(Hs, i);    //Créer/Détruire les liens.
                 }
-                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerlet(Hs, dt); //Mise à jour de la position.
                 temps += dt;
             }
 
