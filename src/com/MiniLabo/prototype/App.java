@@ -14,9 +14,9 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 512 ;
-    public static float Zoom = 30f;
-    public static int FOV = 30;
+    public static int TailleZ = 112 ;
+    public static float Zoom = 10f;
+    public static int FOV = 180;
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
@@ -47,13 +47,13 @@ public class App {
             Atome H = new Atome(i);
             System.out.println(i + " " + H.électronégativité);
         }*/
-
+//Avec Verlet, dt 1/16*10^-16, beaucoup de h2 comparement au rest, et est stable, VB bcp de Ch2
         ArrayList<Atome> Hs = new ArrayList<>();
         ArrayList<Integer> indexe = new ArrayList<>();
-        double espacement = 6.0;
+        double espacement =    12.0;
         for(int x = 0; x < (TailleX/(Zoom*espacement)) - 1; x++){
             for(int y = 0; y < (TailleY/(Zoom*espacement)) - 1; y++){
-                for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1; z++){
+                for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1/espacement; z++){
 
                     Atome C = new Atome(6);
                     C.position = new Vecteur3f(x*espacement + 1.5 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
@@ -79,7 +79,7 @@ public class App {
         
         double temps = 0.0;
         long chorono = System.currentTimeMillis();
-        double dt = 3.0*Math.pow(10.0,-18.0); //Delta t
+        double dt = 0.25*Math.pow(10.0,-16.0); //Delta t
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));
             g.fillRect(0, 0, TailleX, TailleY);
@@ -111,9 +111,9 @@ public class App {
             }
             
 
-            System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+            System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s" );
 
-            //énoncerMolécules(Hs);
+            //énoncerMolécules(Hs); 
 
             SwingUtilities.updateComponentTreeUI(frame);
             //Thread.sleep(1000);
