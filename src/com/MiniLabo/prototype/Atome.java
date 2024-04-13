@@ -233,18 +233,8 @@ public class Atome{
                         //Longueur d'ordre 3;
                         l = rayonsCovalents3[A.NP-1] + rayonsCovalents3[Environnement.get(A.liaisonIndexe[i]).NP-1];
                     }
-                    l = l/100.0;    //La longueur est en pm et on travaille en Å.
-                    double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
-
-                    double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
-                    //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
-                    // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
-                    // quasiment identique à s'il n'était pas lié.
-
-                    double a = Math.sqrt(p/(2.0*D));
-                    //Appliquer la force de morse
-                    double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));
-                    A.Force.add( Vecteur3f.scale(dir, module) );
+                    //l = l;    //La longueur est en pm et on travaille en Å.
+                    A.Force.add( ForceDuLien(l/100.0, dist, dir) );
 
 
                     //Appliquer la force de torsion avec tout les autres liens
@@ -363,7 +353,19 @@ public class Atome{
     private static Vecteur3f ForceVandervall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
         return ( Vecteur3f.scale(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
     }
+    private static Vecteur3f ForceDuLien(double l,double dist, Vecteur3f dir){
+        double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
+        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
+         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
+         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
+         // quasiment identique à s'il n'était pas lié.
 
+         double a = Math.sqrt(p/(2.0*D));
+           //Appliquer la force de morse
+          double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));
+
+        return ( Vecteur3f.scale(dir, module) );
+    }
 
 
     
