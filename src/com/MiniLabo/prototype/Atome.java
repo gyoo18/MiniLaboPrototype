@@ -166,7 +166,7 @@ public class Atome{
                     //Appliquer la force de Pauli
                     A.Force.add( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer les forces de Van der Walls
-                    A.Force.add( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
+                   A.Force.add( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer la force électrique
                     A.Force.add( ForceElectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
@@ -185,8 +185,11 @@ public class Atome{
                         A.forceDoublet[j].add(  ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
 
                         //Appliquer la force électrique
-                        A.forceDoublet[j].add(  ForceElectrique(-2, Environnement.get(i).charge,eDist,eDir) );
-                        
+                        A.forceDoublet[j].add(  ForceElectrique(Environnement.get(i).charge,-2,eDist,eDir) );
+                        //A.Force.add(  ForceElectrique(A.charge, -2,eDist,eDir) );
+                        //A.forceDoublet[j].add(  ForceElectrique(A.charge,-2,eDist,eDir) );
+                        //A.Force.add(  ForceElectrique(Environnement.get(i).charge, -2,eDist,eDir) );
+                        //A.forceDoublet[j].add(  ForceElectrique(-0.5,-0.5,eDist,eDir) );
                     }
                 }
             }
@@ -352,7 +355,7 @@ public class Atome{
 
     
     private static Vecteur3f ForceElectrique(double q1, double q2, double r, Vecteur3f dir){
-        return ( Vecteur3f.scale(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
+        return ( Vecteur3f.scale(dir,(K*(q1)*e*(q2)*e/Math.pow(r,2.0)) ));
     }
     private static Vecteur3f ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
         return ( Vecteur3f.scale(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
