@@ -15,6 +15,8 @@ public class Atome{
     public double charge = 0;           //Charge de l'atome
     public float électronégativité = 0; //Électronégativité de l'atome peut varier avec le nombre d'électrons
 
+    public int indexe = -1; //Indexe de cet atome dans la liste de la simulation
+
     //État des doublets
     public Vecteur3D[] positionDoublet; //Position des doublets relatif au noyau
     public Vecteur3D[] prevPosDoublet;  //Position des doublets à temps t-1
@@ -124,6 +126,7 @@ public class Atome{
     /**
      * Créé un nouvel atome.
      * @param nombreProton - Nombre de proton de cet atome. Définit l'élément qu'il représente.
+     * @param indexe - Indexe de cet atome dans liste de la simulation
      */
     public Atome(int nombreProton){
         NP = nombreProton;
@@ -682,7 +685,12 @@ public class Atome{
     }
     
     /**Créé et brise les liens lorsque nécessaire.*/
-    public void miseÀJourLiens(int indexe){
+    public void miseÀJourLiens(){
+
+        //Aller chercher l'indexe de cet atome dans Environnement
+        if(indexe == -1){
+            indexe = Atome.Environnement.indexOf(this);
+        }
 
         double forceSigmoide = 5.0;
 

@@ -66,10 +66,12 @@ public class App {
             }
         }
 
+        //Ajouter les atomes dans l'ordre de dessin
         for (int i = 0; i < Hs.size(); i++) {
-            indexe.add(i);  //Ajouter les atomes dans l'ordre de dessin
+            indexe.add(i);
         }
         
+        //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
@@ -79,16 +81,17 @@ public class App {
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
 
-            for (int N = 0; N < 20; N++) {              //Sous-étapes. Répète N fois/image
+            //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 20; N++) {
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourLiens(Hs, i);    //Créer/Détruire les liens.
+                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
                 Intégrateur.IterVerlet(Hs, dt); //Mise à jour de la position.
                 temps += dt;
             }
 
             //Affichage de la simulation
-            DessinerBoite();                            //Dessiner le domaine
+            DessinerBoite();  //Dessiner le domaine
 
             //Ordonner les atomes pour résoudre le problème de visibilité
             for (int i = 0; i < Hs.size()-1; i++) {
@@ -106,13 +109,13 @@ public class App {
             
             //Statistiques sur la vitesse de la simulation
             System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-
-            //énoncerMolécules(Hs);     //Lister les pourcentages de présence de chaques molécules dans la simulation
-
+            
+            //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
         }
     }
 
+    /**Dessine une boite représentant le domaine de simulation à  l'écran */
     public static void DessinerBoite(){
         double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
         double multPersZBoiteProche=(FOVBoite/(-TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
@@ -207,6 +210,11 @@ public class App {
         );
     } 
     
+    /**
+     * Dessine l'atome A à l'écran.
+     * @param A - Atome à dessiner
+     * @param B - Liste des atomes de la simulation. Est utilisé pour dessiner les liens.
+     */
     public static void DessinerAtome(Atome A, ArrayList<Atome> B){
 
         double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet)); //Multiplicateur de profondeur (forme la perspective)
@@ -273,10 +281,24 @@ public class App {
         }
     }
 
+    /**
+     * Fonction d'interpolation linéaire ente a et b.
+     * @param a - Valeur a
+     * @param b - Valeur b
+     * @param m - Facteur d'interpolation
+     * @return Interpolation linéaire entre a et b
+     */
     private static double mix(double a, double b, double m){
         return (1.0-m)*a + m*b;
     }
 
+    /**
+     * Fixe a entre les valeurs de b et c.
+     * @param a - Valeur à fixer
+     * @param b - Minimum de a
+     * @param c - Maximum de b
+     * @return Max( Min( a, c ), b )
+     */
     private static double clamp(double a, double b, double c){
         if(a < b){
             return b;
@@ -287,7 +309,9 @@ public class App {
         }
     }
 
-    //Liste le pourcentage de présence de chaque molécule dans la simulation
+    /**Liste le pourcentage de présence de chaque molécule dans la simulation
+     * @param Atomes - Liste des atomes de la simulation
+    */
     public static void énoncerMolécules(ArrayList<Atome> Atomes){
 
         ArrayList<Integer> vus = new ArrayList<>();         //Tout les atomes déjà évalués
@@ -391,7 +415,11 @@ public class App {
         System.out.println(outB);
     }
 
-    //Vas chercher tout les atomes reliés à cet atome et renvoie ainsi les constituants de la molécule.
+    /**Vas chercher tout les atomes reliés à cet atome et renvoie ainsi les constituants de la molécule.
+     * @param Atomes - Liste de tout les atomes de la simulation
+     * @param indexe - Indexe de l'atome à regarder
+     * @param vus - Liste de tout les atomes déjà traités
+    */
     public static int[] ajouterAtomeÀMolécule(ArrayList<Atome> Atomes, int indexe, ArrayList<Integer> vus){
 
         int[] retour = new int[19]; // Initialise la liste des atomes de retours.
