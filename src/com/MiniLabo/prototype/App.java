@@ -49,8 +49,8 @@ public class App {
                 for(int z = 0; z < (TailleZ/(Zoom*espacement)) - 1/espacement; z++){
 
                     Atome C = new Atome(8);
-                    C.position = new Vecteur3f(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
-                    C.vélocité = new Vecteur3f((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    C.position = new Vecteur3D(x*espacement + 1 - (TailleX/(2*Zoom)),y*espacement - (TailleY/(2*Zoom)), ((-z)*espacement + (TailleZ/(2*Zoom))));
+                    C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
                     /*Atome H2 = new Atome(17);
@@ -216,7 +216,7 @@ public class App {
         g.setColor(Color.YELLOW);   //Couleur de l'électron
         for (int i = 0; i < A.positionDoublet.length; i++) {
             if(A.positionDoublet[i] .z> 0.0){
-                Vecteur3f Epos = Vecteur3f.add(A.position, A.positionDoublet[i]); //Position 3D du doublet
+                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet[i]); //Position 3D du doublet
                 //Dessiner le doublet
                 g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
             }
@@ -245,7 +245,7 @@ public class App {
         g.setColor(Color.YELLOW); //Couleur de l'électron
         for (int i = 0; i < A.positionDoublet.length; i++) {
             if(A.positionDoublet[i] .z < 0.0){
-                Vecteur3f Epos = Vecteur3f.add(A.position, A.positionDoublet[i]);//Position 3D du doublet
+                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet[i]);//Position 3D du doublet
                 //Dessiner le doublet
                 g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
             }

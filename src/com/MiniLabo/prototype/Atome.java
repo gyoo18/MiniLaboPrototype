@@ -4,10 +4,10 @@ import java.util.ArrayList;
 public class Atome{
 
     //État de l'atome
-    public Vecteur3f prevPosition = null;                       //Position de l'atome à temps t-1
-    public Vecteur3f position = new Vecteur3f(100,0,0);   //Position présente de l'atome
-    public Vecteur3f vélocité = new Vecteur3f(0,0,0);     //Vélocité présente
-    public Vecteur3f Force = new Vecteur3f(0);              //Force appliquée présentement
+    public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
+    public Vecteur3D position = new Vecteur3D(100,0,0);   //Position présente de l'atome
+    public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
+    public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
     public int NP;                      //Nombre de protons. Définis le type d'atomes.
     public int NE;                      //Nombre d'électrons.
@@ -16,10 +16,10 @@ public class Atome{
     public float électronégativité = 0; //Électronégativité de l'atome peut varier avec le nombre d'électrons
 
     //État des doublets
-    public Vecteur3f[] positionDoublet; //Position des doublets relatif au noyau
-    public Vecteur3f[] prevPosDoublet;  //Position des doublets à temps t-1
-    public Vecteur3f[] vélDoublet;      //Vélocité des doublets
-    public Vecteur3f[] forceDoublet;    //Force appliqué sur les doublets
+    public Vecteur3D[] positionDoublet; //Position des doublets relatif au noyau
+    public Vecteur3D[] prevPosDoublet;  //Position des doublets à temps t-1
+    public Vecteur3D[] vélDoublet;      //Vélocité des doublets
+    public Vecteur3D[] forceDoublet;    //Force appliqué sur les doublets
 
     public int[] liaisonIndexe;
     // Indexe des atomes liés à cet atome. Chaque case représente une possibilité de liaison. 
@@ -156,36 +156,36 @@ public class Atome{
                 //Si on ne regarde pas cet atome
 
                 //Vecteur direction vers l'autre atome (A')
-                Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(A.position,Environnement.get(i).position) );
+                Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,Environnement.get(i).position) );
                 //Distance entre A et A'
-                double dist = Vecteur3f.distance(Environnement.get(i).position, A.position); 
+                double dist = Vecteur3D.distance(Environnement.get(i).position, A.position); 
 
                 if(dist < 25*A.rayonCovalent){
                     //Si A' se situe à moins de 25 rayons covalents de A
                     
                     //Appliquer la force de Pauli
-                    A.Force.add( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
+                    A.Force.addi( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer les forces de Van der Walls
-                    A.Force.add( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
+                    A.Force.addi( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer la force électrique
-                    A.Force.add( ForceElectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    A.Force.addi( ForceElectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     //Forces des autres atomes sur les doublets
                     for (int j = 0; j < A.forceDoublet.length; j++) {
                         //TODO #8 YuriSlayer ajouter effet des électrons sur les atomes et interraction électrons-électrons
 
                         //Vecteur de direction vers l'autre atome (A')
-                        Vecteur3f eDir = Vecteur3f.normalize(Vecteur3f.sub(Vecteur3f.add(A.positionDoublet[j], A.position),Environnement.get(i).position));
+                        Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet[j], A.position),Environnement.get(i).position));
                         //Distance entre le doublet et A'
-                        double eDist = Vecteur3f.distance(Vecteur3f.add(A.position,A.positionDoublet[j]), Environnement.get(i).position);
+                        double eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet[j]), Environnement.get(i).position);
 
                         //Appliquer la force de Pauli
-                        A.forceDoublet[j].add( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir)); //force paulie
+                        A.forceDoublet[j].addi( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir)); //force paulie
                         //Apliquer les force de Van der Walls
-                        A.forceDoublet[j].add(  ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
+                        A.forceDoublet[j].addi(  ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
 
                         //Appliquer la force électrique
-                        A.forceDoublet[j].add(  ForceElectrique(-2, Environnement.get(i).charge,eDist,eDir) );
+                        A.forceDoublet[j].addi(  ForceElectrique(-2, Environnement.get(i).charge,eDist,eDir) );
                         
                     }
                 }
@@ -199,9 +199,9 @@ public class Atome{
             if(A.liaisonIndexe[i] != -1){
                 //S'il y a une liaison
                 //Vecteur de direction qui pointe vers l'autre atome (A')
-                Vecteur3f dir = Vecteur3f.normalize( Vecteur3f.sub(A.position,Environnement.get(A.liaisonIndexe[i]).position) );
+                Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,Environnement.get(A.liaisonIndexe[i]).position) );
                 //Distance entre A et A'
-                double dist = Vecteur3f.distance(Environnement.get(A.liaisonIndexe[i]).position, A.position);
+                double dist = Vecteur3D.distance(Environnement.get(A.liaisonIndexe[i]).position, A.position);
 
                 //Évaluer le nombre de liaison existantes entre A et A'
                 int nLiaisons = 0;
@@ -241,11 +241,11 @@ public class Atome{
                     double a = Math.sqrt(p/(2.0*D));
                     //Appliquer la force de morse
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));
-                    A.Force.add( Vecteur3f.scale(dir, module) );
+                    A.Force.addi( Vecteur3D.mult(dir, module) );
 
 
                     //Appliquer la force de torsion avec tout les autres liens
-                    /*int nLiens = 0;
+                    int nLiens = 0;
                     boolean[] traité = new boolean[A.liaisonIndexe.length];
                     for (int j = 0; j < A.liaisonIndexe.length; j++) {
                         if(A.liaisonIndexe[j] != -1 && !traité[j]){
@@ -258,17 +258,17 @@ public class Atome{
 
                     for(int j = i+1; j < A.liaisonIndexe.length; j++){
                         if(A.liaisonIndexe[j] != -1 && A.liaisonIndexe[i] != A.liaisonIndexe[j]){
-                            Vecteur3f lDir = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, Environnement.get(A.liaisonIndexe[j]).position);
+                            Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe[i]).position, Environnement.get(A.liaisonIndexe[j]).position);
 
-                            Vecteur3f IAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, A.position );
-                            Vecteur3f IDir = Vecteur3f.sub( lDir, Vecteur3f.scale( IAxe, Vecteur3f.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
+                            Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe[i]).position, A.position );
+                            Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
                             IDir.norm();
 
-                            Vecteur3f JAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[j]).position, A.position );
-                            Vecteur3f JDir = Vecteur3f.sub( lDir.opposé(), Vecteur3f.scale( JAxe, Vecteur3f.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
+                            Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe[j]).position, A.position );
+                            Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
                             JDir.norm();
 
-                            double angle = Math.acos(Vecteur3f.scal(IAxe, JAxe)/(IAxe.length()*JAxe.length()));
+                            double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
                             double angle0;
 
                             //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
@@ -298,17 +298,17 @@ public class Atome{
                     }
 
                     for(int j = 0; j < A.positionDoublet.length; j++){
-                        Vecteur3f lDir = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, Vecteur3f.add(A.positionDoublet[j],A.position));
+                        Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe[i]).position, Vecteur3D.addi(A.positionDoublet[j],A.position));
 
-                        Vecteur3f IAxe = Vecteur3f.sub( Environnement.get(A.liaisonIndexe[i]).position, A.position );
-                        Vecteur3f IDir = Vecteur3f.sub( lDir, Vecteur3f.scale( IAxe, Vecteur3f.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
+                        Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe[i]).position, A.position );
+                        Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
                         IDir.norm();
 
-                        Vecteur3f JAxe = A.positionDoublet[j];
-                        Vecteur3f JDir = Vecteur3f.sub( lDir.opposé(), Vecteur3f.scale( JAxe, Vecteur3f.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
+                        Vecteur3D JAxe = A.positionDoublet[j];
+                        Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
                         JDir.norm();
 
-                        double angle = Math.acos(Vecteur3f.scal(IAxe, JAxe)/(IAxe.length()*JAxe.length()));
+                        double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
                         double angle0;
 
                         //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
@@ -337,7 +337,6 @@ public class Atome{
 
                         //A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
                     }
-                    */
 
                     liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
                 }
@@ -351,18 +350,17 @@ public class Atome{
     }
 
     
-    private static Vecteur3f ForceElectrique(double q1, double q2, double r, Vecteur3f dir){
-        return ( Vecteur3f.scale(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
+    private static Vecteur3D ForceElectrique(double q1, double q2, double r, Vecteur3D dir){
+        return ( Vecteur3D.mult(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
     }
-    private static Vecteur3f ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
-        return ( Vecteur3f.scale(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+    
+    private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+        return ( Vecteur3D.mult(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
-    private static Vecteur3f ForceVandervall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3f dir){
-        return ( Vecteur3f.scale(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
+    
+    private static Vecteur3D ForceVandervall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
     }
-
-
-
     
     //Applique des contraintes de mouvement, comme des bords de domaines.
     public void ÉvaluerContraintes(){
@@ -374,7 +372,7 @@ public class Atome{
             //Inverser la vitesse
             vélocité.y = -vélocité.y;
             if(prevPosition != null){
-                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,2*(position.y-prevPosition.y),0) );
+                prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(0,2*(position.y-prevPosition.y),0) );
             }
         }
         //Rebondir en X
@@ -384,7 +382,7 @@ public class Atome{
             //Inverser la vitesse
             vélocité.x = -vélocité.x;
             if(prevPosition != null)
-                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(2*(position.x-prevPosition.x),0,0));
+                prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(2*(position.x-prevPosition.x),0,0));
             
         }
         //Rebondir en Z
@@ -394,18 +392,18 @@ public class Atome{
             //Inverser la vitesse
             vélocité.z = -vélocité.z;
             if(prevPosition != null)
-                prevPosition= Vecteur3f.add(prevPosition, new Vecteur3f(0,0,2*(position.z-prevPosition.z)) );
+                prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(0,0,2*(position.z-prevPosition.z)) );
         }
 
         //Conserver la même distance entre les doublets et l'atome
         for (int i = 0; i < forceDoublet.length; i++) {
             //Contraindre la position et la position précédente
-            positionDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(positionDoublet[i]), rayonCovalent);
-            prevPosDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(prevPosDoublet[i]), rayonCovalent);
+            positionDoublet[i] = Vecteur3D.mult(Vecteur3D.norm(positionDoublet[i]), rayonCovalent);
+            prevPosDoublet[i] = Vecteur3D.mult(Vecteur3D.norm(prevPosDoublet[i]), rayonCovalent);
             //Retirer la vitesse centripède
-            if(vélDoublet[i].length() > 0){
-                vélDoublet[i] = Vecteur3f.sub(vélDoublet[i], Vecteur3f.scale( positionDoublet[i], Vecteur3f.scal(vélDoublet[i], positionDoublet[i])/(positionDoublet[i].longueur()*positionDoublet[i].longueur()) ) );
-                vélDoublet[i] = Vecteur3f.scale(Vecteur3f.norm(vélDoublet[i]), Math.min(vélDoublet[i].length(), 10000000000000.0));
+            if(vélDoublet[i].longueur() > 0){
+                vélDoublet[i] = Vecteur3D.sous(vélDoublet[i], Vecteur3D.mult( positionDoublet[i], Vecteur3D.scal(vélDoublet[i], positionDoublet[i])/(positionDoublet[i].longueur()*positionDoublet[i].longueur()) ) );
+                vélDoublet[i] = Vecteur3D.mult(Vecteur3D.norm(vélDoublet[i]), Math.min(vélDoublet[i].longueur(), 10000000000000.0));
             }
         }
     }
@@ -575,15 +573,15 @@ public class Atome{
         }
         
         //charge += (double)doublets*2.0; //Ajuste la charge de l'atome en fonction des doublets. Ils seront traités séparéments.
-        positionDoublet = new Vecteur3f[doublets]; //Initialiser la liste des positions des doublets
-        prevPosDoublet = new Vecteur3f[doublets];  //Initialiser la liste des positions précédentes des doublets
-        vélDoublet = new Vecteur3f[doublets];      //Initialiser la liste des vélocités des doublets
-        forceDoublet = new Vecteur3f[doublets];    //Initialiser la liste des forces des doublets
+        positionDoublet = new Vecteur3D[doublets]; //Initialiser la liste des positions des doublets
+        prevPosDoublet = new Vecteur3D[doublets];  //Initialiser la liste des positions précédentes des doublets
+        vélDoublet = new Vecteur3D[doublets];      //Initialiser la liste des vélocités des doublets
+        forceDoublet = new Vecteur3D[doublets];    //Initialiser la liste des forces des doublets
         //Remplir les listes
         for (int i = 0; i < positionDoublet.length; i++) {
-            forceDoublet[i] = new Vecteur3f(0);
-            vélDoublet[i] = new Vecteur3f(0);
-            positionDoublet[i] = new Vecteur3f(Math.random(),Math.random(),Math.random()); //Donner une position de départ aléatoire entre (0,0,0) et (1,1,1). Elle serat ramenée au rayon de l'atome plus tard.
+            forceDoublet[i] = new Vecteur3D(0);
+            vélDoublet[i] = new Vecteur3D(0);
+            positionDoublet[i] = new Vecteur3D(Math.random(),Math.random(),Math.random()); //Donner une position de départ aléatoire entre (0,0,0) et (1,1,1). Elle serat ramenée au rayon de l'atome plus tard.
             prevPosDoublet[i] = positionDoublet[i].copier(); //Donner la position initiale comme position précédente initiale.
         }
         System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
@@ -612,7 +610,7 @@ public class Atome{
             //Pour toutes les possibilités de liaisons
             if(liaisonIndexe[i] != -1){
                 //S'il y a une liaison
-                double dist = Vecteur3f.distance(position, Atomes.get(liaisonIndexe[i]).position); //Évaluer la distance entre les deux atomes
+                double dist = Vecteur3D.distance(position, Atomes.get(liaisonIndexe[i]).position); //Évaluer la distance entre les deux atomes
                 if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
                     //Si la distance est 2 fois la longueur de liaison,
                     //Distribuer les électrons entre les deux atomes
@@ -656,7 +654,7 @@ public class Atome{
 
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liens
-            double min_dist = Double.MAX_VALUE;
+            double min_dist = Double.MAX_VALUE; //distance avec l'atome le plus proche
             if (liaisonIndexe[i] == -1) {
                 //S'il n'y a pas de lien déjà en place
                 int indexePot = -1; //Indexe du candidat potentiel pour créer un lien
@@ -666,10 +664,10 @@ public class Atome{
                     //Pour tout les atomes
                     if(indexe != j){
                         //Si ce n'est pas cet atome (A)
-                        double dist = Vecteur3f.distance(position, Atomes.get(j).position); //Calculer la distance entre A et A'
+                        double dist = Vecteur3D.distance(position, Atomes.get(j).position); //Calculer la distance entre A et A'
                         if(dist < min_dist && dist < 2.0*(rayonCovalent + Atomes.get(j).rayonCovalent)){
-                            //Si la distance est de moins de 2 longueurs de liaisons
-                            //Évaluer le nombres de liaisons que A' peut encore créer
+                            //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
+                            //Chercher une case qui peut acceuillir une liaison chez A'
                             placeLibre = -1;
                             for (int k = 0; k < Atomes.get(j).liaisonIndexe.length; k++) {
                                 if(Atomes.get(j).liaisonIndexe[k] == -1){
@@ -678,47 +676,59 @@ public class Atome{
                                 }
                             }
                             if(placeLibre != -1){
-                                //S'il y a au moins une place libre
+                                //Si on a trouvé une place libre chez A'
+                                //Évaluer le nombre de liaisons déjà créés avec A'
                                 nLiaisons = 0;
                                 for (int k = 0; k < liaisonIndexe.length; k++) {
                                     if(j == liaisonIndexe[k]){
                                         nLiaisons++;
                                     }
                                 }
-                                indexePot = j;
-                                min_dist = dist;
+                                if(nLiaisons < 3){
+                                    //S'il y a moins de 3 liaisons avec A'
+                                    indexePot = j;  //Garder A' comme candidat potentiel
+                                    min_dist = dist;//Garder A' comme atome le plus proche
+                                }
                             }
                         }
                     }
                 }
                 if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
-                    liaisonIndexe[i] = indexePot;
-                    Atomes.get(indexePot).liaisonIndexe[placeLibre] = indexe;
+                    //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
+                    liaisonIndexe[i] = indexePot;   //Ajouter une référence de A' à A
+                    Atomes.get(indexePot).liaisonIndexe[placeLibre] = indexe;   //Donner une référence de A à A'
                     if (nLiaisons == 0) {
+                        //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
                         liaisonType[i] = false;
+                        Atomes.get(indexePot).liaisonType[placeLibre] = false;
                     }else {
-                        liaisonType[i] = true;   
+                        //Sinon, la nouvelle sera de type pi
+                        liaisonType[i] = true;
+                        Atomes.get(indexePot).liaisonType[placeLibre] = true;
                     }
 
+                    //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
                     float proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),forceSigmoide);
-                    charge += 1.0-2.0*proportion;
-                    Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);
+                    charge += 1.0-2.0*proportion;                            //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
+                    Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);//Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
                 }
             }
         }
     }
 
+    //Utilisation pour le calcul des charge partielles des liens.
     private double sigmoide(double x, double facteur){
         double fNorm = 0.5/ ( Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5))) - 0.5);
         return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
     }
 
-    public Atome copy(){
+    //Renvoie une copie de l'atome
+    public Atome copier(){
         Atome a = new Atome();
-        a.prevPosition = this.prevPosition==null?null:this.prevPosition.copy();
-        a.position = this.position.copy();
-        a.vélocité = this.vélocité.copy();
-        a.Force = this.Force.copy();
+        a.prevPosition = this.prevPosition==null?null:this.prevPosition.copier();
+        a.position = this.position.copier();
+        a.vélocité = this.vélocité.copier();
+        a.Force = this.Force.copier();
         a.positionDoublet = this.positionDoublet.clone();
         a.prevPosDoublet = this.prevPosDoublet.clone();
         a.vélDoublet = this.vélDoublet.clone();
@@ -738,12 +748,13 @@ public class Atome{
         return a;
     }
 
-    public void copy(Atome a){
+    //Copie l'atome a
+    public void copier(Atome a){
         Atome b = (Atome) a;
         this.prevPosition = b.prevPosition;
-        this.position = b.position.copy();
-        this.vélocité = b.vélocité.copy();
-        this.Force = b.Force.copy();
+        this.position = b.position.copier();
+        this.vélocité = b.vélocité.copier();
+        this.Force = b.Force.copier();
         this.positionDoublet = b.positionDoublet.clone();
         this.prevPosDoublet = b.prevPosDoublet.clone();
         this.vélDoublet = b.vélDoublet.clone();
@@ -761,9 +772,10 @@ public class Atome{
         this.cases = b.cases;
     }
 
+    //Initialise la position précédente initiale avec une certaine vitesse. Est utilisé pour Verlet.
     public void prevPositionInit(double h){
         if(prevPosition == null){
-            prevPosition = Vecteur3f.add(position, Vecteur3f.scale(vélocité, -h)).copy();
+            prevPosition = Vecteur3D.addi(position, Vecteur3D.mult(vélocité, -h)).copier();
         }
     }
 }
