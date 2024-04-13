@@ -199,13 +199,13 @@ public class Atome{
         //qu'il a déjà été traité.
         for(int i = 0; i < A.liaisonIndexe.length; i++){
             //Pour toutes les liaisons
+
+            //S'il n'y a pas de liaison, sauter à la prochaine
             if(A.liaisonIndexe[i] == -1){
-                //S'il n'y a pas de liaison, sauter à la prochaine
                 continue;
             }
-
+            //Si l'atome a déjà été traité, passer au prochain
             if(liaisonTraitée[i]){
-                //Si l'atome a déjà été traité, passer au prochain
                 continue;
             }
 
@@ -220,13 +220,13 @@ public class Atome{
                 }
             }
 
-            Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,Environnement.get(A.liaisonIndexe[i]).position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
+            Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position, Environnement.get(A.liaisonIndexe[i]).position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
             double dist = Vecteur3D.distance(Environnement.get(A.liaisonIndexe[i]).position, A.position); //Distance entre A et A'
 
-            A.Force.addi( ForceDeMorse(dist, dir, nLiaisons, A.NP, Environnement.get(i).NP) ); //Appliquer la force de Morse
+            A.Force.addi( ForceDeMorse(dist, dir, nLiaisons, A.NP, Environnement.get(A.liaisonIndexe[i]).NP) ); //Appliquer la force de Morse
 
             //Appliquer la force de torsion avec tout les autres liens
-            int nLiens = 0;
+            /*int nLiens = 0;
             boolean[] traité = new boolean[A.liaisonIndexe.length];
             for (int j = 0; j < A.liaisonIndexe.length; j++) {
                 if(A.liaisonIndexe[j] != -1 && !traité[j]){
@@ -239,7 +239,7 @@ public class Atome{
 
             for(int j = i+1; j < A.liaisonIndexe.length; j++){
                 
-                if(A.liaisonIndexe[j] != -1 && A.liaisonIndexe[i] != A.liaisonIndexe[j]){
+                if(A.liaisonIndexe[j] == -1 || A.liaisonIndexe[i] == A.liaisonIndexe[j]){
                     //Si la liaison n'existe pas ou qu'elle est celle que nous évaluons en ce moment, passer à la prochaine
                     continue;
                 }
@@ -321,7 +321,7 @@ public class Atome{
 
                 A.Force.addi(Vecteur3D.mult(A.positionDoublet[j], Vecteur3D.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].longueur()*A.positionDoublet[j].longueur())));
             }
-
+            */
             liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
         }
 
@@ -376,7 +376,7 @@ public class Atome{
         A.Force.addi( Vecteur3D.mult(A.vélocité,-0.000000000001)); //Appliquer une force de friction
         A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.length; i++) {
-            A.forceDoublet[i].addi(Vecteur3D.mult(A.vélDoublet[i],-0.000001));
+            A.forceDoublet[i].addi(Vecteur3D.mult(A.vélDoublet[i],-0.01));
         }
 
         //A.ÉvaluerContraintes();
@@ -449,7 +449,7 @@ public class Atome{
         double a = Math.sqrt(p/(2.0*D));
         double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
 
-        return ( Vecteur3D.mult(dir, module) );
+        return ( Vecteur3D.mult(dir,module) );
     }
     
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
@@ -697,7 +697,7 @@ public class Atome{
         //Briser les liens
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liaisons
-            if(liaisonIndexe[i] != -1){
+            if(liaisonIndexe[i] == -1){
                 //S'il n'y a pas de liaison, passer à la prochaine
                 continue;
             }
@@ -746,8 +746,8 @@ public class Atome{
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liens
             double min_dist = Double.MAX_VALUE; //distance avec l'atome le plus proche
-            if (liaisonIndexe[i] == -1) {
-                //S'il n'y a pas de liaison, passer à la prochaine
+            if (liaisonIndexe[i] != -1) {
+                //S'il y a une liaison, passer à la prochaine
                 continue;
             }
             
@@ -756,14 +756,14 @@ public class Atome{
             int placeLibre = -1;//Nombre de liaisons que A' peut encore créer
             for (int j = 0; j < Atome.Environnement.size(); j++) {
                 //Pour tout les atomes
-                if(indexe != j){
-                    //Si j est cet atome (A), passer au prochain
+                if(indexe == j){
+                    //Si A' est A, passer au prochain
                     continue;
                 }
                 
-                Atome APrime = Atome.Environnement.get(liaisonIndexe[j]); //Référence à A'
+                Atome APrime = Atome.Environnement.get(j); //Référence à A'
                 double dist = Vecteur3D.distance(position, APrime.position); //Calculer la distance entre A et A'
-                if(dist < min_dist && dist < 2.0*(rayonCovalent +APrime.rayonCovalent)){
+                if(dist < min_dist && dist < 2.0*(rayonCovalent + APrime.rayonCovalent)){
                     //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
                     //Chercher une case qui peut acceuillir une liaison chez A'
                     placeLibre = -1;

@@ -48,14 +48,16 @@ public class App {
             for(int y = 0; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 0; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
+                    //int x = 1;int y = 1; int z = 1;
+
                     Atome C = new Atome(8);
-                    C.position = new Vecteur3D(x*espacement[0] + 1 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))+1));
-                   // //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    C.position = new Vecteur3D(x*espacement[0] + 1 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
+                    //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
                     Atome H2 = new Atome(1);
-                    H2.position = new Vecteur3D(x*espacement[0] + 2 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))-1));
-                   // //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    H2.position = new Vecteur3D(x*espacement[0] + 2 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H2);
 
                     Atome H3 = new Atome(1);
