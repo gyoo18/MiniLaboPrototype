@@ -121,7 +121,10 @@ public class Atome{
         { 0 } , // tableau [3] de int
     };
     
-
+    /**
+     * Créé un nouvel atome.
+     * @param nombreProton - Nombre de proton de cet atome. Définit l'élément qu'il représente.
+     */
     public Atome(int nombreProton){
         NP = nombreProton;
         m = (double)NP*2.0*mP; //Calculer la masse de l'atome. La masse des électrons est négligeable.
@@ -138,15 +141,19 @@ public class Atome{
     }
 
 
-    //Initialisation de l'atome uniquement utilisée lorsqu'on le copie
+    /**Initialisation de l'atome uniquement utilisée lorsqu'on le copie*/
     private Atome(){}
 
-    //Mise à jour de la référence à l'environnement
+    /**Mise à jour de la référence à l'environnement
+     * @param E - Liste des atomes de la simulation
+    */
     public static void MettreÀJourEnvironnement(ArrayList<Atome> E){
         Environnement = E;
     }
 
-    //Retourne les forces appliqués sur l'atome A
+    /**Retourne les forces appliqués sur l'atome A
+     * @param a - Atome sur lequel appliquer les forces 
+    */
     public static void ÉvaluerForces(Atome A){
 
         //Forces découlant des interractions avec les atomes non-liés
@@ -183,7 +190,10 @@ public class Atome{
         }
 
         //Forces de liaisons
-        boolean[] liaisonTraitée = new boolean[A.liaisonIndexe.length]; //Liste des atomes traités dans les liaisons (il y a des doublons, ça permet de ne pas les traiter deux fois)
+        boolean[] liaisonTraitée = new boolean[A.liaisonIndexe.length]; //Liste des liaison déjà traités
+        //S'il y a plus d'une liaison par atome, A' sera représenté plus d'une fois dans la liste.
+        //Puisque nous ne voulons pas appliquer la force plus d'une fois, il faut indiquer
+        //qu'il a déjà été traité.
         for(int i = 0; i < A.liaisonIndexe.length; i++){
             //Pour toutes les liaisons
             if(A.liaisonIndexe[i] == -1){
@@ -191,8 +201,10 @@ public class Atome{
                 continue;
             }
 
-            Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,Environnement.get(A.liaisonIndexe[i]).position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
-            double dist = Vecteur3D.distance(Environnement.get(A.liaisonIndexe[i]).position, A.position); //Distance entre A et A'
+            if(liaisonTraitée[i]){
+                //Si l'atome a déjà été traité, passer au prochain
+                continue;
+            }
 
             //Évaluer le nombre de liaison existantes entre A et A'
             int nLiaisons = 0;
@@ -200,39 +212,15 @@ public class Atome{
                 if(A.liaisonIndexe[j] == A.liaisonIndexe[i]){
                     nLiaisons++;
                     if(i != j){
-                        //S'il y a plus d'une liaison, l'atome sera représenté plus d'une fois dans la liste.
-                        //Puisque nous ne voulons pas appliquer la force plus d'une fois, il faut indiquer
-                        //que l'atome a déjà été traité.
-                        liaisonTraitée[j] = true; 
+                        liaisonTraitée[j] = true; //Indiquer que A' a déjà été traité
                     }
                 }
             }
-            
-            if(!liaisonTraitée[i]){
-                //Si l'atome a déjà été traité, passer au prochain
-                continue;
-            }
 
-            //Appliquer les forces de liaisons
-            double l = 0; //Longueur de liaison
-            if(nLiaisons == 1){
-                l = rayonsCovalents[A.NP-1] + rayonsCovalents[Environnement.get(A.liaisonIndexe[i]).NP-1]; //Longueur d'ordre 1
-            }else if(nLiaisons == 2){
-                l = rayonsCovalents2[A.NP-1] + rayonsCovalents2[Environnement.get(A.liaisonIndexe[i]).NP-1]; //Longueur d'ordre 2
-            }else if(nLiaisons == 3){
-                l = rayonsCovalents3[A.NP-1] + rayonsCovalents3[Environnement.get(A.liaisonIndexe[i]).NP-1];  //Longueur d'ordre 3;
-            }
-            
-            l = l/100.0;    //La longueur est en pm et on travaille en Å.
-            double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
-            double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
-            //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
-            // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
-            // quasiment identique à s'il n'était pas lié.
-            double a = Math.sqrt(p/(2.0*D));
-            double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
-            A.Force.addi( Vecteur3D.mult(dir, module) );
+            Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,Environnement.get(A.liaisonIndexe[i]).position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
+            double dist = Vecteur3D.distance(Environnement.get(A.liaisonIndexe[i]).position, A.position); //Distance entre A et A'
 
+            A.Force.addi( ForceDeMorse(dist, dir, nLiaisons, A.NP, Environnement.get(i).NP) ); //Appliquer la force de Morse
 
             //Appliquer la force de torsion avec tout les autres liens
             int nLiens = 0;
@@ -391,35 +379,77 @@ public class Atome{
         //A.ÉvaluerContraintes();
     }
 
-    
+    /**
+     * Renvoie un vecteur qui représente la force électrique entre deux particules
+     * @param q1 - Charge de la première particule en nombre de charges élémentaires. Sera multiplié par la charge élémentaire e.
+     * @param q2 - Charge de la deuxième particule.
+     * @param r - Distance entre les deux particule en Angströms
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième charge vers la première.
+     * @return - Vecteur de force en Newtons Angströmiens
+     */
     private static Vecteur3D ForceÉlectrique(double q1, double q2, double r, Vecteur3D dir){
         return ( Vecteur3D.mult(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
     }
     
+    /**
+     * L'interaction de répulsion de Pauli est un phénomène quantique qui n'a pas d'équivalent physique. 
+     * Cette force ne représente pas une conversion directe,seulement une approximation raisonnable.
+     * Ainsi, cette fonction renvoie une force qui immite la répulsion de Pauli avec un terme de Lennard-Jones 6-12.
+     * @param RayonCovalent1 - Rayon Covalent de la première particule. Utilisé pour calculer la longueur d'une liaison potentielle entre les deux particule. Cette force devrait équilibrer les forces de Van der Walls et la force électrique autour de 2 fois la longueur de liaison.
+     * @param RayonCovalent2 - Rayon Covlaent de la deuxième particule.
+     * @param dist - Distance entre les deux particules en Angströms.
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
+     * @return Vecteur de force en Newtons Angströmiens
+     */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
         return ( Vecteur3D.mult(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
     
+    /**
+     * Renvoie une approximation des forces de Van der Walls.
+     * @param RayonCovalent1 - Rayon covalent de la première particule.
+     * @param RayonCovalent2 - Rayon covalent de la deuxième particule.
+     * @param dist - Distance entre les deux particules en Angströms.
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
+     * @return Vecteur de force en Newtons Angströmiens
+     */
     private static Vecteur3D ForceVanDerWall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
         return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
     }
-    private static Vecteur3D ForceDuLien(double l,double dist, Vecteur3D dir){
+
+    /**
+     * Le mécanisme de liaison de deux atome est très complexe, mais nous pouvons l'approximer avec un potentiel oscillatoire.
+     * Cette fonction renvoie une force qui imite le comportement d'une particule dans un lien en utilisant le potentiel de Morse.
+     * @param dist - Distance entre les deux atomes
+     * @param dir - Vecteur unitaire de direction qui pointe du deuxième atome vers le premier
+     * @param nLiaisons - Nombre de liaison présentes entre les deux atomes. (Liaison simple, double ou triple).
+     * @param NP - Nombre de protons du premier atome.
+     * @param NPA - Nombre de protons du deuxième atome.
+     * @return Vecteur de force en Newtons Angströmiens.
+     */
+    private static Vecteur3D ForceDeMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
+        double l = 0; //Longueur de liaison
+        if(nLiaisons == 1){
+            l = rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]; //Longueur d'ordre 1
+        }else if(nLiaisons == 2){
+            l = rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]; //Longueur d'ordre 2
+        }else if(nLiaisons == 3){
+            l = rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1];  //Longueur d'ordre 3;
+        }
+
+        l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
         double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
-         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
-         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
-         // quasiment identique à s'il n'était pas lié.
-
-         double a = Math.sqrt(p/(2.0*D));
-           //Appliquer la force de morse
-          double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));
+        //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
+        // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
+        // quasiment identique à s'il n'était pas lié.
+        double a = Math.sqrt(p/(2.0*D));
+        double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
 
         return ( Vecteur3D.mult(dir, module) );
     }
-
-
     
-    //Applique des contraintes de mouvement, comme des bords de domaines.
+    /**Applique des contraintes de mouvement, comme des bords de domaines.*/
     public void ÉvaluerContraintes(){
         //Appliquer des bords de domaine
         //Rebondir en Y
@@ -458,7 +488,7 @@ public class Atome{
         }
     }
 
-    //Ajouter un électron aux cases quantiques (en mode hybridé)
+    /**Ajouter un électron aux cases quantiques (en mode hybridé)*/
     private void ajouterÉlectron(){
         int Qn = 1; //Nombre quantique principal n
         int Ql = 0; //Nombre quantique azimutal l
@@ -509,7 +539,7 @@ public class Atome{
         calculerÉlectronégativitée();
     }
 
-    //Retirer un électron aux cases quantiques (en mode hybridé)
+    /**Retirer un électron aux cases quantiques (en mode hybridé)*/
     private void retirerÉlectron(){
         int Qn = MAX_N; //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence au MAX_N
         int Ql = Qn-1;  //Nombre quantique azimutal l.
@@ -567,7 +597,7 @@ public class Atome{
         calculerÉlectronégativitée();
     }
 
-    //Extrait certaines informations de la couche de valence
+    /**Extrait certaines informations de la couche de valence*/
     private void évaluerValence(){
         //Évalue le nombre liaisons possibles
         int n = 0;
@@ -636,6 +666,7 @@ public class Atome{
         System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
 
+    /**Calcule l'électronégativité de cet atome en utilisant l'électronégativité d'Allred-Rochow et la règle de Slater. L'électronégativité est affectée par le nombre d'électrons. */
     private void calculerÉlectronégativitée(){
         //Implémente l'électronégativité d'Allred-Rochow, avec la règle de Slater.
         double sigma;
@@ -650,7 +681,8 @@ public class Atome{
         électronégativité = (float)(0.359*Zeff/(Radii[NP-1]*Radii[NP-1]))+0.744f;
     }
     
-    public void miseÀJourLiens(ArrayList<Atome> Atomes, int indexe){
+    /**Créé et brise les liens lorsque nécessaire.*/
+    public void miseÀJourLiens(int indexe){
 
         double forceSigmoide = 5.0;
 
@@ -658,120 +690,136 @@ public class Atome{
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liaisons
             if(liaisonIndexe[i] != -1){
-                //S'il y a une liaison
-                double dist = Vecteur3D.distance(position, Atomes.get(liaisonIndexe[i]).position); //Évaluer la distance entre les deux atomes
-                if(dist > 2.0*(rayonCovalent + Atomes.get(liaisonIndexe[i]).rayonCovalent)){
-                    //Si la distance est 2 fois la longueur de liaison,
-                    //Distribuer les électrons entre les deux atomes
-                    //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
-                    float proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
-                    charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
-                    Atomes.get(liaisonIndexe[i]).charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
-                    retirerÉlectron();                              //Retirer un électron à A
-                    Atomes.get(liaisonIndexe[i]).retirerÉlectron(); //Retirer un électron à A'
+                //S'il n'y a pas de liaison, passer à la prochaine
+                continue;
+            }
+            
+            Atome APrime = Atome.Environnement.get(liaisonIndexe[i]); //Référence à A'
+            double dist = Vecteur3D.distance(position, APrime.position); //Évaluer la distance entre les deux atomes
+            if(dist > 2.0*(rayonCovalent + APrime.rayonCovalent)){
+                //Si la distance est 2 fois la longueur de liaison,
+                //Distribuer les électrons entre les deux atomes
+                //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
+                float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
+                charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
+                APrime.charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
+                retirerÉlectron();                              //Retirer un électron à A
+                APrime.retirerÉlectron(); //Retirer un électron à A'
 
-                    //Donner aléatoirement un électron à un atome. Plus l'atome est électronégatif, plus il a de chances d'obtenir l'électron
-                    if(Math.random() < proportion){
-                        ajouterÉlectron();
-                    }else{
-                        Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
-                    }
-                    
-                    //Recalculer les proportions, car l'électronégativité est affectée par la charge.
-                    proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(liaisonIndexe[i]).électronégativité),forceSigmoide);
-                    //Donner aléatoirment un électron à un atome.
-                    if(Math.random() < proportion){
-                        ajouterÉlectron();
-                    }else{
-                        Atomes.get(liaisonIndexe[i]).ajouterÉlectron();
-                    }
-
-                    //Retirer les références à A'
-                    for (int j = 0; j < Atomes.get(liaisonIndexe[i]).liaisonIndexe.length; j++) {
-                        if(Atomes.get(liaisonIndexe[i]).liaisonIndexe[j] == indexe){
-                            Atomes.get(liaisonIndexe[i]).liaisonIndexe[j] = -1;
-                            Atomes.get(liaisonIndexe[i]).liaisonType[j] = false;
-                        }
-                    }
-                    liaisonIndexe[i] = -1;
-                    liaisonType[i] = false;
+                //Donner aléatoirement un électron à un atome. Plus l'atome est électronégatif, plus il a de chances d'obtenir l'électron
+                if(Math.random() < proportion){
+                    ajouterÉlectron();
+                }else{
+                    APrime.ajouterÉlectron();
                 }
+                
+                //Recalculer les proportions, car l'électronégativité est affectée par la charge.
+                proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide);
+                //Donner aléatoirment un électron à un atome.
+                if(Math.random() < proportion){
+                    ajouterÉlectron();
+                }else{
+                    APrime.ajouterÉlectron();
+                }
+
+                //Retirer les références à A'
+                for (int j = 0; j < APrime.liaisonIndexe.length; j++) {
+                    if(APrime.liaisonIndexe[j] == indexe){
+                        APrime.liaisonIndexe[j] = -1;
+                        APrime.liaisonType[j] = false;
+                    }
+                }
+                liaisonIndexe[i] = -1;
+                liaisonType[i] = false;
             }
         }
 
         //Créer les liens
-
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liens
             double min_dist = Double.MAX_VALUE; //distance avec l'atome le plus proche
             if (liaisonIndexe[i] == -1) {
-                //S'il n'y a pas de lien déjà en place
-                int indexePot = -1; //Indexe du candidat potentiel pour créer un lien
-                int nLiaisons = 0;  //Nombre de liaisons déjà créées avec ce candidat
-                int placeLibre = -1;//Nombre de liaisons que A' peut encore créer
-                for (int j = 0; j < Atomes.size(); j++) {
-                    //Pour tout les atomes
-                    if(indexe != j){
-                        //Si ce n'est pas cet atome (A)
-                        double dist = Vecteur3D.distance(position, Atomes.get(j).position); //Calculer la distance entre A et A'
-                        if(dist < min_dist && dist < 2.0*(rayonCovalent + Atomes.get(j).rayonCovalent)){
-                            //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
-                            //Chercher une case qui peut acceuillir une liaison chez A'
-                            placeLibre = -1;
-                            for (int k = 0; k < Atomes.get(j).liaisonIndexe.length; k++) {
-                                if(Atomes.get(j).liaisonIndexe[k] == -1){
-                                    placeLibre = k;
-                                    break;
-                                }
+                //S'il n'y a pas de liaison, passer à la prochaine
+                continue;
+            }
+            
+            int indexePot = -1; //Indexe du candidat potentiel pour créer un lien
+            int nLiaisons = 0;  //Nombre de liaisons déjà créées avec ce candidat
+            int placeLibre = -1;//Nombre de liaisons que A' peut encore créer
+            for (int j = 0; j < Atome.Environnement.size(); j++) {
+                //Pour tout les atomes
+                if(indexe != j){
+                    //Si j est cet atome (A), passer au prochain
+                    continue;
+                }
+                
+                Atome APrime = Atome.Environnement.get(liaisonIndexe[j]); //Référence à A'
+                double dist = Vecteur3D.distance(position, APrime.position); //Calculer la distance entre A et A'
+                if(dist < min_dist && dist < 2.0*(rayonCovalent +APrime.rayonCovalent)){
+                    //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
+                    //Chercher une case qui peut acceuillir une liaison chez A'
+                    placeLibre = -1;
+                    for (int k = 0; k < APrime.liaisonIndexe.length; k++) {
+                        if(APrime.liaisonIndexe[k] == -1){
+                            placeLibre = k;
+                            break;
+                        }
+                    }
+                    if(placeLibre != -1){
+                        //Si on a trouvé une place libre chez A'
+                        //Évaluer le nombre de liaisons déjà créés avec A'
+                        nLiaisons = 0;
+                        for (int k = 0; k < liaisonIndexe.length; k++) {
+                            if(j == liaisonIndexe[k]){
+                                nLiaisons++;
                             }
-                            if(placeLibre != -1){
-                                //Si on a trouvé une place libre chez A'
-                                //Évaluer le nombre de liaisons déjà créés avec A'
-                                nLiaisons = 0;
-                                for (int k = 0; k < liaisonIndexe.length; k++) {
-                                    if(j == liaisonIndexe[k]){
-                                        nLiaisons++;
-                                    }
-                                }
-                                if(nLiaisons < 3){
-                                    //S'il y a moins de 3 liaisons avec A'
-                                    indexePot = j;  //Garder A' comme candidat potentiel
-                                    min_dist = dist;//Garder A' comme atome le plus proche
-                                }
-                            }
+                        }
+                        if(nLiaisons < 3){
+                            //S'il y a moins de 3 liaisons avec A'
+                            indexePot = j;  //Garder A' comme candidat potentiel
+                            min_dist = dist;//Garder A' comme atome le plus proche
                         }
                     }
                 }
-                if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
-                    //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
-                    liaisonIndexe[i] = indexePot;   //Ajouter une référence de A' à A
-                    Atomes.get(indexePot).liaisonIndexe[placeLibre] = indexe;   //Donner une référence de A à A'
-                    if (nLiaisons == 0) {
-                        //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
-                        liaisonType[i] = false;
-                        Atomes.get(indexePot).liaisonType[placeLibre] = false;
-                    }else {
-                        //Sinon, la nouvelle sera de type pi
-                        liaisonType[i] = true;
-                        Atomes.get(indexePot).liaisonType[placeLibre] = true;
-                    }
-
-                    //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
-                    float proportion = (float)sigmoide(électronégativité/(électronégativité+Atomes.get(indexePot).électronégativité),forceSigmoide);
-                    charge += 1.0-2.0*proportion;                            //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
-                    Atomes.get(indexePot).charge += 1.0-2.0*(1.0-proportion);//Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
+            }
+            if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
+                //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
+                Atome APrime = Atome.Environnement.get(indexePot); //Référence à A'
+                liaisonIndexe[i] = indexePot;   //Ajouter une référence de A' à A
+                APrime.liaisonIndexe[placeLibre] = indexe;   //Donner une référence de A à A'
+                if (nLiaisons == 0) {
+                    //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
+                    liaisonType[i] = false;
+                    APrime.liaisonType[placeLibre] = false;
+                }else {
+                    //Sinon, la nouvelle sera de type pi
+                    liaisonType[i] = true;
+                    APrime.liaisonType[placeLibre] = true;
                 }
+
+                //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
+                float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
+                charge += 1.0-2.0*proportion;                            //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
+                APrime.charge += 1.0-2.0*(1.0-proportion);//Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
             }
         }
     }
 
-    //Utilisation pour le calcul des charge partielles des liens.
+    /**
+     * Augmente le contraste d'une valeur entre 0 et 1, en l'éloignant de 0.5 et en la poussant vers les extrêmes.
+     * @param x - Valeur à contraster. Doit être entre 0 et 1.
+     * @param facteur - Facteur de contraste
+     * @return Une version contrasté de x. La valeur serat comprise entre 0 et 1 et sigmoide(0) = 0; sigmoide(1) = 1
+     */
     private double sigmoide(double x, double facteur){
         double fNorm = 0.5/ ( Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5))) - 0.5);
         return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
     }
 
-    //Renvoie une copie de l'atome
+    /**
+     * Renvoie une copie de l'atome
+     * @return Un atome copié
+     */
     public Atome copier(){
         Atome a = new Atome();
         a.prevPosition = this.prevPosition==null?null:this.prevPosition.copier();
@@ -797,7 +845,10 @@ public class Atome{
         return a;
     }
 
-    //Copie l'atome a
+    /**
+     * Copie l'atome.
+     * @param a - Atome à copier
+     */
     public void copier(Atome a){
         Atome b = (Atome) a;
         this.prevPosition = b.prevPosition;
@@ -821,7 +872,9 @@ public class Atome{
         this.cases = b.cases;
     }
 
-    //Initialise la position précédente initiale avec une certaine vitesse. Est utilisé pour Verlet.
+    /**Initialise la position précédente initiale avec une certaine vitesse. Est utilisé pour Verlet.
+     * @param h - delta temps
+    */
     public void prevPositionInit(double h){
         if(prevPosition == null){
             prevPosition = Vecteur3D.addi(position, Vecteur3D.mult(vélocité, -h)).copier();
