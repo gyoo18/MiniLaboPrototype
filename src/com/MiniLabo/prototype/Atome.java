@@ -160,15 +160,15 @@ public class Atome{
                 //Distance entre A et A'
                 double dist = Vecteur3D.distance(Environnement.get(i).position, A.position); 
 
-                if(dist < 25*A.rayonCovalent){
-                    //Si A' se situe à moins de 25 rayons covalents de A
+                if(dist < 10*A.rayonCovalent){
+                    //Si A' se situe à moins de N rayons covalents de A
                     
                     //Appliquer la force de Pauli
                     A.Force.addi( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer les forces de Van der Walls
-                    A.Force.addi( ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
+                    A.Force.addi( ForceVanDerWall(A.rayonCovalent,Environnement.get(i).rayonCovalent, dist, dir));
                     //Appliquer la force électrique
-                    A.Force.addi( ForceElectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
+                    A.Force.addi( ForceÉlectrique(A.charge, Environnement.get(i).charge,dist,dir)); //Force electrique, les forces se repousse quand il son positive hydrogen est .37 ag
 
                     //Forces des autres atomes sur les doublets
                     for (int j = 0; j < A.forceDoublet.length; j++) {
@@ -182,10 +182,10 @@ public class Atome{
                         //Appliquer la force de Pauli
                         A.forceDoublet[j].addi( ForcePaulie(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir)); //force paulie
                         //Apliquer les force de Van der Walls
-                        A.forceDoublet[j].addi(  ForceVandervall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
+                        A.forceDoublet[j].addi(  ForceVanDerWall(A.rayonCovalent,Environnement.get(i).rayonCovalent, eDist, eDir));
 
                         //Appliquer la force électrique
-                        A.forceDoublet[j].addi(  ForceElectrique(-2, Environnement.get(i).charge,eDist,eDir) );
+                        A.forceDoublet[j].addi(  ForceÉlectrique(-2, Environnement.get(i).charge,eDist,eDir) );
                         
                     }
                 }
@@ -243,7 +243,6 @@ public class Atome{
                     double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l)));
                     A.Force.addi( Vecteur3D.mult(dir, module) );
 
-
                     //Appliquer la force de torsion avec tout les autres liens
                     int nLiens = 0;
                     boolean[] traité = new boolean[A.liaisonIndexe.length];
@@ -291,8 +290,8 @@ public class Atome{
                             double Kij = 1000.0;
                             double D0 = angle0-angle;
                             
-                            //Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
-                            //Atome.Environnement.get(A.liaisonIndexe[j]).Force.add(Vecteur3f.scale(JDir, D0*Kij));
+                            Atome.Environnement.get(A.liaisonIndexe[i]).Force.addi(Vecteur3D.mult(IDir, D0*Kij));
+                            Atome.Environnement.get(A.liaisonIndexe[j]).Force.addi(Vecteur3D.mult(JDir, D0*Kij));
 
                         }
                     }
@@ -331,11 +330,11 @@ public class Atome{
                         double Kij = 1000.0;
                         double D0 = angle0-angle;
                         
-                        //Atome.Environnement.get(A.liaisonIndexe[i]).Force.add(Vecteur3f.scale(IDir, D0*Kij));
-                        //Vecteur3f forceDoublet = Vecteur3f.scale(JDir, D0*Kij);
-                        //A.forceDoublet[j].add(forceDoublet);
+                        Atome.Environnement.get(A.liaisonIndexe[i]).Force.addi(Vecteur3D.mult(IDir, D0*Kij));
+                        Vecteur3D forceDoublet = Vecteur3D.mult(JDir, D0*Kij);
+                        A.forceDoublet[j].addi(forceDoublet);
 
-                        //A.Force.add(Vecteur3f.scale(A.positionDoublet[j], Vecteur3f.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].length()*A.positionDoublet[j].length())));
+                        A.Force.addi(Vecteur3D.mult(A.positionDoublet[j], Vecteur3D.scal(forceDoublet, A.positionDoublet[j])/(A.positionDoublet[j].longueur()*A.positionDoublet[j].longueur())));
                     }
 
                     liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
@@ -343,14 +342,65 @@ public class Atome{
             }
         }
 
-        //A.Force.add( Vecteur3f.scale(A.vélocité,-0.000000000001)); //Appliquer une force de friction
-        //A.Force.add(new Vecteur3f(0,-0.1,0.0)); //Appliquer une force de gravité
+        int nLiens = 0;
+        boolean[] traité = new boolean[A.liaisonIndexe.length];
+        for (int j = 0; j < A.liaisonIndexe.length; j++) {
+            if(A.liaisonIndexe[j] != -1 && !traité[j]){
+                nLiens++;
+                traité[j] = true;
+            }
+        }
+        for (int i = 0; i < A.positionDoublet.length; i++) {
+            for(int j = i+1; j < A.positionDoublet.length; j++){
+                Vecteur3D lDir = Vecteur3D.sous( Vecteur3D.addi(A.positionDoublet[i],A.position), Vecteur3D.addi(A.positionDoublet[j],A.position));
+
+                Vecteur3D IAxe = A.positionDoublet[i];
+                Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
+                IDir.norm();
+
+                Vecteur3D JAxe = A.positionDoublet[j];
+                Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
+                JDir.norm();
+
+                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
+                double angle0;
+
+                //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                switch(nLiens+A.positionDoublet.length){
+                    case 2:
+                        angle0 = Math.PI;
+                        break;
+                    case 3:
+                        angle0 = 2.0*Math.PI/3.0;
+                        break;
+                    case 4:
+                        angle0 = 73.0*Math.PI/120.0;
+                        break;
+                    default:
+                        angle0 = angle;
+                    //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                        break;
+                }
+
+                double Kij = 100000.0;
+                double D0 = (109.5*Math.PI/180.0)-angle;
+                
+                A.forceDoublet[i].addi(Vecteur3D.mult(IDir, D0*Kij));
+                A.forceDoublet[j].addi(Vecteur3D.mult(JDir, D0*Kij));
+            }
+        }
+
+        A.Force.addi( Vecteur3D.mult(A.vélocité,-0.000000000001)); //Appliquer une force de friction
+        A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
+        for (int i = 0; i < A.positionDoublet.length; i++) {
+            A.forceDoublet[i].addi(Vecteur3D.mult(A.vélDoublet[i],-0.000001));
+        }
 
         //A.ÉvaluerContraintes();
     }
 
     
-    private static Vecteur3D ForceElectrique(double q1, double q2, double r, Vecteur3D dir){
+    private static Vecteur3D ForceÉlectrique(double q1, double q2, double r, Vecteur3D dir){
         return ( Vecteur3D.mult(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
     }
     
@@ -358,7 +408,7 @@ public class Atome{
         return ( Vecteur3D.mult(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
     
-    private static Vecteur3D ForceVandervall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+    private static Vecteur3D ForceVanDerWall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
         return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
     }
     

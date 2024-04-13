@@ -79,10 +79,9 @@ public class Intégrateur {
                 o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(0,0,2*(o.position.z-o.prevPosition.z)) );
             }*/
             o.position = (Vecteur3D.addi(Vecteur3D.mult(o.position, 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosition, -1.0), Vecteur3D.mult(o.Force, h*h/o.m))));
-            
             o.prevPosition = pPos.copier();
 
-            
+            o.vélocité = Vecteur3D.mult(Vecteur3D.sous(o.position, pPos),1.0/(2.0*h));
             
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.length; i++) {

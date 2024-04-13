@@ -161,7 +161,7 @@ public class Vecteur3D {
      * @return a*s
      */
     public static Vecteur3D mult(Vecteur3D a, double s){
-        return new Vecteur3D(a.x * s,a.y*s, a.z*s);
+        return new Vecteur3D(a.x*s, a.y*s, a.z*s);
     }
 
     /**
