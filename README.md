@@ -4,7 +4,7 @@ Ceci est le dépôt du prototype du projet MiniLabo. Ce projet vise à développ
 
 Nous nous basons sur un modèle de dynamique moléculaire dans lequel les atomes sont représentés par des sphères rigides qui évoluent dans un système newtonnien. Ils sont alors influencés par des forces interatomiques et peuvent créer et briser des liens entre eux pour former des molécules et des réactions chimiques.
 
-Comme mentionné plus haut, ceci est un prototype, il ne sert qu'à bâtir le coeur de la simulation. Pour voir le véritable projet allez voir ___.
+Comme mentionné plus haut, ceci est un prototype, il ne sert qu'à bâtir le coeur de la simulation. Pour voir le véritable projet allez voir https://github.com/gyoo18/MiniLabo.
 
 ## Simulation
 
