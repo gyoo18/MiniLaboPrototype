@@ -214,7 +214,12 @@ public class Vecteur3D {
      * @return (1/||a||)*a
      */
     public static Vecteur3D norm(Vecteur3D a){
-        return new Vecteur3D(a.x/a.longueur(),a.y/a.longueur(),a.z/a.longueur());
+        if(a.longueur() > 0){
+            return new Vecteur3D(a.x/a.longueur(),a.y/a.longueur(),a.z/a.longueur());
+        }else{
+            //System.err.println("Normalisation d'un vecteur nul. Les composantes resteront 0.");
+            return a;
+        }
     }
 
     /**

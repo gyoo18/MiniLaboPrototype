@@ -88,6 +88,8 @@ public class Intégrateur {
                     pPos = o.positionDoublet[i].copier();
                     o.positionDoublet[i] = (Vecteur3D.addi(Vecteur3D.mult(o.positionDoublet[i], 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosDoublet[i], -1.0), Vecteur3D.mult(o.forceDoublet[i], h*h/Atome.mE))));
                     o.prevPosDoublet[i] = pPos;
+
+                    o.vélDoublet[i] = Vecteur3D.mult(Vecteur3D.sous(o.positionDoublet[i], pPos),1.0/(2.0*h));
                 }
                /*  for (int i = 0; i < o.forceDoublet.length; i++) {
                     o.positionDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(o.positionDoublet[i]), o.rayonCovalent);
