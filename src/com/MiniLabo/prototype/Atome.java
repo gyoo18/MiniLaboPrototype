@@ -160,7 +160,7 @@ public class Atome{
                 //Distance entre A et A'
                 double dist = Vecteur3D.distance(Environnement.get(i).position, A.position); 
 
-                if(dist < 10*A.rayonCovalent){
+                if(dist < 25*A.rayonCovalent){
                     //Si A' se situe à moins de N rayons covalents de A
                     
                     //Appliquer la force de Pauli
@@ -186,10 +186,10 @@ public class Atome{
 
                         //Appliquer la force électrique
                         A.forceDoublet[j].addi(  ForceÉlectrique(Environnement.get(i).charge,-2,eDist,eDir) );
-                        //A.Force.add(  ForceElectrique(A.charge, -2,eDist,eDir) );
-                        //A.forceDoublet[j].add(  ForceElectrique(A.charge,-2,eDist,eDir) );
-                        //A.Force.add(  ForceElectrique(Environnement.get(i).charge, -2,eDist,eDir) );
-                        //A.forceDoublet[j].add(  ForceElectrique(-0.5,-0.5,eDist,eDir) );
+                        A.Force.addi(  ForceÉlectrique(A.charge, -2,eDist,eDir) );
+                        A.forceDoublet[j].addi(  ForceÉlectrique(A.charge,-2,eDist,eDir) );
+                        A.Force.addi(  ForceÉlectrique(Environnement.get(i).charge, -2,eDist,eDir) );
+                       A.forceDoublet[j].addi(  ForceÉlectrique(-0.5,-0.5,eDist,eDir) );
                     }
                 }
             }
@@ -384,11 +384,11 @@ public class Atome{
             }
         }
 
-        A.Force.addi( Vecteur3D.mult(A.vélocité,-0.000000000001)); //Appliquer une force de friction
-        A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
-        for (int i = 0; i < A.positionDoublet.length; i++) {
+       // A.Force.addi( Vecteur3D.mult(A.vélocité,-0.000000000001)); //Appliquer une force de friction
+        //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
+        /*for (int i = 0; i < A.positionDoublet.length; i++) {
             A.forceDoublet[i].addi(Vecteur3D.mult(A.vélDoublet[i],-0.000001));
-        }
+        }*/
 
         //A.ÉvaluerContraintes();
     }
