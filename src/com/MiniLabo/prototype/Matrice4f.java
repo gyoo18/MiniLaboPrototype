@@ -42,7 +42,7 @@ public class Matrice4f {
         return this;
     }
 
-    //TODO Implémenter les fonctionnalités de Matrice4f
+    //TODO #15 Implémenter les fonctionnalités de Matrice4f
     public static Vecteur3D MultiplierMV(Matrice4f m, Vecteur3D v){
         double[] vec = new double[]{v.x,v.y,v.z,1.0f};
         double[] res = new double[4];

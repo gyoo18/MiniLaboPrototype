@@ -279,7 +279,7 @@ public class Intégrateur {
 
         Atome[] oTmp = new Atome[O.size()];
         for (int i = 0; i < O.size(); i++) {
-            oTmp[i] = O.get(i).copier();
+            oTmp[i] = O.get(i).copier(false);
         }
 
         /* k1v = v(x)
@@ -345,7 +345,7 @@ public class Intégrateur {
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s3 = new Struct(s);
-            O.get(i).copier(oTmp[i]);
+            O.get(i).copier(oTmp[i],false);
             //s3.x = s.x + (s.h/2f)*K2x;
             O.get(i).position.addi(Vecteur3D.mult(K2v[i],h/2.0));
             //s3.v = s.v + (s.h/2f)*K2v;
@@ -378,7 +378,7 @@ public class Intégrateur {
 
         for (int i = 0; i < O.size(); i++) {
             //Struct s4 = new Struct(s);
-            O.get(i).copier(oTmp[i]);
+            O.get(i).copier(oTmp[i],false);
             //s4.x = s.x + s.h*K3x;
             O.get(i).position.addi(Vecteur3D.mult(K3v[i],h));
             //s4.v = s.v + s.h*K3v;
@@ -414,7 +414,7 @@ public class Intégrateur {
             K2a[i].mult(2.0);
             K3v[i].mult(2.0);
             K3a[i].mult(2.0);
-            O.get(i).copier(oTmp[i]);
+            O.get(i).copier(oTmp[i],false);
             //s.x = s.x + (s.h/6f)*(K1x + 2f*K2x + 2f*K3x + K4x);
             O.get(i).position.addi(Vecteur3D.mult(Vecteur3D.addi(K1v[i], Vecteur3D.addi(K2v[i], Vecteur3D.addi(K3v[i], K4v[i]))), h/6.0));
             //s.v = (s.h/6f)*(K1v + 2f*K2v + 2f*K3v + K4v);

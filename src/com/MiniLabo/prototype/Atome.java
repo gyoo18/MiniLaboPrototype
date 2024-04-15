@@ -32,6 +32,8 @@ public class Atome{
     public int doublets;            // Nombre de doublets électroniques
     public double rayonCovalent;    // Rayon covalent d'ordre 1 sur cet atome.
 
+    public Molécule molécule;       //Molécule de l'atome.
+
     private final int MAX_N = 4;    //Nombre principal maximal. Indique le nombre de ligne du tableau prériodique utilisé.
     private final int MAX_CASE = (MAX_N*(MAX_N+1)*(2*MAX_N+1))/6 - 1;   //Nombre maximal de cases quantiques
 
@@ -144,6 +146,9 @@ public class Atome{
         évaluerValence(); //Extraire certaines propriétés de l'atome à partir de la couche de valence
 
         //calculerÉlectronégativitée();
+
+        molécule = new Molécule();  //Initialise la molécule
+        molécule.ajouterAtome(this);//Ajoute cet atome à la molécule
     }
 
 
@@ -798,6 +803,9 @@ public class Atome{
                 }
                 liaisonIndexe[i] = -1;
                 liaisonType[i] = false;
+
+                //Séparer la molécule
+                molécule.séparerMolécule(this, APrime);
             }
         }
 
@@ -866,8 +874,9 @@ public class Atome{
 
                 //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
                 float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
-                charge += 1.0-2.0*proportion;                            //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
-                APrime.charge += 1.0-2.0*(1.0-proportion);//Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
+                charge += 1.0-2.0*proportion;               //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
+                APrime.charge += 1.0-2.0*(1.0-proportion);  //Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
+                molécule.fusionnerMolécule(APrime.molécule);//Fusionner les deux molécules
             }
         }
     }
@@ -885,9 +894,10 @@ public class Atome{
 
     /**
      * Renvoie une copie de l'atome
+     * @param copierMolécule - Si vrai, copie la molécule, sinon la molécule restera la même référence
      * @return Un atome copié
      */
-    public Atome copier(){
+    public Atome copier(boolean copierMolécule){
         Atome a = new Atome();
         a.prevPosition = this.prevPosition==null?null:this.prevPosition.copier();
         a.position = this.position.copier();
@@ -909,14 +919,23 @@ public class Atome{
 
         a.cases = this.cases;
 
+        if(copierMolécule){
+            a.molécule = this.molécule.copier();
+            a.molécule.retirerAtome(this);
+            a.molécule.ajouterAtome(a);
+        }else{
+            a.molécule = this.molécule;
+        }
+
         return a;
     }
 
     /**
      * Copie l'atome.
      * @param a - Atome à copier
+     * @param copierMolécule - Si vrai, copie la molécule, sinon la molécule restera la même référence.
      */
-    public void copier(Atome a){
+    public void copier(Atome a, boolean copierMolécule){
         Atome b = (Atome) a;
         this.prevPosition = b.prevPosition;
         this.position = b.position.copier();
@@ -937,6 +956,14 @@ public class Atome{
         this.rayonCovalent = b.rayonCovalent;
 
         this.cases = b.cases;
+
+        if(copierMolécule){
+            this.molécule = b.molécule.copier();
+            this.molécule.retirerAtome(b);
+            this.molécule.ajouterAtome(this);
+        }else{
+            this.molécule = b.molécule;
+        }
     }
 
     /**Initialise la position précédente initiale avec une certaine vitesse. Est utilisé pour Verlet.
