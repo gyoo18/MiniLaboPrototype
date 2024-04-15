@@ -27,12 +27,23 @@ public class Vecteur3f {
         y += b.y;
         z += b.z;
     }
+    public void add(Vecteur3f b){
+        x += b.x;
+        y += b.y;
+        z += b.z;
+    }
 
     public void sous(Vecteur3f b){
         x -= b.x;
         y -= b.y;
         z -= b.z;
     }
+    public void sub(Vecteur3f b){
+        x -= b.x;
+        y -= b.y;
+        z -= b.z;
+    }
+
 
     public void mult(double s){
         x *= s;
@@ -41,6 +52,17 @@ public class Vecteur3f {
     }
 
     public void mult(Vecteur3f m){
+        x *= m.x;
+        y *= m.y;
+        z *= m.z;
+    }
+    public void scale(double s){
+        x *= s;
+        y *= s;
+        z *= s;
+    }
+
+    public void scale(Vecteur3f m){
         x *= m.x;
         y *= m.y;
         z *= m.z;
@@ -57,8 +79,17 @@ public class Vecteur3f {
         y = y/ longueur();
         z = z/ longueur();
     }
+    public void normalize(){
+        x = x/ length();
+        y = y/ length();
+        z = z/ length();
+    }
+
 
     public double longueur(){
+        return (double) Math.sqrt(x*x+y*y+z*z);
+    }
+    public double length(){
         return (double) Math.sqrt(x*x+y*y+z*z);
     }
 
@@ -77,8 +108,14 @@ public class Vecteur3f {
     public static Vecteur3f addi(Vecteur3f a, Vecteur3f b){
         return new Vecteur3f(a.x+b.x, a.y + b.y, a.z+b.z);
     }
+    public static Vecteur3f add(Vecteur3f a, Vecteur3f b){
+        return new Vecteur3f(a.x+b.x, a.y + b.y, a.z+b.z);
+    }
 
     public static Vecteur3f sous(Vecteur3f a, Vecteur3f b){
+        return new Vecteur3f(a.x-b.x, a.y - b.y, a.z-b.z);
+    }
+    public static Vecteur3f sub(Vecteur3f a, Vecteur3f b){
         return new Vecteur3f(a.x-b.x, a.y - b.y, a.z-b.z);
     }
 
@@ -96,6 +133,9 @@ public class Vecteur3f {
 
     public static double scal(Vecteur3f a, Vecteur3f b){
         return (a.x*b.x)+(a.y*b.y)+(a.z*b.z);
+    }
+    public static Vecteur3f scale(Vecteur3f a, double s){
+        return new Vecteur3f(a.x * s, a.y*s, a.z * s );
     }
 
     /* |i  j  k |
@@ -129,10 +169,21 @@ public class Vecteur3f {
         return r;
     }
 
+    public static Vecteur3f normalize(Vecteur3f a){
+        if(a.length() != 0 ){
+            return new Vecteur3f(a.x/a.length(),a.y/a.length(),a.z/a.length());
+        }else{
+            return new Vecteur3f(0);
+        }
+    }
+
     public Vecteur3f copier(){
         return new Vecteur3f(x,y,z);
     }
 
+    public Vecteur3f copy(){
+        return new Vecteur3f(x,y,z);
+    }
     public Vecteur3f opposé(){
         return new Vecteur3f(-x,-y,-z);
     }
