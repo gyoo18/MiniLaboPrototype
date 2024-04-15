@@ -37,11 +37,14 @@ public class Atome{
 
     private int[] cases;    //Cases quantiques
 
-    public static double e = 1.602*Math.pow(10.0, -19.0);    //Charge élémentaire
-    public static double mP = 1.0*1.672*Math.pow(10.0,-27.0);//Masse du proton
-    public static double mE = 1.0*9.109*Math.pow(10.0,-31.0);//Masse de l'électron
-    public static double Ag = Math.pow(10,-15);              //Facteur de conversion en Angströms
-    public static double K = 8.987*Math.pow(10.0,39.0);    //Constante de Coulomb
+    public static final double e = 1.602*Math.pow(10.0, -19.0);    //Charge élémentaire
+    public static final double mP = 1.0*1.672*Math.pow(10.0,-27.0);//Masse du proton
+    public static final double mE = 1.0*9.109*Math.pow(10.0,-31.0);//Masse de l'électron
+    public static final double Ag = Math.pow(10,-15);              //Facteur de conversion en Angströms
+    public static final double K = 8.987*Math.pow(10.0,39.0);    //Constante de Coulomb
+    public static final double ep0 = 8.854*Math.pow(10.0,-42);     //Permittivité du vide
+    public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
+    public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman
 
     private static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
@@ -255,7 +258,7 @@ public class Atome{
 
             //Appliquer la force de torsion avec tout les autres liens
             //Trop instable pour le moment
-            /*int nLiens = 0;
+            int nLiens = 0;
             boolean[] traité = new boolean[A.liaisonIndexe.length];
             for (int j = 0; j < A.liaisonIndexe.length; j++) {
                 if(A.liaisonIndexe[j] != -1 && !traité[j]){
@@ -347,7 +350,7 @@ public class Atome{
                 Atome.Environnement.get(A.liaisonIndexe[i]).Force.addi(Vecteur3D.mult(lDir, D0*Kij));
                 A.forceDoublet[j].addi(Vecteur3D.mult(lDir.opposé(), D0*Kij));
             }
-            */
+            
             liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
         }
 
@@ -456,6 +459,21 @@ public class Atome{
      * @return Vecteur de force en Newtons Angströmiens
      */
     private static Vecteur3D ForceVanDerWall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+        //TODO #11 Implémenter moments dipolaires
+        //TODO #12 Implémenter fréquence d'ionisation
+        //TODO #13 Implémenter polarisabilité électronique
+        //TODO #14 Implémenter température
+        double mu1 = 1.0; //Moment dipolaire de la particule 1
+        double mu2 = 1.0; //Moment dipolaire de la particule 2
+        double nu1 = 1.0; //Fréquence d'ionisation de la particule 1
+        double nu2 = 1.0; //Fréquence d'ionisation de la particule 2
+        double a1 = 1.0;  //Polarisabilité électronique de la particule 1
+        double a2 = 1.0;  //Polarisabilité électronique de la particule 2
+        double T = 1.0;   //Température du système en °K
+        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3*Math.pow(4*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
+        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
+        double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
+        double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
     }
 
@@ -493,6 +511,7 @@ public class Atome{
     
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
     public void ÉvaluerContraintes(){
+        //TODO #10 Le rebond de Verlet perd toujours de l'énergie
         //Appliquer des bords de domaine
         //Rebondir en Y
         if(Math.abs(position.y) > (double)App.TailleY/(2.0*App.Zoom)){
@@ -703,7 +722,7 @@ public class Atome{
         for (int i = 0; i < positionDoublet.length; i++) {
             forceDoublet[i] = new Vecteur3D(0);
             vélDoublet[i] = new Vecteur3D(0);
-            positionDoublet[i] = new Vecteur3D(Math.random(),Math.random(),Math.random()); //Donner une position de départ aléatoire entre (0,0,0) et (1,1,1). Elle serat ramenée au rayon de l'atome plus tard.
+            positionDoublet[i] = new Vecteur3D((Math.random()-0.5)*2.0,(Math.random()-0.5)*2.0,(Math.random()-0.5)*2.0); //Donner une position de départ aléatoire entre (0,0,0) et (1,1,1). Elle serat ramenée au rayon de l'atome plus tard.
             prevPosDoublet[i] = positionDoublet[i].copier(); //Donner la position initiale comme position précédente initiale.
         }
         System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
