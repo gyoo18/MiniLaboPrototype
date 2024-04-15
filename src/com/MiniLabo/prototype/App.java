@@ -14,8 +14,8 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 512;
-    public static float Zoom = 30f;
+    public static int TailleZ = 200;
+    public static float Zoom = 15f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -43,27 +43,27 @@ public class App {
         //Initialiser les atomes
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
+        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
                     //int x = 1;int y = 1; int z = 1;
 
-                    Atome C = new Atome(8);
+                    Atome C = new Atome(11);
                     C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
                     //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
-                    Atome H2 = new Atome(1);
-                    H2.position = new Vecteur3D(x*espacement[0]+1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    Atome H2 = new Atome(17);
+                    H2.position = new Vecteur3D(x*espacement[0]+2.5 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H2);
 
                     Atome H3 = new Atome(1);
                     H3.position = new Vecteur3D(x*espacement[0]-1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    Hs.add(H3);
+                    //Hs.add(H3);
 
                     H3 = new Atome(1);
                     H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
@@ -86,7 +86,7 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 5.0*Math.pow(10.0,-19.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-16.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -98,7 +98,7 @@ public class App {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
-                Intégrateur.IterVerletV(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerlet(Hs, dt); //Mise à jour de la position.
                 temps += dt;
             }
 
