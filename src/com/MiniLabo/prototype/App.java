@@ -14,8 +14,8 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 100;
-    public static float Zoom = 50f;
+    public static int TailleZ = 200;
+    public static float Zoom = 15f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -23,7 +23,7 @@ public class App {
 
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        System.out.println("Hello World!");
 
         BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
         g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
@@ -43,52 +43,67 @@ public class App {
         //Initialiser les atomes
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        float [] espacement = {6,5,1};                        //Matrice Espacement entre les atomes en x,y,z
-        for(int x = 0; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
-            for(int y = 0; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
-                for(int z = 0; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
+        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
+        for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
+            for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
+                for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
-                    Atome C = new Atome(8);
-                    C.position = new Vecteur3D(x*espacement[0] + 1 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))+1));
-                   // //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    //int x = 1;int y = 1; int z = 1;
+
+                    Atome C = new Atome(11);
+                    C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
+                    //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
-                    Atome H2 = new Atome(1);
-                    H2.position = new Vecteur3D(x*espacement[0] + 2 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))-1));
-                   // //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H2);
+                    Atome H2 = new Atome(17);
+                    H2.position = new Vecteur3D(x*espacement[0]+2.5 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    Hs.add(H2);
 
                     Atome H3 = new Atome(1);
-                    H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    H3.position = new Vecteur3D(x*espacement[0]-1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                   // Hs.add(H3);
+                    //Hs.add(H3);
+
+                    H3 = new Atome(1);
+                    H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    //Hs.add(H3);
+
+                    H3 = new Atome(1);
+                    H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - 1 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
+                    //Hs.add(H3);
                 }
             }
         }
 
+        //Ajouter les atomes dans l'ordre de dessin
         for (int i = 0; i < Hs.size(); i++) {
-            indexe.add(i);  //Ajouter les atomes dans l'ordre de dessin
+            indexe.add(i);
         }
         
+        //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-16.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
 
-            for (int N = 0; N < 20; N++) {              //Sous-étapes. Répète N fois/image
+            //Sous-étapes. Répète N fois/image
+            for (int N = 0; N < 20; N++) {
                 for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourLiens(Hs, i);    //Créer/Détruire les liens.
+                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
                 temps += dt;
             }
 
             //Affichage de la simulation
-            DessinerBoite();                            //Dessiner le domaine
+            DessinerBoite();  //Dessiner le domaine
 
             //Ordonner les atomes pour résoudre le problème de visibilité
             for (int i = 0; i < Hs.size()-1; i++) {
@@ -106,13 +121,13 @@ public class App {
             
             //Statistiques sur la vitesse de la simulation
             System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-
-            //énoncerMolécules(Hs);     //Lister les pourcentages de présence de chaques molécules dans la simulation
-
+            
+            //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
         }
     }
 
+    /**Dessine une boite représentant le domaine de simulation à  l'écran */
     public static void DessinerBoite(){
         double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
         double multPersZBoiteProche=(FOVBoite/(-TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
@@ -207,6 +222,11 @@ public class App {
         );
     } 
     
+    /**
+     * Dessine l'atome A à l'écran.
+     * @param A - Atome à dessiner
+     * @param B - Liste des atomes de la simulation. Est utilisé pour dessiner les liens.
+     */
     public static void DessinerAtome(Atome A, ArrayList<Atome> B){
 
         double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet)); //Multiplicateur de profondeur (forme la perspective)
@@ -225,16 +245,18 @@ public class App {
         g.setStroke(new BasicStroke());
         double col = 1.0-((A.position.z*2.0*Zoom/TailleZ) + 0.5)*0.5; //Obscurissement avec la profondeur
         col = clamp(col, 0.0, 1.0);
+
+        double charge = A.charge-(2.0*A.doublets);
         //Rouge = charge+, Blanc = neutre, Bleu = charge-
-        if(A.charge > 0.0){
+        if(charge > 0.0){
             //Rouge
-            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(A.charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(A.charge/2.0,1.0)), 200));
-        }else if(A.charge == 0.0){
+            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(charge/2.0,1.0)), 200));
+        }else if(charge == 0.0){
             //Blanc
             g.setColor(new Color((int)(255*col),(int)(255*col),(int)(255*col),200));
-        }else if(A.charge < 0.0){
+        }else if(charge < 0.0){
             //Bleu
-            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-A.charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-A.charge/2.0,1.0)), (int)(col*255f), 200));
+            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-charge/2.0,1.0)), (int)(col*255f), 200));
         }
 
         double PR = A.rayonCovalent*multPersZ;  //Rayon 2D de l'atome
@@ -244,7 +266,7 @@ public class App {
         //Dessin des doublets en arrières de l'atome
         g.setColor(Color.YELLOW); //Couleur de l'électron
         for (int i = 0; i < A.positionDoublet.length; i++) {
-            if(A.positionDoublet[i] .z < 0.0){
+            if(A.positionDoublet[i] .z <= 0.0){
                 Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet[i]);//Position 3D du doublet
                 //Dessiner le doublet
                 g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
@@ -273,10 +295,24 @@ public class App {
         }
     }
 
+    /**
+     * Fonction d'interpolation linéaire ente a et b.
+     * @param a - Valeur a
+     * @param b - Valeur b
+     * @param m - Facteur d'interpolation
+     * @return Interpolation linéaire entre a et b
+     */
     private static double mix(double a, double b, double m){
         return (1.0-m)*a + m*b;
     }
 
+    /**
+     * Fixe a entre les valeurs de b et c.
+     * @param a - Valeur à fixer
+     * @param b - Minimum de a
+     * @param c - Maximum de b
+     * @return Max( Min( a, c ), b )
+     */
     private static double clamp(double a, double b, double c){
         if(a < b){
             return b;
@@ -287,7 +323,9 @@ public class App {
         }
     }
 
-    //Liste le pourcentage de présence de chaque molécule dans la simulation
+    /**Liste le pourcentage de présence de chaque molécule dans la simulation
+     * @param Atomes - Liste des atomes de la simulation
+    */
     public static void énoncerMolécules(ArrayList<Atome> Atomes){
 
         ArrayList<Integer> vus = new ArrayList<>();         //Tout les atomes déjà évalués
@@ -391,7 +429,11 @@ public class App {
         System.out.println(outB);
     }
 
-    //Vas chercher tout les atomes reliés à cet atome et renvoie ainsi les constituants de la molécule.
+    /**Vas chercher tout les atomes reliés à cet atome et renvoie ainsi les constituants de la molécule.
+     * @param Atomes - Liste de tout les atomes de la simulation
+     * @param indexe - Indexe de l'atome à regarder
+     * @param vus - Liste de tout les atomes déjà traités
+    */
     public static int[] ajouterAtomeÀMolécule(ArrayList<Atome> Atomes, int indexe, ArrayList<Integer> vus){
 
         int[] retour = new int[19]; // Initialise la liste des atomes de retours.
