@@ -780,7 +780,7 @@ public class Atome{
             vélDoublet.add( new Vecteur3D(0, 0, 0));
             forceDoublet.add( new Vecteur3D(   0, 0, 0));
         }
-        while (liaisonIndexe.size()>n) {
+        while (positionDoublet.size()>doublets) {
             positionDoublet.remove(0);
             prevPosDoublet.remove(0);
             vélDoublet.remove(0);

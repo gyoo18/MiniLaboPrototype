@@ -14,7 +14,7 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 512;
+    public static int TailleZ = 212;
     public static float Zoom = 30f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
