@@ -14,7 +14,7 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 200;
+    public static int TailleZ = 512;
     public static float Zoom = 30f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
@@ -40,43 +40,70 @@ public class App {
             e.printStackTrace();
         }
 
-        //Initialiser les atomes
+        /*for (int i = 1; i < 16; i++) {
+            Atome H = new Atome(i);
+            System.out.println(i + " " + H.électronégativité);
+        }*/
+
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        float [] espacement = {6f,6f,3f};        //Espacement entre les atomes en x,y,z
+
+        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
+
+        /*//Initialiser les atomes en grille
+        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
                     //int x = 1;int y = 1; int z = 1;
 
-                    Atome C = new Atome(8);
-                    C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    Hs.add(C);
-
-                    Atome H2 = new Atome(1);
-                    H2.position = new Vecteur3D(x*espacement[0]+1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
-                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    Hs.add(H2);
-
-                    Atome H3 = new Atome(1);
-                    H3.position = new Vecteur3D(x*espacement[0]-1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
-                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    Hs.add(H3);
-
-                    Atome H4 = new Atome(1);
-                    H4.position = new Vecteur3D(x*espacement[0] -0.5- (TailleX/(2*Zoom)),y*espacement[1] -0.6 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
-                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    H4.retirerÉlectron();
-                    Hs.add(H4);
-
-                    Atome H5 = new Atome(1);
-                    H5.position = new Vecteur3D(x*espacement[0] +0.5- (TailleX/(2*Zoom)),y*espacement[1] - 2 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
-                    //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H5);
-                    
+                    //C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
+                    H2O.position = new Vecteur3D(-(TailleX/(2.0*Zoom)) + x*espacement[0], -(TailleY/(2.0*Zoom)) + y*espacement[1], -(TailleZ/(2.0*Zoom)) + z*espacement[2]);
+                    MoléculeRéf.intégrerÀSimulation(Hs, H2O);
                 }
+            }
+        }
+*/
+        //Initialiser les atomes selon l'algorithme de poisson
+        int NbMolécules = 10;  //Nombre de molécules voulus
+        int totalMolécules = 0;//Nombre de molécules ajoutés
+        int essais = 0;        //Nombre d'essais à placer la molécule
+        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
+        //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
+        while (totalMolécules < NbMolécules && essais < 10) {
+            essais++;
+            MoléculeRéf mol = H2O; //Molécule à ajouter dans la simulation
+            //position aléatoire dans le domaine.
+            Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
+            boolean intersecte = false;
+            for (int i = 0; i < Hs.size(); i++) {
+                //Réessayer si cet emplacement intersecte un atome dans la simulation
+                if(BEAA){
+                    //Intersection avec la BEAA
+                    Vecteur3D posRel = Vecteur3D.sous(Hs.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
+                    if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent,0) < mol.BEAA.z/2.0){
+                        //S'il y a intersection
+                        intersecte = true;
+                        break; //Sortir de la boucle en n'ajoutant pas la molécule
+                    }
+                }else{
+                    //Intesection avec la sphère
+                    if(Vecteur3D.distance(position,Hs.get(i).position) + Hs.get(i).rayonCovalent < mol.rayon){
+                        //S'il y a intersection
+                        intersecte = true;
+                        break; //Sortir de la boucle en n'ajoutant pas la molécule
+                    }
+                }
+            }
+
+            //S'il n'y a pas d'intersection
+            if(!intersecte){
+                mol.position = position;
+                MoléculeRéf.intégrerÀSimulation(Hs, mol); //Ajouter molécule à simulation
+                essais = 0;
+                totalMolécules++;
             }
         }
 
@@ -88,12 +115,13 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 6.0*Math.pow(10.0,-20.0);     //Delta temps de la simulation
+        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
+            Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
             //Sous-étapes. Répète N fois/image
             for (int N = 0; N < 20; N++) {
