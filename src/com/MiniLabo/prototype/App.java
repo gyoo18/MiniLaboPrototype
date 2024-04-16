@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 30f;
+    public static float Zoom = 40f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -66,7 +66,7 @@ public class App {
         }
 */
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 10;  //Nombre de molécules voulus
+        int NbMolécules = 1;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -105,6 +105,10 @@ public class App {
                 essais = 0;
                 totalMolécules++;
             }
+        }
+
+        for (int i = 0; i < Hs.size(); i++) {
+            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*Math.pow(10.0,13.0),2.0*(Math.random()-0.5)*Math.pow(10.0,13.0),2.0*(Math.random()-0.5)*Math.pow(10.0,14.0));
         }
 
         //Ajouter les atomes dans l'ordre de dessin

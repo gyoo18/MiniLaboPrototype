@@ -493,7 +493,7 @@ public class Atome{
      * @return Vecteur de force en Newtons Angströmiens
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        return ( Vecteur3D.mult(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+        return ( Vecteur3D.mult(dir, (1.0*Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
     
     /**
@@ -519,7 +519,7 @@ public class Atome{
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
         double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
-        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
+        return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
 
     /**
@@ -543,7 +543,7 @@ public class Atome{
         }
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
+        double D = 40000.0*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
         double p = ConstanteDeForce[NP-1][NPA-1]*100.0;
         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
@@ -551,7 +551,7 @@ public class Atome{
         double a = Math.sqrt(p/(2.0*D));
         double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
 
-        return ( Vecteur3D.mult(dir,module) );
+        return ( Vecteur3D.mult(dir,100.0*module) );
     }
     
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
@@ -954,36 +954,7 @@ public class Atome{
      */
     public Atome copier(boolean copierMolécule){
         Atome a = new Atome();
-        a.prevPosition = this.prevPosition==null?null:this.prevPosition.copier();
-        a.position = this.position.copier();
-        a.vélocité = this.vélocité.copier();
-        a.Force = this.Force.copier();
-        a.positionDoublet = this.positionDoublet.clone();
-        a.prevPosDoublet = this.prevPosDoublet.clone();
-        a.vélDoublet = this.vélDoublet.clone();
-        a.forceDoublet = this.forceDoublet.clone();
-        a.NP = this.NP;
-        a.NE = this.NE;
-        a.m = this.m;
-        a.électronégativité = this.électronégativité;
-        a.charge = this.charge;
-        a.indexe = this.indexe;
-
-        a.liaisonIndexe = this.liaisonIndexe.clone();
-        a.liaisonType = this.liaisonType.clone(); // sigma = faux, pi = vrai
-        a.doublets = this.doublets;
-        a.rayonCovalent = this.rayonCovalent;
-
-        a.cases = this.cases;
-
-        if(copierMolécule){
-            a.molécule = this.molécule.copier();
-            a.molécule.retirerAtome(this);
-            a.molécule.ajouterAtome(a);
-        }else{
-            a.molécule = this.molécule;
-        }
-
+        a.copier(this,copierMolécule);
         return a;
     }
 

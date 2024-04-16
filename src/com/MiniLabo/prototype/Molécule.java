@@ -226,12 +226,45 @@ public class Molécule {
         }
     }
     
+
     private void évaluerSystèmesConjugués(){
+        /*boolean[] estDouble = new boolean[Atomes.size()]; //Liste des atomes qui possèdent un lien multiple
+        boolean[] estSimple = new boolean[Atomes.size()]; //Liste des atomes qui possèdent un lien simple
+        boolean[] estPlus = new boolean[Atomes.size()];   //Liste des atomes qui ont une charge positive
+        boolean[] estÉN = new boolean[Atomes.size()];     //Liste des atomes qui sont fortement électronégatifs
+        boolean[] estDoublet = new boolean[Atomes.size()];//Liste des atomes qui portent des doublets
         for (int i = 0; i < Atomes.size(); i++) {
-            int[] système;
+            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
+                if(Atomes.get(i).liaisonType[j]){
+                    estDouble[i] = true;
+                    break;
+                }
+            }
+            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
+                if(!Atomes.get(i).liaisonType[j]){
+                    estSimple[i] = true;
+                    break;
+                }
+            }
+
+            if(Atomes.get(i).NP > Atomes.get(i).NE){
+                estPlus[i] = true;
+            }
+
+            //TODO #22 fixer le minimum d'électronégativité
+            
+            if (Atomes.get(i).électronégativité > 2.0) {
+                estÉN[i] = true;
+            }
+
+            if(Atomes.get(i).doublets > 0){
+                estDoublet[i] = true;
+            }
+        }*/
+
+        for (int i = 0; i < Atomes.size(); i++) {
             //=-=
-            //Ce système conjugué nécessite que les atomes du centre fassent soit 3 (liaison double) soit 4(liaison triple) liens entre eux.
-            if(Atomes.get(i).liaisonIndexe.length == 3 || Atomes.get(i).liaisonIndexe.length == 4){
+            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
                 
             }
             //:-=
