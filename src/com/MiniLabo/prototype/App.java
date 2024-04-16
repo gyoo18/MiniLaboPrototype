@@ -45,10 +45,12 @@ public class App {
             System.out.println(i + " " + H.électronégativité);
         }*/
 
-        //Initialiser les atomes
-        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle();
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
+
+        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
+
+        /*//Initialiser les atomes en grille
         float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
@@ -60,6 +62,48 @@ public class App {
                     H2O.position = new Vecteur3D(-(TailleX/(2.0*Zoom)) + x*espacement[0], -(TailleY/(2.0*Zoom)) + y*espacement[1], -(TailleZ/(2.0*Zoom)) + z*espacement[2]);
                     MoléculeRéf.intégrerÀSimulation(Hs, H2O);
                 }
+            }
+        }
+*/
+        //Initialiser les atomes selon l'algorithme de poisson
+        int NbMolécules = 10;  //Nombre de molécules voulus
+        int totalMolécules = 0;//Nombre de molécules ajoutés
+        int essais = 0;        //Nombre d'essais à placer la molécule
+        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
+        //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
+        while (totalMolécules < NbMolécules && essais < 10) {
+            essais++;
+            MoléculeRéf mol = H2O; //Molécule à ajouter dans la simulation
+            //position aléatoire dans le domaine.
+            Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
+            boolean intersecte = false;
+            for (int i = 0; i < Hs.size(); i++) {
+                //Réessayer si cet emplacement intersecte un atome dans la simulation
+                if(BEAA){
+                    //Intersection avec la BEAA
+                    Vecteur3D posRel = Vecteur3D.sous(Hs.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
+                    if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent,0) < mol.BEAA.z/2.0){
+                        //S'il y a intersection
+                        intersecte = true;
+                        break; //Sortir de la boucle en n'ajoutant pas la molécule
+                    }
+                }else{
+                    //Intesection avec la sphère
+                    if(Vecteur3D.distance(position,Hs.get(i).position) + Hs.get(i).rayonCovalent < mol.rayon){
+                        //S'il y a intersection
+                        intersecte = true;
+                        break; //Sortir de la boucle en n'ajoutant pas la molécule
+                    }
+                }
+            }
+
+            //S'il n'y a pas d'intersection
+            if(!intersecte){
+                mol.position = position;
+                MoléculeRéf.intégrerÀSimulation(Hs, mol); //Ajouter molécule à simulation
+                essais = 0;
+                totalMolécules++;
             }
         }
 

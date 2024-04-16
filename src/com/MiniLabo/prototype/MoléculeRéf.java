@@ -3,8 +3,8 @@ package com.MiniLabo.prototype;
 import java.util.ArrayList;
 
 public class MoléculeRéf extends Molécule{
-    public Vecteur3D AABB = new Vecteur3D(0);
-    public double rayon = 0;
+    public Vecteur3D BEAA = new Vecteur3D(0); //Boîte Englobante Alignée sur les Axes.
+    public double rayon = 0; //Rayon de la plus petite sphère contenant la molécule.
 
     public MoléculeRéf(){
         super();
@@ -12,8 +12,8 @@ public class MoléculeRéf extends Molécule{
     }
     
     private void calculerAABB(){
-        Vecteur3D max = new Vecteur3D(Double.MAX_VALUE);
-        Vecteur3D min = new Vecteur3D(-Double.MAX_VALUE);
+        Vecteur3D max = new Vecteur3D(-Double.MAX_VALUE);
+        Vecteur3D min = new Vecteur3D(Double.MAX_VALUE);
         for (int i = 0; i < Atomes.size(); i++) {
             if(Atomes.get(i).position.x + Atomes.get(i).rayonCovalent > max.x){
                 max.x = Atomes.get(i).position.x + Atomes.get(i).rayonCovalent;
@@ -34,13 +34,13 @@ public class MoléculeRéf extends Molécule{
                 min.z = Atomes.get(i).position.z - Atomes.get(i).rayonCovalent;
             }
         }
-        rayon = Vecteur3D.distance(min,max);
-        AABB = new Vecteur3D(max.x-min.x, max.y-min.y, max.z-min.z);
+        rayon = Math.max( Math.max( (max.x-min.x), (max.y-min.y) ), (max.z-min.z) ); //Rayon de la plus petite sphère contenant la molécule
+        BEAA = new Vecteur3D(max.x-min.x, max.y-min.y, max.z-min.z); //BEAA de la molécule
     }
 
     public void copier(MoléculeRéf m){
         super.copier(m);
-        this.AABB = m.AABB.copier();
+        this.BEAA = m.BEAA.copier();
         this.rayon = m.rayon;
     }
 
