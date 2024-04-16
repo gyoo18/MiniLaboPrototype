@@ -50,7 +50,8 @@ public class Atome{
 
     private static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
-    private static float[] AffinitéÉlectronique = {
+    //Électronégativité de Pauling de chaque élément.
+    private static final float[] AffinitéÉlectronique = {
         2.20f,                                                                                                0.00f,
         0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
         0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
@@ -61,7 +62,8 @@ public class Atome{
         1.10f,1.30f,      1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f
     };
 
-    private static float[] rayonsCovalents = {
+    //Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.
+    private static final float[] rayonsCovalents = {
          32f,                                                                                 46f,
         133f,102f,                                                   85f, 75f, 71f, 63f, 64f, 67f,
         155f,139f,                                                  126f,116f,111f,103f, 99f, 96f,
@@ -73,7 +75,8 @@ public class Atome{
                   157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
     };
 
-    private static float[] rayonsCovalents2 = {
+    //Rayon covalent de lien double.
+    private static final float[] rayonsCovalents2 = {
          0f,                                                                                   0f,
         124f, 90f,                                                   78f, 67f, 60f, 57f, 59f, 96f,
         160f,132f,                                                  113f,107f,102f, 94f, 95f,107f,
@@ -85,7 +88,8 @@ public class Atome{
                   140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    private static float[] rayonsCovalents3 = {
+    //Rayon covalent de lien triple
+    private static final float[] rayonsCovalents3 = {
           0f,                                                                                  0f,
           0f, 85f,                                                   73f, 60f, 54f, 53f, 53f,  0f,
           0f,127f,                                                  111f,102f, 94f, 95f, 93f, 96f,
@@ -97,8 +101,8 @@ public class Atome{
                   131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    //Constante d'écran utilisé dans le calcul de la charge effective de l'atome
-    private double ConstanteÉcran[] = {
+    //Constante d'écran utilisé dans le calcul de la charge effective de l'atome.
+    private final double ConstanteÉcran[] = {
         0.000,                                                                                                0.300,
         1.700,2.050,                                                            2.400,2.750,3.100,3.450,3.800,4.2515,
         8.800,9.150,                                                            9.500,9.850,10.20,10.55,10.90,11.25,
@@ -109,8 +113,8 @@ public class Atome{
         84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
     };
     
-    //Rayon atomique absolut Utilisé dans le calcul de l'électronégativité
-    private double Radii [] = {
+    //Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.
+    private static final double Radii [] = {
         0.5292,                                                                                                                0.3113,
         1.6283,1.08550,                                                                     0.8141,0.6513,0.5428,0.4652,0.4071,0.3676,
         2.1650,1.67110,                                                                     1.3608,1.1477,0.9922,0.8739,0.7808,0.7056,
@@ -119,6 +123,43 @@ public class Atome{
         4.2433,3.2753,       2.6673,2.2494,1.9447,1.7129,1.5303,1.3830,1.2615,1.1596,1.0730,0.9984,0.9335,0.8765,0.8261,0.7812,0.7409,
                       0.7056,0.6716,0.6416,0.6141,0.5890,0.5657,0.5443,0.5244,0.5060,1.8670,1.6523,1.4818,1.3431,1.2283,1.1315,
         4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
+    };
+
+    //Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par convPolar pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)
+    private static final double Polarisabilité[] = {
+        4.50,                                                                               1.38,
+        164,37.7,                                                  20.5,11.3, 7.4, 5.3,3.74,2.66,
+        163,71.2,                                                  57.8,37.3,  25,19.4,14.6,11.1,
+        290, 161,  97, 100,  87,  83,  68,  62,  55,  49,  47,38.7,  50,  40,  30,  29,  21,16.8,
+        320, 197, 162, 112,  98,  87,  79,  72,  66,26.1,  55,  46,  65,  53,  43,  38,32.9,27.3,
+        401, 272,      215, 205, 216, 208, 200, 192, 184, 158, 170, 165, 156, 150, 144, 139,
+                  137, 103,  74,  68,  62,  57,  54,  48,  36,33.9,  50,  47,  48,  44,  42,  35,
+        318, 246,      203, 217, 154, 129, 151, 132, 131, 144, 125, 122, 118, 113, 109, 110,
+                  320, 112,  42,  40,  38,  36,  34,  32,  32,  28,  29,  31,  71,   0,  76,  58
+    };
+    private static final double convPolar = 1.64986832*Math.pow(10.0,-41.0);
+
+    //Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.
+    private static final double[][] ConstanteDeForce = {
+      //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,  Mg,  Al,  Si,   P,   S,  Cl,  Ar
+        {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,   0,   0,   0,3.22,4.26,5.16,   0},//H
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//He
+        {1.03,   0,0.26,   0,   0,   0,   0,   0,2.50,   0,0.21,   0,   0,   0,   0,   0,1.43,   0},//Li
+        {2.27,   0,   0,   0,   0,   0,   0,7.51,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Be
+        {3.05,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//B
+        {5.27,   0,   0,   0,   0,8.36,14.6,14.2,6.57,   0,   0,   0,   0,   0,7.83,7.94,3.80,   0},//C
+        {5.97,   0,   0,   0,   0,14.6,20.8,27.7,   0,   0,   0,   0,   0,   0,5.56,   0,   0,   0},//N
+        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0,   0,3.48,   0,9.24,9.45,9.32,   0,   0},//O
+        {9.66,   0,2.50,   0,   0,6.57,   0,   0,4.70,   0,1.76,   0,   0,4.90,   0,   0,4.48,   0},//F
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ne
+        {0.78,   0,0.21,   0,   0,   0,   0,   0,1.76,   0,0.17,   0,   0,   0,   0,   0,1.09,   0},//Na
+        {   0,   0,   0,   0,   0,   0,   0,3.48,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Mg
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Al
+        {   0,   0,   0,   0,   0,   0,   0,9.24,4.90,   0,   0,   0,   0,2.15,   0,   0,2.63,   0},//Si
+        {3.22,   0,   0,   0,   0,7.83,5.56,9.45,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//P
+        {4.26,   0,   0,   0,   0,7.94,   0,9.32,   0,   0,   0,   0,   0,   0,   0,4.96,   0,   0},//S
+        {5.16,   0,1.43,   0,   0,3.80,   0,   0,4.48,   0,1.09,   0,   0,2.63,   0,   0,3.23,   0},//Cl
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ar
     };
 
     private int Table2 [][] = { 
@@ -457,13 +498,13 @@ public class Atome{
     
     /**
      * Renvoie une approximation des forces de Van der Walls.
-     * @param RayonCovalent1 - Rayon covalent de la première particule.
-     * @param RayonCovalent2 - Rayon covalent de la deuxième particule.
+     * @param NP - Nombre de protons du premier atome.
+     * @param NPA - Nombres de protons du deuxième atome.
      * @param dist - Distance entre les deux particules en Angströms.
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
      * @return Vecteur de force en Newtons Angströmiens
      */
-    private static Vecteur3D ForceVanDerWall(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+    private static Vecteur3D ForceVanDerWall(int NP, int NPA, double dist, Vecteur3D dir){
         //TODO #11 Implémenter moments dipolaires
         //TODO #12 Implémenter fréquence d'ionisation
         //TODO #13 Implémenter polarisabilité électronique
@@ -472,14 +513,14 @@ public class Atome{
         double mu2 = 1.0; //Moment dipolaire de la particule 2
         double nu1 = 1.0; //Fréquence d'ionisation de la particule 1
         double nu2 = 1.0; //Fréquence d'ionisation de la particule 2
-        double a1 = 1.0;  //Polarisabilité électronique de la particule 1
-        double a2 = 1.0;  //Polarisabilité électronique de la particule 2
+        double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
+        double a2 = Polarisabilité[NPA-1]*convPolar;  //Polarisabilité électronique de la particule 2
         double T = 1.0;   //Température du système en °K
         double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3*Math.pow(4*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
         double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
-        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),7.0)/Math.pow(dist,7.0)) )));
+        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(rayonsCovalents[NP-1]+rayonsCovalents[NPA-1]),7.0)/Math.pow(dist,7.0)) )));
     }
 
     /**
@@ -504,7 +545,7 @@ public class Atome{
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = 40000.0; //*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
-        double p = 2*D*Math.pow(Math.log(1-Math.sqrt(0.99))/l,2.0);
+        double p = ConstanteDeForce[NP-1][NPA-1]*100.0;
         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
         // quasiment identique à s'il n'était pas lié.
@@ -769,7 +810,7 @@ public class Atome{
             Atome APrime = Atome.Environnement.get(liaisonIndexe[i]); //Référence à A'
             double dist = Vecteur3D.distance(position, APrime.position); //Évaluer la distance entre les deux atomes
             if(dist > 2.0*(rayonCovalent + APrime.rayonCovalent)){
-                //Si la distance est 2 fois la longueur de liaison,
+                //Si la distance est 2 fois la longueur de liaison, briser le lien
                 //Distribuer les électrons entre les deux atomes
                 //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
                 float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
@@ -833,14 +874,14 @@ public class Atome{
                 if(dist < min_dist && dist < 2.0*(rayonCovalent + APrime.rayonCovalent)){
                     //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
                     //Chercher une case qui peut acceuillir une liaison chez A'
-                    placeLibre = -1;
+                    int pL = -1;
                     for (int k = 0; k < APrime.liaisonIndexe.length; k++) {
                         if(APrime.liaisonIndexe[k] == -1){
-                            placeLibre = k;
+                            pL = k;
                             break;
                         }
                     }
-                    if(placeLibre != -1){
+                    if(pL != -1){
                         //Si on a trouvé une place libre chez A'
                         //Évaluer le nombre de liaisons déjà créés avec A'
                         nLiaisons = 0;
@@ -853,6 +894,7 @@ public class Atome{
                             //S'il y a moins de 3 liaisons avec A'
                             indexePot = j;  //Garder A' comme candidat potentiel
                             min_dist = dist;//Garder A' comme atome le plus proche
+                            placeLibre = pL;
                         }
                     }
                 }
