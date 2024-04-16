@@ -48,7 +48,7 @@ public class App {
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
-        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
+        MoléculeRéf H2O = MoléculeRéf.avoirH3Op(); //Molécule de base
 
         /*//Initialiser les atomes en grille
         float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
@@ -264,9 +264,9 @@ public class App {
         //Dessin des doublets en avant de l'atome
         double ER = 0.1*multPersZ; //Rayon 2D du doublet
         g.setColor(Color.YELLOW);   //Couleur de l'électron
-        for (int i = 0; i < A.positionDoublet.length; i++) {
-            if(A.positionDoublet[i] .z> 0.0){
-                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet[i]); //Position 3D du doublet
+        for (int i = 0; i < A.positionDoublet.size(); i++) {
+            if(A.positionDoublet.get(i).z> 0.0){
+                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet.get(i)); //Position 3D du doublet
                 //Dessiner le doublet
                 g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
             }
@@ -295,32 +295,32 @@ public class App {
 
         //Dessin des doublets en arrières de l'atome
         g.setColor(Color.YELLOW); //Couleur de l'électron
-        for (int i = 0; i < A.positionDoublet.length; i++) {
-            if(A.positionDoublet[i] .z <= 0.0){
-                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet[i]);//Position 3D du doublet
+        for (int i = 0; i < A.positionDoublet.size(); i++) {
+            if(A.positionDoublet.get(i) .z <= 0.0){
+                Vecteur3D Epos = Vecteur3D.addi(A.position, A.positionDoublet.get(i));//Position 3D du doublet
                 //Dessiner le doublet
                 g.fillOval((int)(Epos.x*multPersZ - ER) + (TailleX/2), (TailleY/2) - (int)(Epos.y*multPersZ + ER), (int)(ER)*2,(int)(ER)*2);
             }
         }
 
         //Dessiner les liens
-        for (int i = 0; i < A.liaisonIndexe.length; i++) {
+        for (int i = 0; i < A.liaisonIndexe.size(); i++) {
             
-            if(A.liaisonIndexe[i] != -1 && !A.liaisonType[i]){
+            if(A.liaisonIndexe.get(i) != -1 && !A.liaisonType.get(i)){
                 // Si c'est une liaison sigma
-                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet)); //Profondeur du dexième atome
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + FOVet)); //Profondeur du dexième atome
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);        //Couleur de la liaison
                 //Dessiner la liaison
-                g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             
-            }else if(A.liaisonIndexe[i] != -1 && A.liaisonType[i]){
+            }else if(A.liaisonIndexe.get(i) != -1 && A.liaisonType.get(i)){
                 //Si c'est une liaison pi
-                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe[i]).position.z+TailleZ/(2.0*Zoom) + FOVet));   // Profondeur du deuxième atome
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + FOVet));   // Profondeur du deuxième atome
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);         //Couleur de la liaison
                 //Dessiner la liaison
-                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe[i]).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe[i]).position.y)*multPersZB));
+                g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             }
         }
     }
@@ -474,12 +474,12 @@ public class App {
         if(!vus.contains(indexe)){
             // Si l'atome n'a pas déjà été traité (A)
             vus.add(indexe);    //Indiquer qu'il aura été traité
-            for (int i = 0; i < Atomes.get(indexe).liaisonIndexe.length; i++) {
+            for (int i = 0; i < Atomes.get(indexe).liaisonIndexe.size(); i++) {
                 // Chercher dans tout les atomes liés (A')
-                if(!vus.contains(Atomes.get(indexe).liaisonIndexe[i]) && Atomes.get(indexe).liaisonIndexe[i] != -1){
+                if(!vus.contains(Atomes.get(indexe).liaisonIndexe.get(i)) && Atomes.get(indexe).liaisonIndexe.get(i) != -1){
                     //Si cet atome lié n'a pas déjà été traité
                     //Aller chercher tout les atomes liés à A' (A'')
-                    int[] r = ajouterAtomeÀMolécule(Atomes, Atomes.get(indexe).liaisonIndexe[i], vus);
+                    int[] r = ajouterAtomeÀMolécule(Atomes, Atomes.get(indexe).liaisonIndexe.get(i), vus);
                     //Ajouter ces atomes à la liste de retour
                     for (int j = 0; j < r.length; j++) {
                         retour[j] += r[j];
