@@ -46,63 +46,19 @@ public class App {
         }*/
 
         //Initialiser les atomes
+        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle();
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        float [] espacement = {8f,6f,6f};        //Espacement entre les atomes en x,y,z
+        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
                     //int x = 1;int y = 1; int z = 1;
 
-                    Atome C = new Atome(6);
-                    C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(6);
-                    C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(6);
-                    C.position = new Vecteur3D(x*espacement[0] + 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(6);
-                    C.position = new Vecteur3D(x*espacement[0] + 3 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-                    
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    //C = new Atome(1);
-                    //C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    //Hs.add(C);
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    //C = new Atome(1);
-                    //C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    //Hs.add(C);
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] + 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] + 3 - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    Hs.add(C);
-
-                    C = new Atome(1);
-                    C.position = new Vecteur3D(x*espacement[0] + 3 - (TailleX/(2*Zoom)),y*espacement[1] - 1 - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
-                    //Hs.add(C);
+                    //C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
+                    H2O.position = new Vecteur3D(-(TailleX/(2.0*Zoom)) + x*espacement[0], -(TailleY/(2.0*Zoom)) + y*espacement[1], -(TailleZ/(2.0*Zoom)) + z*espacement[2]);
+                    MoléculeRéf.intégrerÀSimulation(Hs, H2O);
                 }
             }
         }

@@ -5,7 +5,7 @@ public class Atome{
 
     //État de l'atome
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
-    public Vecteur3D position = new Vecteur3D(100,0,0);   //Position présente de l'atome
+    public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
@@ -48,7 +48,7 @@ public class Atome{
     public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
     public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman
 
-    private static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
+    public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
     //Électronégativité de Pauling de chaque élément.
     private static final float[] AffinitéÉlectronique = {
@@ -507,7 +507,6 @@ public class Atome{
     private static Vecteur3D ForceVanDerWall(int NP, int NPA, double dist, Vecteur3D dir){
         //TODO #11 Implémenter moments dipolaires
         //TODO #12 Implémenter fréquence d'ionisation
-        //TODO #13 Implémenter polarisabilité électronique
         //TODO #14 Implémenter température
         double mu1 = 1.0; //Moment dipolaire de la particule 1
         double mu2 = 1.0; //Moment dipolaire de la particule 2
@@ -520,7 +519,7 @@ public class Atome{
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
         double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
-        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(rayonsCovalents[NP-1]+rayonsCovalents[NPA-1]),7.0)/Math.pow(dist,7.0)) )));
+        return ( Vecteur3D.mult(dir, (-(80.0*Math.pow(1.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
 
     /**
@@ -797,8 +796,6 @@ public class Atome{
             indexe = Atome.Environnement.indexOf(this);
         }
 
-        double forceSigmoide = 5.0;
-
         //Briser les liens
         for (int i = 0; i < liaisonIndexe.length; i++) {
             //Pour toutes les possibilités de liaisons
@@ -807,46 +804,10 @@ public class Atome{
                 continue;
             }
             
-            Atome APrime = Atome.Environnement.get(liaisonIndexe[i]); //Référence à A'
-            double dist = Vecteur3D.distance(position, APrime.position); //Évaluer la distance entre les deux atomes
-            if(dist > 2.0*(rayonCovalent + APrime.rayonCovalent)){
+            double dist = Vecteur3D.distance(position, Environnement.get(liaisonIndexe[i]).position); //Évaluer la distance entre les deux atomes
+            if(dist > 2.0*(rayonCovalent + Environnement.get(liaisonIndexe[i]).rayonCovalent)){
                 //Si la distance est 2 fois la longueur de liaison, briser le lien
-                //Distribuer les électrons entre les deux atomes
-                //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
-                float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
-                charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
-                APrime.charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
-                retirerÉlectron();                              //Retirer un électron à A
-                APrime.retirerÉlectron(); //Retirer un électron à A'
-
-                //Donner aléatoirement un électron à un atome. Plus l'atome est électronégatif, plus il a de chances d'obtenir l'électron
-                if(Math.random() < proportion){
-                    ajouterÉlectron();
-                }else{
-                    APrime.ajouterÉlectron();
-                }
-                
-                //Recalculer les proportions, car l'électronégativité est affectée par la charge.
-                proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide);
-                //Donner aléatoirment un électron à un atome.
-                if(Math.random() < proportion){
-                    ajouterÉlectron();
-                }else{
-                    APrime.ajouterÉlectron();
-                }
-
-                //Retirer les références à A'
-                for (int j = 0; j < APrime.liaisonIndexe.length; j++) {
-                    if(APrime.liaisonIndexe[j] == indexe){
-                        APrime.liaisonIndexe[j] = -1;
-                        APrime.liaisonType[j] = false;
-                    }
-                }
-                liaisonIndexe[i] = -1;
-                liaisonType[i] = false;
-
-                //Séparer la molécule
-                molécule.séparerMolécule(this, APrime);
+                briserLien(i);
             }
         }
 
@@ -901,26 +862,78 @@ public class Atome{
             }
             if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
                 //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
-                Atome APrime = Atome.Environnement.get(indexePot); //Référence à A'
-                liaisonIndexe[i] = indexePot;   //Ajouter une référence de A' à A
-                APrime.liaisonIndexe[placeLibre] = indexe;   //Donner une référence de A à A'
-                if (nLiaisons == 0) {
-                    //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
-                    liaisonType[i] = false;
-                    APrime.liaisonType[placeLibre] = false;
-                }else {
-                    //Sinon, la nouvelle sera de type pi
-                    liaisonType[i] = true;
-                    APrime.liaisonType[placeLibre] = true;
-                }
-
-                //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
-                float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
-                charge += 1.0-2.0*proportion;               //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
-                APrime.charge += 1.0-2.0*(1.0-proportion);  //Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
-                molécule.fusionnerMolécule(APrime.molécule);//Fusionner les deux molécules
+                créerLien(indexePot, i, placeLibre, nLiaisons==0?false:true);
             }
         }
+    }
+
+    private double forceSigmoide = 5.0;
+
+    /**
+     * Créé un lien avec l'atome spécifié par indexeAtome.
+     * @param indexeAtome - Indexe de l'atome avec lequel faire un lien
+     * @param liaisonIndexeA - Indexe de la case de liaisonIndexe[] qui contiendra le lien, dans l'atome A
+     * @param liaisonIndexeB - Indexe de la case de liaisonIndexe[] qui contiendra le lien, dans l'atome B
+     * @param liaisonPi - Type de liaison. Faux = liaison sigma, Vrai = liaison pi.
+     */
+    public void créerLien(int indexeAtome, int liaisonIndexeA, int liaisonIndexeB, boolean liaisonPi ){
+        Atome APrime = Atome.Environnement.get(indexeAtome); //Référence à A'
+        liaisonIndexe[liaisonIndexeA] = indexeAtome;   //Ajouter une référence de A' à A
+        APrime.liaisonIndexe[liaisonIndexeB] = indexe;   //Donner une référence de A à A'
+        //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
+        liaisonType[liaisonIndexeA] = liaisonPi;
+        APrime.liaisonType[liaisonIndexeB] = liaisonPi;
+
+        //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
+        float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
+        charge += 1.0-2.0*proportion;               //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
+        APrime.charge += 1.0-2.0*(1.0-proportion);  //Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
+        molécule.fusionnerMolécule(APrime.molécule);//Fusionner les deux molécules
+    }
+
+    /**
+     * Détruit un lien.
+     * @param indexeLiaison - Indexe de la case de liaisonIndexe[] qui contient le lien.
+     */
+    public void briserLien(int indexeLiaison){
+        Atome APrime = Atome.Environnement.get(liaisonIndexe[indexeLiaison]); //Référence à A'
+        //Distribuer les électrons entre les deux atomes
+        //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
+        float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
+        charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
+        APrime.charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
+        retirerÉlectron();                              //Retirer un électron à A
+        APrime.retirerÉlectron(); //Retirer un électron à A'
+
+        //Donner aléatoirement un électron à un atome. Plus l'atome est électronégatif, plus il a de chances d'obtenir l'électron
+        if(Math.random() < proportion){
+            ajouterÉlectron();
+        }else{
+            APrime.ajouterÉlectron();
+        }
+        
+        //Recalculer les proportions, car l'électronégativité est affectée par la charge.
+        proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide);
+        //Donner aléatoirment un électron à un atome.
+        if(Math.random() < proportion){
+            ajouterÉlectron();
+        }else{
+            APrime.ajouterÉlectron();
+        }
+
+        //Retirer les références à A de A'
+        for (int j = 0; j < APrime.liaisonIndexe.length; j++) {
+            if(APrime.liaisonIndexe[j] == indexe){
+                APrime.liaisonIndexe[j] = -1;
+                APrime.liaisonType[j] = false;
+            }
+        }
+        //Retirer les références à A' de A
+        liaisonIndexe[indexeLiaison] = -1;
+        liaisonType[indexeLiaison] = false;
+
+        //Séparer la molécule
+        molécule.séparerMolécule(this, APrime);
     }
 
     /**
@@ -952,7 +965,9 @@ public class Atome{
         a.NP = this.NP;
         a.NE = this.NE;
         a.m = this.m;
+        a.électronégativité = this.électronégativité;
         a.charge = this.charge;
+        a.indexe = this.indexe;
 
         a.liaisonIndexe = this.liaisonIndexe.clone();
         a.liaisonType = this.liaisonType.clone(); // sigma = faux, pi = vrai
@@ -991,6 +1006,8 @@ public class Atome{
         this.NE = b.NE;
         this.m = b.m;
         this.charge = b.charge;
+        this.électronégativité = b.électronégativité;
+        this.indexe = b.indexe;
 
         this.liaisonIndexe = b.liaisonIndexe.clone();
         this.liaisonType = b.liaisonType.clone(); // sigma = faux, pi = vrai
