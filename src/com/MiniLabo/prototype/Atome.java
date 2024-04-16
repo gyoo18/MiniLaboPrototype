@@ -224,7 +224,7 @@ public class Atome{
                 //Si A' se situe à moins de N rayons covalents de A
                 
                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli
-                A.Force.addi( ForceVanDerWall(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer les forces de Van der Walls
+                A.Force.addi( ForceVanDerWall(A.NP,APrime.NP, dist, dir)); //Appliquer les forces de Van der Walls
                 A.Force.addi( ForceÉlectrique(A.charge, APrime.charge,dist,dir)); //Appliquer la force électrique
 
                 for (int j = 0; j < APrime.forceDoublet.length; j++) {
