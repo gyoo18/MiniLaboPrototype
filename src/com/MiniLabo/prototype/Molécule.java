@@ -136,12 +136,12 @@ public class Molécule {
         if(!vus.contains(indexe)){
             // Si l'atome n'a pas déjà été traité (A)
             vus.add(indexe);    //Indiquer qu'il aura été traité
-            for (int i = 0; i < Environnement.get(indexe).liaisonIndexe.length; i++) {
+            for (int i = 0; i < Environnement.get(indexe).liaisonIndexe.size(); i++) {
                 // Chercher dans tout les atomes liés (A')
-                if(!vus.contains(Environnement.get(indexe).liaisonIndexe[i]) && Environnement.get(indexe).liaisonIndexe[i] != -1){
+                if(!vus.contains(Environnement.get(indexe).liaisonIndexe.get(i)) && Environnement.get(indexe).liaisonIndexe.get(i) != -1){
                     //Si cet atome lié n'a pas déjà été traité
                     //Aller chercher tout les atomes liés à A' (A'')
-                    ArrayList<Atome> r = ajouterAtomeÀMolécule(Environnement.get(indexe).liaisonIndexe[i], vus);
+                    ArrayList<Atome> r = ajouterAtomeÀMolécule(Environnement.get(indexe).liaisonIndexe.get(i), vus);
                     //Ajouter ces atomes à la liste de retour
                     for (int j = 0; j < r.size(); j++) {
                         retour.add(r.get(j));

@@ -56,9 +56,9 @@ public class MoléculeRéf extends Molécule{
         for (int i = 0; i < molécule.Atomes.size(); i++) {
             Atome A = mol.Atomes.get(i).copier(false);
             A.indexe += décalage;
-            for (int j = 0; j < A.liaisonIndexe.length; j++) {
-                if(A.liaisonIndexe[j] != -1){
-                    A.liaisonIndexe[j] += décalage;
+            for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                if(A.liaisonIndexe.get(j) != -1){
+                    A.liaisonIndexe.set(j, A.liaisonIndexe.get(j)+décalage);
                 }
             }
             A.position = Vecteur3D.addi(mol.position, mol.posAtomes.get(i));
@@ -94,6 +94,44 @@ public class MoléculeRéf extends Molécule{
 
         return H2O;
     }
+
+    public static MoléculeRéf avoirH3Op(){
+        MoléculeRéf H3Op = new MoléculeRéf();
+
+        Atome O = new Atome(8);
+        O.retirerÉlectron();
+        O.évaluerValence();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(1,0,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1,0,0);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(0,1,0);
+        
+
+
+        H3Op.ajouterAtome(O);
+        H3Op.ajouterAtome(H1);
+        H3Op.ajouterAtome(H2);
+        H3Op.ajouterAtome(H3);
+
+        for (int i = 0; i < H3Op.Atomes.size(); i++) {
+            H3Op.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(H3Op.Atomes);
+        O.créerLien(1, 0, 0, false);
+        O.créerLien(2, 1, 0, false);
+        O.créerLien(3, 2, 0, false);
+        Atome.MettreÀJourEnvironnement(Environnement);
+
+        H3Op.calculerAABB();
+        H3Op.MiseÀJourPos();
+
+        return H3Op;
+    }
+
 
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
