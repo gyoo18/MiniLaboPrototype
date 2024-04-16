@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 200;
-    public static float Zoom = 15f;
+    public static float Zoom = 30f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -43,37 +43,39 @@ public class App {
         //Initialiser les atomes
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
-        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
+        float [] espacement = {6f,6f,3f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
                     //int x = 1;int y = 1; int z = 1;
 
-                    Atome C = new Atome(11);
+                    Atome C = new Atome(8);
                     C.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
                     //C.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(C);
 
-                    Atome H2 = new Atome(17);
-                    H2.position = new Vecteur3D(x*espacement[0]+2.5 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    Atome H2 = new Atome(1);
+                    H2.position = new Vecteur3D(x*espacement[0]+1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
                     Hs.add(H2);
 
                     Atome H3 = new Atome(1);
                     H3.position = new Vecteur3D(x*espacement[0]-1 - (TailleX/(2*Zoom)),y*espacement[1]-0 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H3);
+                    Hs.add(H3);
 
-                    H3 = new Atome(1);
-                    H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] + 1 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    Atome H4 = new Atome(1);
+                    H4.position = new Vecteur3D(x*espacement[0] -0.5- (TailleX/(2*Zoom)),y*espacement[1] -0.6 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H3);
+                    H4.retirerÉlectron();
+                    Hs.add(H4);
 
-                    H3 = new Atome(1);
-                    H3.position = new Vecteur3D(x*espacement[0] - (TailleX/(2*Zoom)),y*espacement[1] - 1 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
+                    Atome H5 = new Atome(1);
+                    H5.position = new Vecteur3D(x*espacement[0] +0.5- (TailleX/(2*Zoom)),y*espacement[1] - 2 - (TailleY/(2*Zoom)), ((-z)*espacement[2] + (TailleZ/(2*Zoom))));
                     //H2.vélocité = new Vecteur3D((Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0), (Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0),(Math.random() * 2.0 - 1.0) * 3.0 * Math.pow(10.0, 14.0));
-                    //Hs.add(H3);
+                    //Hs.add(H5);
+                    
                 }
             }
         }
@@ -86,7 +88,7 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-16.0);     //Delta temps de la simulation
+        double dt = 6.0*Math.pow(10.0,-20.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -120,7 +122,7 @@ public class App {
             }
             
             //Statistiques sur la vitesse de la simulation
-            System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+            //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
             
             //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
