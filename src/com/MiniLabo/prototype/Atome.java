@@ -53,7 +53,7 @@ public class Atome{
 
     public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
-    //Électronégativité de Pauling de chaque élément.
+    /**Électronégativité de Pauling de chaque élément.*/
     private static final float[] AffinitéÉlectronique = {
         2.20f,                                                                                                0.00f,
         0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
@@ -65,7 +65,7 @@ public class Atome{
         1.10f,1.30f,      1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f
     };
 
-    //Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.
+    /**Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.*/
     private static final float[] rayonsCovalents = {
          32f,                                                                                 46f,
         133f,102f,                                                   85f, 75f, 71f, 63f, 64f, 67f,
@@ -78,7 +78,7 @@ public class Atome{
                   157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
     };
 
-    //Rayon covalent de lien double.
+    /**Rayon covalent de lien double.*/
     private static final float[] rayonsCovalents2 = {
          0f,                                                                                   0f,
         124f, 90f,                                                   78f, 67f, 60f, 57f, 59f, 96f,
@@ -91,7 +91,7 @@ public class Atome{
                   140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    //Rayon covalent de lien triple
+    /**Rayon covalent de lien triple*/
     private static final float[] rayonsCovalents3 = {
           0f,                                                                                  0f,
           0f, 85f,                                                   73f, 60f, 54f, 53f, 53f,  0f,
@@ -104,7 +104,7 @@ public class Atome{
                   131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    //Constante d'écran utilisé dans le calcul de la charge effective de l'atome.
+    /**Constante d'écran utilisé dans le calcul de la charge effective de l'atome.*/
     private final double ConstanteÉcran[] = {
         0.000,                                                                                                0.300,
         1.700,2.050,                                                            2.400,2.750,3.100,3.450,3.800,4.2515,
@@ -116,7 +116,7 @@ public class Atome{
         84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
     };
     
-    //Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.
+    /**Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.*/
     private static final double Radii [] = {
         0.5292,                                                                                                                0.3113,
         1.6283,1.08550,                                                                     0.8141,0.6513,0.5428,0.4652,0.4071,0.3676,
@@ -128,7 +128,7 @@ public class Atome{
         4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
     };
 
-    //Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par convPolar pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)
+    /**Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par convPolar pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)*/
     private static final double Polarisabilité[] = {
         4.50,                                                                               1.38,
         164,37.7,                                                  20.5,11.3, 7.4, 5.3,3.74,2.66,
@@ -142,7 +142,7 @@ public class Atome{
     };
     private static final double convPolar = 1.64986832*Math.pow(10.0,-41.0);
 
-    //Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.
+    /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.*/
     private static final double[][] ConstanteDeForce = {
       //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,  Mg,  Al,  Si,   P,   S,  Cl,  Ar
         {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,   0,   0,   0,3.22,4.26,5.16,   0},//H
@@ -488,7 +488,7 @@ public class Atome{
      * @return Vecteur de force en Newtons Angströmiens
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        return ( Vecteur3D.mult(dir, (1.0*Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+        return ( Vecteur3D.mult(dir, (80.0*Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
     
     /**
@@ -546,7 +546,7 @@ public class Atome{
         double a = Math.sqrt(p/(2.0*D));
         double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
 
-        return ( Vecteur3D.mult(dir,100.0*module) );
+        return ( Vecteur3D.mult(dir,1*module) );
     }
     
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
@@ -591,7 +591,7 @@ public class Atome{
     }
 
     /**Ajouter un électron aux cases quantiques (en mode hybridé)*/
-    private void ajouterÉlectron(){
+    public void ajouterÉlectron(){
         int Qn = 1; //Nombre quantique principal n
         int Ql = 0; //Nombre quantique azimutal l
         int Qm = 0; //Nombre quantique magnétique m
@@ -1053,6 +1053,7 @@ public class Atome{
 
         a.liaisonIndexe = (ArrayList<Integer>)this.liaisonIndexe.clone();
         a.liaisonType = (ArrayList<Boolean>)this.liaisonType.clone(); // sigma = faux, pi = vrai
+        a.liaisonOrdre = (ArrayList<Integer>)this.liaisonOrdre.clone();
         a.doublets = this.doublets;
         a.rayonCovalent = this.rayonCovalent;
 

@@ -108,7 +108,7 @@ public class Molécule {
             }
             MiseÀJourPos();
             évaluerFormuleChimique();
-            évaluerSystèmesConjugués();
+            //évaluerSystèmesConjugués();
 
             Molécule moléculeB = new Molécule();
             moléculeB.Atomes = molB;
@@ -117,7 +117,7 @@ public class Molécule {
             }
             moléculeB.MiseÀJourPos();
             moléculeB.évaluerFormuleChimique();
-            moléculeB.évaluerSystèmesConjugués();
+            //moléculeB.évaluerSystèmesConjugués();
 
         }else{
             System.out.println("La molécule n'a pas été coupée en deux. Aucune action ne sera entreprise.");
@@ -227,7 +227,8 @@ public class Molécule {
     }
     
 
-    public void évaluerSystèmesConjugués(){  
+    public void évaluerSystèmesConjugués(){
+        //TODO #24 Régler bug de (A)-(B)=(A) résonance
         for (int i = 0; i < Atomes.size(); i++) {
             Atome A = Atomes.get(i);
             //=-= | indexe = 0
@@ -322,7 +323,7 @@ public class Molécule {
             if (A.doublets > 0) {
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
                     Atome B = Atomes.get(A.liaisonIndexe.get(j));
-                    if(A.liaisonOrdre.get(i) == 1 && B.NP > B.NE){
+                    if(A.liaisonOrdre.get(j) == 1 && B.NP > B.NE){
                         int[] système = {5, i, A.liaisonIndexe.get(j)};
                         ajouterSystèmeConjugé(système);
                     }
@@ -351,7 +352,27 @@ public class Molécule {
      * @param système - Description du système.
      */
     private void ajouterSystèmeConjugé(int[] système){
-        //TODO #23 implémenter Molécule.ajouterSystèmeConjugué();
+        boolean déjàPrésent = false;
+        for (int i = 0; i < systèmesConjugués.size(); i++) {
+            if(système[0] == systèmesConjugués.get(i)[0]){
+                boolean égale = true;
+                for (int j = 1; j < système.length; j++) {
+                    égale = égale && système[j] == systèmesConjugués.get(i)[j];
+                }
+                boolean égaleSC = true;
+                for (int j = 1; j < système.length; j++) {
+                    égaleSC = égaleSC && système[j] == systèmesConjugués.get(i)[système.length-j];
+                }
+                if (égale || égaleSC) {
+                    déjàPrésent = true;
+                    break;
+                }
+            }
+        }
+
+        if (!déjàPrésent) {
+            systèmesConjugués.add(système);
+        }
     }
 
     /**

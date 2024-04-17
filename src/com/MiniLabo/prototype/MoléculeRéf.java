@@ -8,10 +8,10 @@ public class MoléculeRéf extends Molécule{
 
     public MoléculeRéf(){
         super();
-        calculerAABB();
+        calculerBEAA();
     }
     
-    private void calculerAABB(){
+    private void calculerBEAA(){
         Vecteur3D max = new Vecteur3D(-Double.MAX_VALUE);
         Vecteur3D min = new Vecteur3D(Double.MAX_VALUE);
         for (int i = 0; i < Atomes.size(); i++) {
@@ -89,7 +89,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(2, 1, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
-        H2O.calculerAABB();
+        H2O.calculerBEAA();
         H2O.MiseÀJourPos();
 
         return H2O;
@@ -126,7 +126,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(3, 2, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
-        H3Op.calculerAABB();
+        H3Op.calculerBEAA();
         H3Op.MiseÀJourPos();
 
         return H3Op;
@@ -154,7 +154,7 @@ public class MoléculeRéf extends Molécule{
         Na.créerLien(1, 0, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
-        NaCl.calculerAABB();
+        NaCl.calculerBEAA();
         NaCl.MiseÀJourPos();
 
         return NaCl;
@@ -183,7 +183,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(2, 1, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
-        CH2.calculerAABB();
+        CH2.calculerBEAA();
         CH2.MiseÀJourPos();
 
         return CH2;
@@ -220,7 +220,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(4, 3, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
-        CH4.calculerAABB();
+        CH4.calculerBEAA();
         CH4.MiseÀJourPos();
 
         return CH4;
@@ -282,8 +282,58 @@ public class MoléculeRéf extends Molécule{
 
         C4H6.évaluerSystèmesConjugués();
 
-        C4H6.calculerAABB();
+        C4H6.calculerBEAA();
 
         return C4H6;
+    }
+
+    public static MoléculeRéf avoirAcétate(){
+        MoléculeRéf C2H3O2 = new MoléculeRéf();
+
+        Atome C1 = new Atome(6);
+        C1.position = new Vecteur3D(0);
+        Atome C2 = new Atome(6);
+        C2.position = new Vecteur3D(-1.05,-1.05,0);
+        Atome O1 = new Atome(8);
+        O1.position = new Vecteur3D(0,1.24,0);
+        Atome O2 = new Atome(8);
+        O2.position = new Vecteur3D(0.98,-0.98,0);
+        O2.ajouterÉlectron();
+        O2.évaluerValence();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(-1.63,-0.47,0.58);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1.63,-0.47,-0.58);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(-1.05,-2.12,0);
+
+        C2H3O2.ajouterAtome(C1);
+        C2H3O2.ajouterAtome(C2);
+        C2H3O2.ajouterAtome(O1);
+        C2H3O2.ajouterAtome(O2);
+        C2H3O2.ajouterAtome(H1);
+        C2H3O2.ajouterAtome(H2);
+        C2H3O2.ajouterAtome(H3);
+
+        for (int i = 0; i < C2H3O2.Atomes.size(); i++) {
+            C2H3O2.Atomes.get(i).indexe = i;
+        }
+        
+        ArrayList<Atome> Environnement = new ArrayList<>();
+        Atome.MettreÀJourEnvironnement(C2H3O2.Atomes);
+        C1.créerLien(C2.indexe, 0, 0, 1, false);
+        C1.créerLien(O1.indexe, 1, 0, 2, false);
+        C1.créerLien(O1.indexe, 2, 1, 2, true);
+        C1.créerLien(O2.indexe, 3, 0, 1, false);
+        C2.créerLien(H1.indexe, 1, 0, 1, false);
+        C2.créerLien(H2.indexe, 2, 0, 1, false);
+        C2.créerLien(H3.indexe, 3, 0, 1, false);
+        Atome.MettreÀJourEnvironnement(Environnement);
+
+        C2H3O2.évaluerSystèmesConjugués();;
+
+        C2H3O2.calculerBEAA();
+
+        return C2H3O2;
     }
 }
