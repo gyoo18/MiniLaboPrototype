@@ -225,7 +225,7 @@ public class Atome{
                 //Si A' se situe à moins de N rayons covalents de A
                 
                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli
-                A.Force.addi( ForceVanDerWall(A.NP,APrime.NP, dist, dir)); //Appliquer les forces de Van der Walls
+                A.Force.addi( ForceVanDerWall(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
                 A.Force.addi( ForceÉlectrique(A.charge, APrime.charge,dist,dir)); //Appliquer la force électrique
 
                 for (int j = 0; j < APrime.forceDoublet.size(); j++) {
@@ -497,12 +497,12 @@ public class Atome{
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
      * @return Vecteur de force en Newtons Angströmiens
      */
-    private static Vecteur3D ForceVanDerWall(int NP, int NPA, double dist, Vecteur3D dir){
+    private static Vecteur3D ForceVanDerWall(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
         //TODO #11 Implémenter moments dipolaires
         //TODO #12 Implémenter fréquence d'ionisation
         //TODO #26 Décider quelle température prendre pour Van der Walls
-        double mu1 = 1.0; //Moment dipolaire de la particule 1
-        double mu2 = 1.0; //Moment dipolaire de la particule 2
+        double mu1 = Environnement.get(indexeA).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 1
+        double mu2 = Environnement.get(indexeB).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 2
         double nu1 = 1.0; //Fréquence d'ionisation de la particule 1
         double nu2 = 1.0; //Fréquence d'ionisation de la particule 2
         double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
@@ -515,13 +515,29 @@ public class Atome{
         return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
 
-    /*private Vecteur3D évaluerMomentDipolaire(){
+    private Vecteur3D évaluerMomentDipolaire(){
+        //TODO #27 réviser évaluerMomentDipolaire()
         double chargeTotale = charge;
-        chargeTotale += -2.0*doublets;
-        for (int i = 0; i < AffinitéÉlectronique.length; i++) {
-            
+        //chargeTotale += -2.0*doublets;
+        for (int i = 0; i < liaisonIndexe.size(); i++) {
+            Atome Ap = Environnement.get(liaisonIndexe.get(i));
+            chargeTotale += Ap.charge;
+            //chargeTotale += -2.0*Ap.doublets;
         }
-    }*/
+
+        double équilibre = -chargeTotale/(liaisonIndexe.size()+1.0);
+
+        Vecteur3D momentDipolaire = new Vecteur3D(0);
+        for (int index = 0; index < liaisonIndexe.size(); index++) {
+            Atome Ap = Environnement.get(liaisonIndexe.get(i));
+            Vecteur3D dir = Vecteur3D.norm(Vecteur3D.sous(Ap.position,position));
+            double dist = Vecteur3D.distance(Ap.position, position);
+
+            momentDipolaire.addi(Vecteur3D.mult(dir, dist*(Ap.charge-équilibre)));
+        }
+
+        return momentDipolaire;
+    }
 
     /**
      * Le mécanisme de liaison de deux atome est très complexe, mais nous pouvons l'approximer avec un potentiel oscillatoire.
