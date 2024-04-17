@@ -40,7 +40,7 @@ public class App {
             e.printStackTrace();
         }
 
-        /*for (int i = 1; i < 16; i++) {
+        /*for (int i = 1; i < 100; i++) {
             Atome H = new Atome(i);
             System.out.println(i + " " + H.électronégativité);
         }*/
@@ -48,7 +48,7 @@ public class App {
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
-        MoléculeRéf H2O = MoléculeRéf.avoirAcétate(); //Molécule de base
+        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
 
         /*//Initialiser les atomes en grille
         float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
@@ -65,8 +65,9 @@ public class App {
             }
         }
 */
+        
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 1;  //Nombre de molécules voulus
+        int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -108,7 +109,7 @@ public class App {
         }
 
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(25.0-273.15, Hs.get(i).m);
+            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
             Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
         }
 
@@ -120,7 +121,7 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-18.0);     //Delta temps de la simulation
+        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout

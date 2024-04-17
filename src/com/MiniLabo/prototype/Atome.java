@@ -36,7 +36,7 @@ public class Atome{
     
     public Molécule molécule;       //Molécule de l'atome.
 
-    private final int MAX_N = 4;    //Nombre principal maximal. Indique le nombre de ligne du tableau prériodique utilisé.
+    private final int MAX_N = 3;    //Nombre principal maximal. Indique le nombre de ligne du tableau prériodique utilisé.
     private final int MAX_CASE = (MAX_N*(MAX_N+1)*(2*MAX_N+1))/6 - 1;   //Nombre maximal de cases quantiques
 
     private int[] cases;    //Cases quantiques
@@ -520,6 +520,9 @@ public class Atome{
         double chargeTotale = charge;
         //chargeTotale += -2.0*doublets;
         for (int i = 0; i < liaisonIndexe.size(); i++) {
+            if(liaisonIndexe.get(i) == -1){
+                continue;
+            }
             Atome Ap = Environnement.get(liaisonIndexe.get(i));
             chargeTotale += Ap.charge;
             //chargeTotale += -2.0*Ap.doublets;
@@ -528,7 +531,10 @@ public class Atome{
         double équilibre = -chargeTotale/(liaisonIndexe.size()+1.0);
 
         Vecteur3D momentDipolaire = new Vecteur3D(0);
-        for (int index = 0; index < liaisonIndexe.size(); index++) {
+        for (int i = 0; i < liaisonIndexe.size(); i++) {
+            if(liaisonIndexe.get(i) == -1){
+                continue;
+            }
             Atome Ap = Environnement.get(liaisonIndexe.get(i));
             Vecteur3D dir = Vecteur3D.norm(Vecteur3D.sous(Ap.position,position));
             double dist = Vecteur3D.distance(Ap.position, position);
@@ -940,7 +946,7 @@ public class Atome{
             }
             if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
                 //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
-                créerLien(indexePot, i, placeLibre, nLiaisons, nLiaisons!=1);
+                créerLien(indexePot, i, placeLibre, nLiaisons+1, nLiaisons!=0);
             }
         }
     }
@@ -1016,12 +1022,12 @@ public class Atome{
         //Mettre à jour l'ordre de liaison des autres liaisons
         for (int i = 0; i < liaisonIndexe.size(); i++) {
             if(liaisonIndexe.get(i) == APrime.indexe){
-                liaisonOrdre.set(i,liaisonOrdre.get(i)-1);
+                liaisonOrdre.set(i,0);
             }
         }
         for (int i = 0; i < APrime.liaisonIndexe.size(); i++) {
             if(APrime.liaisonIndexe.get(i) == indexe){
-                APrime.liaisonOrdre.set(i,APrime.liaisonOrdre.get(i)-1);
+                APrime.liaisonOrdre.set(i,0);
             }
         }
 
@@ -1033,8 +1039,12 @@ public class Atome{
             }
         }
         //Retirer les références à A' de A
-        liaisonIndexe.set(indexeLiaison,-1);
-        liaisonType.set(indexeLiaison, false);
+        for (int j = 0; j < liaisonIndexe.size(); j++) {
+            if(liaisonIndexe.get(j) == APrime.indexe){
+                liaisonIndexe.set(j,-1);
+                liaisonType.set(j,false);
+            }
+        }
 
         //Séparer la molécule
         molécule.séparerMolécule(this, APrime);
@@ -1071,7 +1081,7 @@ public class Atome{
     }
 
     public static double TempératureEnVitesse(double T, double m){
-        return 3.0*kB*T/m;
+        return Math.sqrt(3.0*kB*T/m);
     }
 
     /**

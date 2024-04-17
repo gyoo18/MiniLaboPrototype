@@ -66,6 +66,52 @@ public class MoléculeRéf extends Molécule{
         }
     }
 
+    /**
+     * Modèle de construction de molécule. Copier, coller et modifier pour créer un nouveau modèle.
+     * Ne pas oublier de changer de <prev> {@code private} </prev> à <prev> {@code public} </prev>.
+     * @return - Molécule voulus
+     */
+    private static MoléculeRéf avoirMolécule(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf mol = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome A = new Atome(1);    //Créer et donner un nom à chaque atome.
+        A.position = new Vecteur3D(1,0,0);//Donner une position à chaque atome. Elle serat relative au centre de la molécule.
+
+        //Ajouter chaque atome à la molécule
+        mol.ajouterAtome(A);
+
+        //Ne pas changer
+        for (int i = 0; i < mol.Atomes.size(); i++) {
+            mol.Atomes.get(i).indexe = i; //Donne un indexe à chaque atome
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement; //Modifie temporairement la référence à
+        Atome.MettreÀJourEnvironnement(mol.Atomes);           //l'environnement pour détecter la résonance
+        MiseÀJourEnvironnement(mol.Atomes);
+
+        //Créer les liens entre chaque atome
+        //indexeAtomes serat le numéro auquel l'atome a été ajouté dans la molécule. Ex.: H3 a été ajouté en 4em, son indexe serat 3.
+        //LiaisonIndexe réfère au numéro de case dans lequel on fait la liaison. Ex.: O veut faire un premier lien : il serat dans la case 0, pour en faire un deuxième il devrat être dans la case 1.
+        //LiaisonOrdre fait référence à l'ordre de liaison. Chaque lien de la liaison doit être ajouté individuellement. Ex.: Pour faire un lien double entre O1 et O2, il faut ajouter un lien sigma d'ordre 2, puis un lien pi d'ordre 2.
+        //LiaisonType indique si c'est un lien sigma, ou pi. Sigma = false, Pi = true
+        A.créerLien(0, 0, 0, 1, false);
+
+        //Ne pas changer
+        mol.évaluerSystèmesConjugués(); //Détecte la résonance
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        mol.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        mol.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return mol; //Renvoie la molécule
+    }
+
     public static MoléculeRéf avoirH2O(){
         MoléculeRéf H2O = new MoléculeRéf();
 
@@ -85,9 +131,14 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(H2O.Atomes);
+        MiseÀJourEnvironnement(H2O.Atomes);
         O.créerLien(1, 0, 0, 1, false);
         O.créerLien(2, 1, 0, 1, false);
+
+        H2O.évaluerSystèmesConjugués();
+
         Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
 
         H2O.calculerBEAA();
         H2O.MiseÀJourPos();
@@ -124,6 +175,9 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(1, 0, 0, 1, false);
         O.créerLien(2, 1, 0, 1, false);
         O.créerLien(3, 2, 0, 1, false);
+
+        H3Op.évaluerSystèmesConjugués();
+
         Atome.MettreÀJourEnvironnement(Environnement);
 
         H3Op.calculerBEAA();
@@ -131,7 +185,6 @@ public class MoléculeRéf extends Molécule{
 
         return H3Op;
     }
-
 
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
@@ -151,8 +204,13 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(NaCl.Atomes);
+        MiseÀJourEnvironnement(NaCl.Atomes);
         Na.créerLien(1, 0, 0, 1, false);
+
+        NaCl.évaluerSystèmesConjugués();
+
         Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
 
         NaCl.calculerBEAA();
         NaCl.MiseÀJourPos();
@@ -179,9 +237,14 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(CH2.Atomes);
+        MiseÀJourEnvironnement(CH2.Atomes);
         C.créerLien(1, 0, 0, 1, false);
         C.créerLien(2, 1, 0, 1, false);
+
+        CH2.évaluerSystèmesConjugués();
+
         Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
 
         CH2.calculerBEAA();
         CH2.MiseÀJourPos();
@@ -214,11 +277,16 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(CH4.Atomes);
+        MiseÀJourEnvironnement(CH4.Atomes);
         C.créerLien(1, 0, 0, 1, false);
         C.créerLien(2, 1, 0, 1, false);
         C.créerLien(3, 2, 0, 1, false);
         C.créerLien(4, 3, 0, 1, false);
+
+        CH4.évaluerSystèmesConjugués();
+
         Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
 
         CH4.calculerBEAA();
         CH4.MiseÀJourPos();
@@ -267,6 +335,7 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(C4H6.Atomes);
+        MiseÀJourEnvironnement(C4H6.Atomes);
         C1.créerLien(4, 0, 0, 1, false); //Liaison avec H1
         C1.créerLien(5, 1, 0, 1, false); //Liaison avec H2
         C1.créerLien(1, 2, 0, 2, false); //Liaison 1 avec C2
@@ -278,9 +347,12 @@ public class MoléculeRéf extends Molécule{
         C3.créerLien(3, 3, 1, 2, true ); //Liaison 2 avec C4
         C4.créerLien(8, 2, 0, 1, false); //Liaison avec H5
         C4.créerLien(9, 3, 0, 1, false); //Liaison avec H6
-        Atome.MettreÀJourEnvironnement(Environnement);
 
         C4H6.évaluerSystèmesConjugués();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
 
         C4H6.calculerBEAA();
 
@@ -321,6 +393,7 @@ public class MoléculeRéf extends Molécule{
         
         ArrayList<Atome> Environnement = new ArrayList<>();
         Atome.MettreÀJourEnvironnement(C2H3O2.Atomes);
+        MiseÀJourEnvironnement(C2H3O2.Atomes);
         C1.créerLien(C2.indexe, 0, 0, 1, false);
         C1.créerLien(O1.indexe, 1, 0, 2, false);
         C1.créerLien(O1.indexe, 2, 1, 2, true);
@@ -328,9 +401,11 @@ public class MoléculeRéf extends Molécule{
         C2.créerLien(H1.indexe, 1, 0, 1, false);
         C2.créerLien(H2.indexe, 2, 0, 1, false);
         C2.créerLien(H3.indexe, 3, 0, 1, false);
-        Atome.MettreÀJourEnvironnement(Environnement);
 
         C2H3O2.évaluerSystèmesConjugués();;
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
 
         C2H3O2.calculerBEAA();
 

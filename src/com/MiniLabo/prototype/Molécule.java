@@ -226,107 +226,182 @@ public class Molécule {
         }
     }
     
-
+    /**Détecte les systèmes conjugués de résonances présents dans la molécules */
     public void évaluerSystèmesConjugués(){
         //TODO #24 Régler bug de (A)-(B)=(A) résonance
         //TODO #25 Tester détection résonance
         for (int i = 0; i < Atomes.size(); i++) {
             Atome A = Atomes.get(i);
-            //=-= | indexe = 0
-            boolean estDouble = false;
-            boolean estSimple = false;
-            boolean estDouble2 = false;
-            ArrayList<Atome> A1 = new ArrayList<>();
-            ArrayList<Atome> A3 = new ArrayList<>();
-            ArrayList<ArrayList<Atome>> A4 = new ArrayList<>();
+            //=-= | type = 0
+            boolean estDouble = false; //Indique si A possède au moins un lien double
+            boolean estSimple = false; //Indique si A possède au mois un lien simple
+            boolean estDouble2 = false; //Indique si au moins un B dans =(A)-(B) possède au moins une liaison double
+            ArrayList<Atome> A1 = new ArrayList<>(); //Liste des atomes liés par liaison double à A (A1)=(A)
+            ArrayList<Atome> A3 = new ArrayList<>(); //Liste des atomes liés par liaison simple à A (A)-(A3)
+            ArrayList<ArrayList<Atome>> A4 = new ArrayList<>(); //Liste des atomes liés par liaison simple aux atomes de A3 (A3)=(A4)
+            //Chercher tout les atomes liés par liaison double à A
             for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                //Pour toutes les liaisons de A
                 if(A.liaisonOrdre.get(j) > 1 && !A.liaisonType.get(j) && A.liaisonIndexe.get(j) != -1){
-                    estDouble = true;
-                    A1.add(Atomes.get(A.liaisonIndexe.get(j)));
+                    //Si l'ordre de cette liaison est >1, et que cette liaison existe.
+                    //On prend la liaison sigma pour éviter de compter cette liaison plus d'une fois.
+                    estDouble = true; //Indiquer qu'on a au moins une liaison double
+                    A1.add(Environnement.get(A.liaisonIndexe.get(j))); //Ajouter l'autre atome à A1
                 }
             }
+            //Chercher tout les atomes liés par une liaison simple à A
             for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                //Pour toutes les liaisons de A
                 if(A.liaisonOrdre.get(j) == 1 && A.liaisonIndexe.get(j) != -1){
-                    estSimple = true;
+                    //Si cette liaison existe et est simple,
+                    estSimple = true; //Indiquer qu'on a au moins une liaison simple
 
-                    boolean aAjouté = false;
-                    Atome Ap = Atomes.get(A.liaisonIndexe.get(j));
+                    Atome Ap = Environnement.get(A.liaisonIndexe.get(j)); //Référence à l'autre atome de cette liaison (A3)
+                    boolean ajouté = false; //Indique si on a déjà ajouté A3 à la liste des A3
+                    //Chercher tout les atomes liés par une liaison double à A3
                     for (int j2 = 0; j2 < Ap.liaisonIndexe.size(); j2++) {
+                        //Pour toutes les liaisons de A3
                         if(Ap.liaisonOrdre.get(j2) > 1 && !Ap.liaisonType.get(j) && Ap.liaisonIndexe.get(j2) != -1){
-                            estDouble2 = true;
-                            if(!aAjouté){
-                                A3.add(Atomes.get(A.liaisonIndexe.get(j)));
-                                A4.add(new ArrayList<Atome>());
-                                aAjouté = true;
+                            //Si cette liaison existe et qu'elle est d'ordre >1,
+                            //On prend la liaison sigma pour éviter de compter cette liaison plus d'une fois.
+                            estDouble2 = true; //Indique que A3 possède au moins une liaison double
+                            if(!ajouté){
+                                A3.add(Environnement.get(A.liaisonIndexe.get(j))); //Ajouter A3 à la liste des A3. N'ajoute pas si A3 n'a pas de liaison double, car il ne formera pas de système conjugué.
+                                A4.add(new ArrayList<Atome>()); //Ajouter une liste de A4 à A3
+                                ajouté = true; //Indiquer qu'on a ajouté A3 à la liste
                             }
-                            A4.get(A4.size()-1).add(Atomes.get(Ap.liaisonIndexe.get(j2)));
+                            A4.get(A4.size()-1).add(Environnement.get(Ap.liaisonIndexe.get(j2))); //Ajouter A4 à la liste de A4
                         }
                     }
                 }
             }
+            //Ajouter le système conjugué
             if(estDouble&&estSimple&&estDouble2){
+                //Si on a un =-=,
+                //Ajouter toutes les combinaisons de systèmes qu'il peut y avoir.
                 for (int j = 0; j < A1.size(); j++) {
                     for (int j2 = 0; j2 < A3.size(); j2++) {
                         for (int k = 0; k < A4.get(j2).size(); k++) {
-                            int[] système = {0, A1.get(j).indexe, i, A3.get(j2).indexe, A4.get(j2).get(k).indexe};
-                            ajouterSystèmeConjugé(système);
+                            //Pour =-=, le systèmes est organisé ainsi :
+                            //(A1)=(A2)-(A3)=(A4). A2 = cet atome, A.
+                            //[ type = 0, indexe de A1, indexe de A2, indexe de A3, indexe de A4]
+                            int[] système = {0, A1.get(j).indexe, i, A3.get(j2).indexe, A4.get(j2).get(k).indexe}; //Créer le système
+                            ajouterSystèmeConjugé(système); //Stocker le système
                         }
                     }
                 }
             }
 
-            //:-=
+            //:-= | type = 1
             if(A.doublets > 0){
+                //Si on a un doublet,
+                //Chercher tout les atomes liés par une liaison simple à A
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    //Pour toutes les liaisons de A
+                    //Si la liaison n'existe pas, passer au prochain.
+                    if(A.liaisonIndexe.get(j) == -1){
+                        continue;
+                    }
+                    
+                    Atome B = Environnement.get(A.liaisonIndexe.get(j)); //Référence à l'atome à l'autre bout de cette liaison (B)
+                    //Chercher tout les atomes liés par une liaison double à B
                     for (int j2 = 0; j2 < B.liaisonIndexe.size(); j2++) {
-                        Atome C = Atomes.get(B.liaisonIndexe.get(j2));
-                        if(B.liaisonOrdre.get(j2) > 1 && !B.liaisonType.get(j)){
-                            int[] système = {1, i, B.indexe, C.indexe};
-                            ajouterSystèmeConjugé(système);
+                        //Pour toutes les liaisons de B
+                        if(B.liaisonIndexe.get(j2) != -1 && B.liaisonOrdre.get(j2) > 1 && !B.liaisonType.get(j)){
+                            //Si cette liaison existe, qu'elle est d'ordre >1
+                            //On prend la liaison sigma pour éviter de compter cette liaison plus d'une fois.
+                            //Pour :-=, le système est organisé ainsi:
+                            //   :(A)-(B)=(C)
+                            //   [type = 1, indexe de A, indexe de B, indexe de C]
+                            int[] système = {1, i, B.indexe, B.liaisonIndexe.get(j2)}; //Créer système conjugué
+                            ajouterSystèmeConjugé(système); //Ajouter système conjugué dans la liste
                         }
                     }
                 }
             }
-            //=-+
+
+            //=-+ | type = 2
             if(A.NP > A.NE){
+                //Si A a un atome de plus que d'électrons (est considéré positif dans la nomnclature. Ne pas utiliser la charge à causes des charges partielles.)
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    //Pour toutes les liaisons de A,
+                    //Si la liaison n'existe pas, passer au prochain
+                    if(A.liaisonIndexe.get(j) == -1){
+                        continue;
+                    }
+                    
+                    Atome B = Environnement.get(A.liaisonIndexe.get(j)); //Référence à l'atome à l'autre bout de la liaison (B)
+                    //Chercher tout les atomes liés par une liaison double à B
                     for (int j2 = 0; j2 < B.liaisonIndexe.size(); j2++) {
-                        Atome C = Atomes.get(B.liaisonIndexe.get(j2));
-                        if(B.liaisonOrdre.get(j2) > 1 && !B.liaisonType.get(j)){
-                            int[] système = {2, i, B.indexe, C.indexe};
-                            ajouterSystèmeConjugé(système);
+                        //Pour toutes les liaisons de B
+                        if(B.liaisonOrdre.get(j2) > 1 && B.liaisonType.get(j2) && !B.liaisonType.get(j2)){
+                            //Si cette liaison existe et qu'elle est d'ordre >1
+                            //On prend la liaison sigmae pour éviter de compter cette liaison plus qu'une fois.
+                            //Pour =-+, le système est organisé ainsi:
+                            //  +(A)-(B)=(C)
+                            //  [type = 2, indexe de A, indexe de B, indexe de C]
+                            int[] système = {2, i, B.indexe, B.liaisonIndexe.get(j2)}; //Création du système.
+                            ajouterSystèmeConjugé(système); //Ajouter le système dans la liste.
                         }
                     }
                 }
             }
             //TODO #22 fixer le minimum d'électronégativité
-            //=X
-            if(A.électronégativité > 2.0){
+            //=X | type = 3
+            if(A.électronégativité > 4.0){
+                //Inclut N(5.5), O(8.3), F(12) et Cl(4.3).
+                //Chercher tout les atomes qui forment une liaison double avec A
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    //Pour toutes les liaisons de A
                     if(A.liaisonOrdre.get(j) > 1 && !A.liaisonType.get(j) && A.liaisonIndexe.get(j) != -1){
-                        int[] système = {3, i,A.liaisonIndexe.get(j)};
-                        ajouterSystèmeConjugé(système);
+                        //Si la liaison existe et est d'ordre 2,
+                        //On prend la liaison sigma pour éviter de la compter plus d'une fois.
+                        //Pour =X, le système est organisé ainsi:
+                        //  X(A)=(B)
+                        //  [type = 3, indexe de A, indexe de B]
+                        int[] système = {3, i,A.liaisonIndexe.get(j)}; //Créer le système
+                        ajouterSystèmeConjugé(système); //Ajouter le système à la liste
                     }
                 }
             }
-            //=+
+
+            //=+ | type = 4
             if (A.NP > A.NE) {
+                //Si A a un atome de plus que d'électrons (est considéré positif dans la nomenclature. Ne pas utiliser la charge à causes des charges partielles.)
+                //Chercher tout les atomes liés par un lien double à A.
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                    if(A.liaisonOrdre.get(i) > 1 && !A.liaisonType.get(j)){
-                        int[] système = {4, i, A.liaisonIndexe.get(j)};
-                        ajouterSystèmeConjugé(système);
+                    //Pour toutes les liaisons de A.
+                    if(A.liaisonOrdre.get(i) > 1 && !A.liaisonType.get(j) && A.liaisonIndexe.get(i) != -1){
+                        //Si la liaison est d'ordre >1 et qu'elle existe,
+                        //On prend la liaison sigma pour éviter de la compter plus d'une fois
+                        //Pour =+, le système est organisé ainsi:
+                        //  +(A)=(B)
+                        //  [type = 4, indexe de A, indexe de B]
+                        int[] système = {4, i, A.liaisonIndexe.get(j)}; //Créer le système.
+                        ajouterSystèmeConjugé(système); //Ajouter le système à la liste.
                     }
                 }
             }
-            //:-+
+
+            //:-+ | type = 5
             if (A.doublets > 0) {
+                //Si A possède un doublet
+                //Chercher tout les atomes lié par un lien simple à A
                 for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    //Pour toutes les liaisons de A, 
+                    //Si la liaison n'existe pas, passer à la prochaine.
+                    if(A.liaisonIndexe.get(j) == -1){
+                        continue;
+                    }
+                    
+                    Atome B = Atomes.get(A.liaisonIndexe.get(j)); //Référence à l'atome à l'autre bout de la liaison (B)
                     if(A.liaisonOrdre.get(j) == 1 && B.NP > B.NE){
-                        int[] système = {5, i, A.liaisonIndexe.get(j)};
-                        ajouterSystèmeConjugé(système);
+                        //Si la liaison est d'ordre 1, que B a plus de protons que d'électrons (qu'il est considéré positif dans la nomenclature. Ne pas utiliser la charge à causes des charges partielles.)
+                        //Pour :-+, le système est organisé ainsi:
+                        //  :(A)-(B)+
+                        //  [type = 5, indexe de A, indexe de B]
+                        int[] système = {5, i, A.liaisonIndexe.get(j)}; //Créer système.
+                        ajouterSystèmeConjugé(système); //Ajouter système à la liste.
                     }
                 }
             }
@@ -344,12 +419,13 @@ public class Molécule {
      *      <li>4 = [ <b>=+ </b> ],</li>
      *      <li>5 = [ <b>:-+</b> ] </li> </ul>
      *  <p>système[1 - n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
-     *  <ul><li>système[0] = 0 -> n = 4, (1)<b>=</b>(2)<b>-</b>(3)<b>=</b>(4). Dans un sens, comme dans l'autre, s'il existe déjà, il ne serat pas comptabilisé.</li>
-     *      <li>système[0] = 1 -> n = 3, <b>:</b>(1)<b>-</b>(2)<b>=</b>(3).    L'autre sens mènera à du comportement non-définis.</li>
-     *      <li>système[0] = 2 -> n = 3, <b>+</b>(1)<b>-</b>(2)<b>=</b>(3).    L'autre sens mènera à du comportement non-définis.</li>
-     *      <li>système[0] = 3 -> n = 2, <b>X</b>(1)<b>=</b>(2).        L'autre sens mènera à du comportement non-définis.</li>
-     *      <li>système[0] = 4 -> n = 2, <b>+</b>(1)<b>=</b>(2).        L'autre sens mènera à du comportement non-définis.</li>
-     *      <li>système[0] = 5 -> n = 2, <b>:</b>(1)<b>-</b>(2)<b>+</b>.       L'autre sens mènera à du comportement non-définis.</li>
+     *  <ul><li>[ <b>=-=</b> ] -> (A)<b>=</b>(B)<b>-</b>(C)<b>=</b>(D). <b>[ type = 0, indexe (A)=, indexe =(B)-, indexe -(C)=, indexe =(D) ]</b> <i>Dans un sens, comme dans l'autre, s'il existe déjà, il ne serat pas comptabilisé. </i></li>
+     *      <li>[ <b>:-=</b> ] -> <b>:</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 1, indexe :(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=-+</b> ] -> <b>+</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 2, indexe +(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=X </b> ] -> <b>X</b>(A)<b>=</b>(B). <b>[ type = 3, indexe X(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=+ </b> ] -> n = 2, <b>+</b>(A)<b>=</b>(B). <b>[ type = 4, indexe +(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>:-+</b> ] -> n = 2, <b>:</b>(A)<b>-</b>(B)<b>+</b>. <b>[ type = 5, indexe :(A)-, indexe -(B)+ ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *  </ul>
      * @param système - Description du système.
      */
     private void ajouterSystèmeConjugé(int[] système){
@@ -375,6 +451,8 @@ public class Molécule {
             systèmesConjugués.add(système);
         }
     }
+
+    //public int[] obtenirSystèmeConjugué(int a);
 
     /**
      * Copie la molécule m
