@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import javax.swing.text.Position;
 
 public class Atome{
-
     //État de l'atome
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
@@ -195,7 +194,6 @@ public class Atome{
         molécule.ajouterAtome(this);//Ajoute cet atome à la molécule
     }
 
-    
     /**Initialisation de l'atome uniquement utilisée lorsqu'on le copie*/
     private Atome(){}
 
@@ -502,20 +500,28 @@ public class Atome{
     private static Vecteur3D ForceVanDerWall(int NP, int NPA, double dist, Vecteur3D dir){
         //TODO #11 Implémenter moments dipolaires
         //TODO #12 Implémenter fréquence d'ionisation
-        //TODO #14 Implémenter température
+        //TODO #26 Décider quelle température prendre pour Van der Walls
         double mu1 = 1.0; //Moment dipolaire de la particule 1
         double mu2 = 1.0; //Moment dipolaire de la particule 2
         double nu1 = 1.0; //Fréquence d'ionisation de la particule 1
         double nu2 = 1.0; //Fréquence d'ionisation de la particule 2
         double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
         double a2 = Polarisabilité[NPA-1]*convPolar;  //Polarisabilité électronique de la particule 2
-        double T = 1.0;   //Température du système en °K
+        double T = Température(Environnement);   //Température du système en °K
         double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3*Math.pow(4*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
         double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
+
+    /*private Vecteur3D évaluerMomentDipolaire(){
+        double chargeTotale = charge;
+        chargeTotale += -2.0*doublets;
+        for (int i = 0; i < AffinitéÉlectronique.length; i++) {
+            
+        }
+    }*/
 
     /**
      * Le mécanisme de liaison de deux atome est très complexe, mais nous pouvons l'approximer avec un potentiel oscillatoire.
@@ -1027,6 +1033,29 @@ public class Atome{
     private double sigmoide(double x, double facteur){
         double fNorm = 0.5/ ( Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5))) - 0.5);
         return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
+    }
+
+    public double Température(){
+        return vélocité.longueur()*(3.0/2.0)*(1.0/kB)*m;
+    }
+
+    public static double Température(Atome a){
+        return a.Température();
+    }
+
+    public static double Température(ArrayList<Atome> A){
+        double v = 0.0;
+        double m = 0.0;
+        for (int i = 0; i < A.size(); i++) {
+            v += Math.pow(A.get(i).vélocité.longueur(),2.0);
+            m += A.get(i).m;
+        }
+        v = v/(double)A.size();
+        return v*m*(3.0/2.0)*(1.0/kB);
+    }
+
+    public static double TempératureEnVitesse(double T, double m){
+        return 3.0*kB*T/m;
     }
 
     /**

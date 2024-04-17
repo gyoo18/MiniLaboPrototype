@@ -108,7 +108,8 @@ public class App {
         }
 
         for (int i = 0; i < Hs.size(); i++) {
-            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*Math.pow(10.0,13.0),2.0*(Math.random()-0.5)*Math.pow(10.0,13.0),2.0*(Math.random()-0.5)*Math.pow(10.0,14.0));
+            double module = Atome.TempératureEnVitesse(25.0-273.15, Hs.get(i).m);
+            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
         }
 
         //Ajouter les atomes dans l'ordre de dessin

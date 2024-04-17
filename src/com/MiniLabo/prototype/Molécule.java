@@ -229,6 +229,7 @@ public class Molécule {
 
     public void évaluerSystèmesConjugués(){
         //TODO #24 Régler bug de (A)-(B)=(A) résonance
+        //TODO #25 Tester détection résonance
         for (int i = 0; i < Atomes.size(); i++) {
             Atome A = Atomes.get(i);
             //=-= | indexe = 0
