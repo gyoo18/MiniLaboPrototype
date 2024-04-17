@@ -48,7 +48,7 @@ public class App {
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
-        MoléculeRéf H2O = MoléculeRéf.avoirH3Op(); //Molécule de base
+        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
 
         /*//Initialiser les atomes en grille
         float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
@@ -119,7 +119,7 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 1.0*Math.pow(10.0,-16.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout

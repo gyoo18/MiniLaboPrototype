@@ -31,6 +31,7 @@ public class Atome{
     // Est -1 s'il n'y a aucune liaison.
 
     public ArrayList<Boolean> liaisonType  = new ArrayList<>();   // Types de liaisons. Sigma = faux, Pi = vrai
+    public ArrayList<Integer> liaisonOrdre = new ArrayList<>();   // Ordres de liaisons. 1 = liaison simple, 2 = liaison double, 3 = liaison triple
     public int doublets;            // Nombre de doublets électroniques
     public double rayonCovalent;    // Rayon covalent d'ordre 1 sur cet atome.
     
@@ -283,26 +284,18 @@ public class Atome{
             if(A.liaisonIndexe.get(i) == -1){
                 continue;
             }
-            //Si l'atome a déjà été traité, passer au prochain
-            if(liaisonTraitée[i]){
+            //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
+            if(!A.liaisonType.get(i)){
                 continue;
             }
-
+            
             //Évaluer le nombre de liaison existantes entre A et A'
-            int nLiaisons = 0;
-            for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                if(A.liaisonIndexe.get(j) == A.liaisonIndexe.get(i)){
-                    nLiaisons++;
-                    if(i != j){
-                        liaisonTraitée[j] = true; //Indiquer que A' a déjà été traité
-                    }
-                }
-            }
+            int liaisonOrdre = A.liaisonOrdre.get(i);
 
             Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position, Environnement.get(A.liaisonIndexe.get(i)).position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
             double dist = Vecteur3D.distance(Environnement.get(A.liaisonIndexe.get(i)).position, A.position); //Distance entre A et A'
 
-            A.Force.addi( ForceDeMorse(dist, dir, nLiaisons, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
+            A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
 
             //Appliquer la force de torsion avec tout les autres liens
             //Trop instable pour le moment
@@ -452,8 +445,8 @@ public class Atome{
             }
         }*/
 
-        double ModuleFriction = -0.0000000000001;
-       // A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        double ModuleFriction = -0.00000000000001;
+        A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             //A.forceDoublet[i].addi(Vecteur3D.mult(A.vélDoublet[i],ModuleFriction));
@@ -708,10 +701,6 @@ public class Atome{
 
     /**Extrait certaines informations de la couche de valence*/
     public void évaluerValence(){
-        
-    
-        
-
         //Évalue le nombre liaisons possibles
         int n = 0;
         for (int i = 0; i < cases.length; i++) {
@@ -723,12 +712,14 @@ public class Atome{
         while (liaisonIndexe.size()<n) {
             liaisonIndexe.add(-1);
             liaisonType.add(false);
+            liaisonOrdre.add(-1);
         }
         while (liaisonIndexe.size()>n) {
             for (int n1 = 0; n1 < liaisonIndexe.size(); n1++) {
                 if ( liaisonIndexe.get(n1) == -1){
                     liaisonIndexe.remove(n1);
                     liaisonType.remove(n1);
+                    liaisonOrdre.remove(n1);
                     break;
                 }
             }
@@ -788,54 +779,7 @@ public class Atome{
         }
         //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
-    private void newValence(){
-        int n = 0;
-        for (int i = 0; i < cases.length; i++) {
-            //Pour toutes les cases
-            if(cases[i] == 1){
-                n++; //S'il n'y a qu'un électron dans la case, elle peut former un lien
-            }
-        }
-
-        System.out.println(100);
-
-         //Évaluer le nombre de doublets
-         int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
-         int Ql = 0;         //Nombre quantique azimutal l.
-         int Qm = 0;         //Nombre quantique magnétique m.
-         boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
-         int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
-         for (int i = 0; i < MAX_N; i++) {
-             //Traverser n de MAX_N à 1
-             Ql = Qn-1;
-             for (int j = 0; j < Qn; j++) {
-                 //Traverser l de n-1 à 0
-                 Qm = Ql;
-                 for(int j2 = 0; j2 < 2*Ql+1; j2++){
-                     //Traverser m de l à -l
-                     if(cases[casesIndexe] != 0){
-                         //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
-                         trouvéNiveau = true;
-                     }
-                     if (cases[casesIndexe] == 2 && trouvéNiveau) {
-                         //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
-                         doublets++; //Ajouter un doublet
-                     }
-                     casesIndexe--; //Prochaine case
-                     Qm--;          //Prochain m
-                 }
-                 Ql--; //Prochain l
-             }
-             if(trouvéNiveau){
-                 //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
-                 i = 4;
-                 break;
-             }
-             //Sinon,
-             Qn--; //Prochain n
-         }
- 
-    }
+    
     /**Calcule l'électronégativité de cet atome en utilisant l'électronégativité d'Allred-Rochow et la règle de Slater. L'électronégativité est affectée par le nombre d'électrons. */
     private void calculerÉlectronégativitée(){
         //Implémente l'électronégativité d'Allred-Rochow, avec la règle de Slater.
@@ -974,7 +918,7 @@ public class Atome{
             }
             if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
                 //Si on a trouvé un A', qu'il a de la place libre et qu'on a moins de 3 liaisons déjà en cours avec lui,
-                créerLien(indexePot, i, placeLibre, nLiaisons==0?false:true);
+                créerLien(indexePot, i, placeLibre, nLiaisons, nLiaisons!=1);
             }
         }
     }
@@ -982,19 +926,33 @@ public class Atome{
     private double forceSigmoide = 5.0;
 
     /**
-     * Créé un lien avec l'atome spécifié par indexeAtome.
+     * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>
      * @param indexeAtome - Indexe de l'atome avec lequel faire un lien
      * @param liaisonIndexeA - Indexe de la case de liaisonIndexe[] qui contiendra le lien, dans l'atome A
      * @param liaisonIndexeB - Indexe de la case de liaisonIndexe[] qui contiendra le lien, dans l'atome B
-     * @param liaisonPi - Type de liaison. Faux = liaison sigma, Vrai = liaison pi.
+     * @param liaisonOrdre - Ordre de liaison. 1 = lien simple, 2 = lien double, 3 = lien triple
+     * @param liaisonType - Type de liaison. faux = sigma, vrai = pi
      */
-    public void créerLien(int indexeAtome, int liaisonIndexeA, int liaisonIndexeB, boolean liaisonPi ){
-        Atome APrime = Atome.Environnement.get(indexeAtome); //Référence à A'
-        liaisonIndexe.set(liaisonIndexeA,indexeAtome);   //Ajouter une référence de A' à A
-        APrime.liaisonIndexe.set(liaisonIndexeB,indexe);   //Donner une référence de A à A'
-        //Si on n'a aucune liaison avec A', la nouvelle serat de type sigma
-        liaisonType.set(liaisonIndexeA,liaisonPi);
-        APrime.liaisonType.set(liaisonIndexeB,liaisonPi);
+    public void créerLien(int indexeAtome, int liaisonIndexeA, int liaisonIndexeB, int liaisonOrdre, boolean liaisonType ){
+        Atome APrime = Atome.Environnement.get(indexeAtome);    //Référence à A'
+        liaisonIndexe.set(liaisonIndexeA,indexeAtome);          //Ajouter une référence de A' à A
+        APrime.liaisonIndexe.set(liaisonIndexeB,indexe);        //Donner une référence de A à A'
+        this.liaisonOrdre.set(liaisonIndexeA,liaisonOrdre);     //Donner l'ordre de liaison à A
+        APrime.liaisonOrdre.set(liaisonIndexeB,liaisonOrdre);   //Donner l'ordre de liaison à A'
+        this.liaisonType.set(liaisonIndexeA,liaisonType);        //Donner le type de liaison créé
+        APrime.liaisonType.set(liaisonIndexeB,liaisonType); //Donner le type de liaison créé
+
+        //Mettre à jour l'ordre des autres liaisons
+        for (int i = 0; i < this.liaisonOrdre.size(); i++) {
+            if(liaisonIndexe.get(i) == indexeAtome){
+                this.liaisonOrdre.set(i,liaisonOrdre);
+            }
+        }
+        for (int i = 0; i < APrime.liaisonOrdre.size(); i++) {
+            if(APrime.liaisonIndexe.get(i) == indexe){
+                APrime.liaisonOrdre.set(i,liaisonOrdre);
+            }
+        }
 
         //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
         float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
@@ -1031,6 +989,18 @@ public class Atome{
             ajouterÉlectron();
         }else{
             APrime.ajouterÉlectron();
+        }
+
+        //Mettre à jour l'ordre de liaison des autres liaisons
+        for (int i = 0; i < liaisonIndexe.size(); i++) {
+            if(liaisonIndexe.get(i) == APrime.indexe){
+                liaisonOrdre.set(i,liaisonOrdre.get(i)-1);
+            }
+        }
+        for (int i = 0; i < APrime.liaisonIndexe.size(); i++) {
+            if(APrime.liaisonIndexe.get(i) == indexe){
+                APrime.liaisonOrdre.set(i,APrime.liaisonOrdre.get(i)-1);
+            }
         }
 
         //Retirer les références à A de A'

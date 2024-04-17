@@ -39,6 +39,7 @@ public class Molécule {
      * @param a - Atome à ajouter
      */
     public void ajouterAtome(Atome a){
+        a.molécule = this;
         Atomes.add(a);
         posAtomes.add(Vecteur3D.sous(a.position,position));
         évaluerFormuleChimique(); //Mise à jour de la formule chimique
@@ -82,7 +83,6 @@ public class Molécule {
             }
             MiseÀJourPos(); //Recalculer la position relative de chaque atome.
             évaluerFormuleChimique(); //Mettre à jour la formule chimique
-            évaluerSystèmesConjugués();
         }else{
             System.out.println("Ne peut pas fusionner la même molécule.");
         }
@@ -227,52 +227,131 @@ public class Molécule {
     }
     
 
-    private void évaluerSystèmesConjugués(){
-        /*boolean[] estDouble = new boolean[Atomes.size()]; //Liste des atomes qui possèdent un lien multiple
-        boolean[] estSimple = new boolean[Atomes.size()]; //Liste des atomes qui possèdent un lien simple
-        boolean[] estPlus = new boolean[Atomes.size()];   //Liste des atomes qui ont une charge positive
-        boolean[] estÉN = new boolean[Atomes.size()];     //Liste des atomes qui sont fortement électronégatifs
-        boolean[] estDoublet = new boolean[Atomes.size()];//Liste des atomes qui portent des doublets
+    public void évaluerSystèmesConjugués(){  
         for (int i = 0; i < Atomes.size(); i++) {
-            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
-                if(Atomes.get(i).liaisonType[j]){
-                    estDouble[i] = true;
-                    break;
+            Atome A = Atomes.get(i);
+            //=-= | indexe = 0
+            boolean estDouble = false;
+            boolean estSimple = false;
+            boolean estDouble2 = false;
+            ArrayList<Atome> A1 = new ArrayList<>();
+            ArrayList<Atome> A3 = new ArrayList<>();
+            ArrayList<ArrayList<Atome>> A4 = new ArrayList<>();
+            for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                if(A.liaisonOrdre.get(j) > 1 && !A.liaisonType.get(j) && A.liaisonIndexe.get(j) != -1){
+                    estDouble = true;
+                    A1.add(Atomes.get(A.liaisonIndexe.get(j)));
                 }
             }
-            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
-                if(!Atomes.get(i).liaisonType[j]){
-                    estSimple[i] = true;
-                    break;
+            for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                if(A.liaisonOrdre.get(j) == 1 && A.liaisonIndexe.get(j) != -1){
+                    estSimple = true;
+
+                    boolean aAjouté = false;
+                    Atome Ap = Atomes.get(A.liaisonIndexe.get(j));
+                    for (int j2 = 0; j2 < Ap.liaisonIndexe.size(); j2++) {
+                        if(Ap.liaisonOrdre.get(j2) > 1 && !Ap.liaisonType.get(j) && Ap.liaisonIndexe.get(j2) != -1){
+                            estDouble2 = true;
+                            if(!aAjouté){
+                                A3.add(Atomes.get(A.liaisonIndexe.get(j)));
+                                A4.add(new ArrayList<Atome>());
+                                aAjouté = true;
+                            }
+                            A4.get(A4.size()-1).add(Atomes.get(Ap.liaisonIndexe.get(j2)));
+                        }
+                    }
+                }
+            }
+            if(estDouble&&estSimple&&estDouble2){
+                for (int j = 0; j < A1.size(); j++) {
+                    for (int j2 = 0; j2 < A3.size(); j2++) {
+                        for (int k = 0; k < A4.get(j2).size(); k++) {
+                            int[] système = {0, A1.get(j).indexe, i, A3.get(j2).indexe, A4.get(j2).get(k).indexe};
+                            ajouterSystèmeConjugé(système);
+                        }
+                    }
                 }
             }
 
-            if(Atomes.get(i).NP > Atomes.get(i).NE){
-                estPlus[i] = true;
-            }
-
-            //TODO #22 fixer le minimum d'électronégativité
-            
-            if (Atomes.get(i).électronégativité > 2.0) {
-                estÉN[i] = true;
-            }
-
-            if(Atomes.get(i).doublets > 0){
-                estDoublet[i] = true;
-            }
-        }*/
-
-        for (int i = 0; i < Atomes.size(); i++) {
-            //=-=
-            for (int j = 0; j < Atomes.get(i).liaisonIndexe.length; j++) {
-                
-            }
             //:-=
+            if(A.doublets > 0){
+                for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    for (int j2 = 0; j2 < B.liaisonIndexe.size(); j2++) {
+                        Atome C = Atomes.get(B.liaisonIndexe.get(j2));
+                        if(B.liaisonOrdre.get(j2) > 1 && !B.liaisonType.get(j)){
+                            int[] système = {1, i, B.indexe, C.indexe};
+                            ajouterSystèmeConjugé(système);
+                        }
+                    }
+                }
+            }
             //=-+
+            if(A.NP > A.NE){
+                for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    for (int j2 = 0; j2 < B.liaisonIndexe.size(); j2++) {
+                        Atome C = Atomes.get(B.liaisonIndexe.get(j2));
+                        if(B.liaisonOrdre.get(j2) > 1 && !B.liaisonType.get(j)){
+                            int[] système = {2, i, B.indexe, C.indexe};
+                            ajouterSystèmeConjugé(système);
+                        }
+                    }
+                }
+            }
+            //TODO #22 fixer le minimum d'électronégativité
             //=X
+            if(A.électronégativité > 2.0){
+                for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    if(A.liaisonOrdre.get(j) > 1 && !A.liaisonType.get(j) && A.liaisonIndexe.get(j) != -1){
+                        int[] système = {3, i,A.liaisonIndexe.get(j)};
+                        ajouterSystèmeConjugé(système);
+                    }
+                }
+            }
             //=+
+            if (A.NP > A.NE) {
+                for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    if(A.liaisonOrdre.get(i) > 1 && !A.liaisonType.get(j)){
+                        int[] système = {4, i, A.liaisonIndexe.get(j)};
+                        ajouterSystèmeConjugé(système);
+                    }
+                }
+            }
             //:-+
+            if (A.doublets > 0) {
+                for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+                    Atome B = Atomes.get(A.liaisonIndexe.get(j));
+                    if(A.liaisonOrdre.get(i) == 1 && B.NP > B.NE){
+                        int[] système = {5, i, A.liaisonIndexe.get(j)};
+                        ajouterSystèmeConjugé(système);
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * <p>Ajoute un système conjugué de résonance à la liste des systèmes. Si ce système est déjà comptabilisé, il ne serat
+     * pas ajouté une seconde fois. Prend en argument une liste de int sous la forme suivante:</p>
+     *  système[0] = Indexe du type de système.
+     *  <ul><li>0 = [ <b>=-=</b> ],</li>
+     *      <li>1 = [ <b>:-=</b> ],</li>
+     *      <li>2 = [ <b>=-+</b> ],</li>
+     *      <li>3 = [ <b>=X </b> ],</li>
+     *      <li>4 = [ <b>=+ </b> ],</li>
+     *      <li>5 = [ <b>:-+</b> ] </li> </ul>
+     *  <p>système[1 - n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
+     *  <ul><li>système[0] = 0 -> n = 4, (1)<b>=</b>(2)<b>-</b>(3)<b>=</b>(4). Dans un sens, comme dans l'autre, s'il existe déjà, il ne serat pas comptabilisé.</li>
+     *      <li>système[0] = 1 -> n = 3, <b>:</b>(1)<b>-</b>(2)<b>=</b>(3).    L'autre sens mènera à du comportement non-définis.</li>
+     *      <li>système[0] = 2 -> n = 3, <b>+</b>(1)<b>-</b>(2)<b>=</b>(3).    L'autre sens mènera à du comportement non-définis.</li>
+     *      <li>système[0] = 3 -> n = 2, <b>X</b>(1)<b>=</b>(2).        L'autre sens mènera à du comportement non-définis.</li>
+     *      <li>système[0] = 4 -> n = 2, <b>+</b>(1)<b>=</b>(2).        L'autre sens mènera à du comportement non-définis.</li>
+     *      <li>système[0] = 5 -> n = 2, <b>:</b>(1)<b>-</b>(2)<b>+</b>.       L'autre sens mènera à du comportement non-définis.</li>
+     * @param système - Description du système.
+     */
+    private void ajouterSystèmeConjugé(int[] système){
+        //TODO #23 implémenter Molécule.ajouterSystèmeConjugué();
     }
 
     /**

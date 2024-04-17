@@ -85,8 +85,8 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(H2O.Atomes);
-        O.créerLien(1, 0, 0, false);
-        O.créerLien(2, 1, 0, false);
+        O.créerLien(1, 0, 0, 1, false);
+        O.créerLien(2, 1, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
         H2O.calculerAABB();
@@ -121,9 +121,9 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(H3Op.Atomes);
-        O.créerLien(1, 0, 0, false);
-        O.créerLien(2, 1, 0, false);
-        O.créerLien(3, 2, 0, false);
+        O.créerLien(1, 0, 0, 1, false);
+        O.créerLien(2, 1, 0, 1, false);
+        O.créerLien(3, 2, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
         H3Op.calculerAABB();
@@ -151,7 +151,7 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(NaCl.Atomes);
-        Na.créerLien(1, 0, 0, false);
+        Na.créerLien(1, 0, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
         NaCl.calculerAABB();
@@ -179,8 +179,8 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(CH2.Atomes);
-        C.créerLien(1, 0, 0, false);
-        C.créerLien(2, 1, 0, false);
+        C.créerLien(1, 0, 0, 1, false);
+        C.créerLien(2, 1, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
         CH2.calculerAABB();
@@ -214,10 +214,10 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(CH4.Atomes);
-        C.créerLien(1, 0, 0, false);
-        C.créerLien(2, 1, 0, false);
-        C.créerLien(3, 2, 0, false);
-        C.créerLien(4, 3, 0, false);
+        C.créerLien(1, 0, 0, 1, false);
+        C.créerLien(2, 1, 0, 1, false);
+        C.créerLien(3, 2, 0, 1, false);
+        C.créerLien(4, 3, 0, 1, false);
         Atome.MettreÀJourEnvironnement(Environnement);
 
         CH4.calculerAABB();
@@ -267,18 +267,20 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(C4H6.Atomes);
-        C1.créerLien(4, 0, 0, false); //Liaison avec H1
-        C1.créerLien(5, 1, 0, false); //Liaison avec H2
-        C1.créerLien(1, 2, 0, false); //Liaison 1 avec C2
-        C1.créerLien(1, 3, 1, true);  //Liaison 2 avec C2
-        C2.créerLien(6, 2, 0, false); //Liaison avec H3
-        C2.créerLien(2, 3, 0, false); //Liaison avec C3
-        C3.créerLien(7, 1, 0, false); //Liaison avec H4
-        C3.créerLien(3, 2, 0, false); //Liaison 1 avec C4
-        C3.créerLien(3, 3, 1, true);  //Liaison 2 avec C4
-        C4.créerLien(8, 2, 0, false); //Liaison avec H5
-        C4.créerLien(9, 3, 0, false); //Liaison avec H6
+        C1.créerLien(4, 0, 0, 1, false); //Liaison avec H1
+        C1.créerLien(5, 1, 0, 1, false); //Liaison avec H2
+        C1.créerLien(1, 2, 0, 2, false); //Liaison 1 avec C2
+        C1.créerLien(1, 3, 1, 2, true ); //Liaison 2 avec C2
+        C2.créerLien(6, 2, 0, 1, false); //Liaison avec H3
+        C2.créerLien(2, 3, 0, 1, false); //Liaison avec C3
+        C3.créerLien(7, 1, 0, 1, false); //Liaison avec H4
+        C3.créerLien(3, 2, 0, 2, false); //Liaison 1 avec C4
+        C3.créerLien(3, 3, 1, 2, true ); //Liaison 2 avec C4
+        C4.créerLien(8, 2, 0, 1, false); //Liaison avec H5
+        C4.créerLien(9, 3, 0, 1, false); //Liaison avec H6
         Atome.MettreÀJourEnvironnement(Environnement);
+
+        C4H6.évaluerSystèmesConjugués();
 
         C4H6.calculerAABB();
 
