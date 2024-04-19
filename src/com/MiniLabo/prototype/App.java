@@ -14,7 +14,7 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 512;
+    public static int TailleZ = 30;
     public static float Zoom = 40f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
@@ -78,7 +78,7 @@ public class App {
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
-        while (totalMolécules < NbMolécules && essais < 10) {
+        while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
             MoléculeRéf mol;
             if (Math.random() <0.5) {
@@ -120,7 +120,7 @@ public class App {
 
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
-            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -133,6 +133,7 @@ public class App {
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
