@@ -42,7 +42,7 @@ public class Atome{
     private final int MAX_CASE = (MAX_N*(MAX_N+1)*(2*MAX_N+1))/6 - 1;   //Nombre maximal de cases quantiques
 
     private int[] cases;    //Cases quantiques
-
+    private int ForceSimoideDoublets;
     public static final double e = 1.602*Math.pow(10.0, -19.0);    //Charge élémentaire
     public static final double mP = 1.0*1.672*Math.pow(10.0,-27.0);//Masse du proton
     public static final double mE = 1.0*9.109*Math.pow(10.0,-31.0);//Masse de l'électron
@@ -458,7 +458,6 @@ public class Atome{
             A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
     }
-
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
      * @param q1 - Charge de la première particule en nombre de charges élémentaires. Sera multiplié par la charge élémentaire e.
@@ -510,6 +509,7 @@ public class Atome{
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
+
 
     /**
      * Calcule le moment dipolaire d'une molécule en évaluant les liens qu'il fait.
@@ -886,6 +886,7 @@ public class Atome{
                     //Si la distance est de moins de 2 longueurs de liaisons et qu'il est l'atome le plus proche
                     //Chercher une case qui peut acceuillir une liaison chez A'
                     int pL = -1;
+                    
                     for (int k = 0; k < APrime.liaisonIndexe.size(); k++) {
                         if(APrime.liaisonIndexe.get(k) == -1){
                             pL = k;
@@ -914,48 +915,8 @@ public class Atome{
                             placeLibre = pL;
                         }
                         
-                    } /*else {
-                        for (int k2 = 0; k2 <APrime.doublets; k2++) {
-                        if( -1 == liaisonIndexe[liaisonIndexe.length-APrime.doublets+k2] && charge > 0 && APrime.doublets > 0) {
-                            for (int k1 = 0; k1 < APrime.positionDoublet.length; k1++) {
-                                Vecteur3D dirDoubletP = Vecteur3D.norm(Vecteur3D.sous( position, Vecteur3D.addi(APrime.positionDoublet[k1], APrime.position) ));  
-                                double DistanceDoublet = Vecteur3D.distance(position,Vecteur3D.addi(APrime.positionDoublet[k1], APrime.position));
+                    } 
 
-                                if( DistanceDoublet < (rayonCovalent+APrime.rayonCovalent) ){
-                                    
-                                    //Si on a trouvé une place libre chez A'
-                                    //Évaluer le nombre de liaisons déjà créés avec A'
-                                    nLiaisons = 0;
-                                    placeLibre = placeLibre+1;
-                                    for (int k = 0; k < liaisonIndexe.length; k++) {
-                                        if(j == liaisonIndexe[k]){
-                                            nLiaisons++;
-                                        }
-                                        
-                                    }
-                                    if(nLiaisons < 3){
-                                        //S'il y a moins de 3 liaisons avec A'
-                                        indexePot = j;  //Garder A' comme candidat potentiel
-                                        min_dist = dist;//Garder A' comme atome le plus proche
-                                   }
-            
-                                    //System.out.println(APrime.doublets);
-                                    System.out.println(charge);
-                                    System.out.println(APrime.charge);
-                                    APrime.doublets--;
-                                    APrime.ajouterÉlectron();
-                                    ajouterÉlectron(); //fonction appele ajouter electron
-                                    
-                                }
-
-                            } //bla bla le min entre distance des doublets selui le plus proche est suprimer... si pas de place libre, prend doublet a la place.
-
-                        }
-                        }
-
-                    }*/
-                    
-                   
                 }
             }
             if(placeLibre != -1 && indexePot != -1 && nLiaisons < 3){
@@ -963,16 +924,95 @@ public class Atome{
                 créerLien(indexePot, i, placeLibre, nLiaisons+1, nLiaisons!=0);
             }
         }
+        //Créer liens avec doublets
+        for (int i=doublets-1; i >= 0; i--){
+            //Pour toutes les doublets
+            double min_dist = Double.MAX_VALUE; //distance avec l'atome le plus proche
+            
+            for (int j = 0; j < Atome.Environnement.size(); j++) {
+                //Pour tout les atomes
+                if(indexe == j){
+                    //Si A' est A, passer au prochain
+                    continue;
+                }
+                
+                Atome APrime = Atome.Environnement.get(j); //Référence à A' , A est l'atome ayant le doublets, A' n'importe qu'elle atome
+                double dist = Vecteur3D.distance(position, APrime.position); //Calculer la distance entre A et A'
+                if(dist < min_dist && dist < 2.0*(rayonCovalent + APrime.rayonCovalent)){
+                        int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
+                        int Ql = 0;         //Nombre quantique azimutal l.
+                        int Qm = 0;         //Nombre quantique magnétique m.
+                        int CaseVide = 0; //Trouver le nombre de caseVide
+                        boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
+                        int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
+                        for (int i1 = 0; i1 < MAX_N; i1++) {
+                            //Traverser n de MAX_N à 1
+                            Ql = Qn-1;
+                            for (int j1 = 0; j1 < Qn; j1++) {
+                                //Traverser l de n-1 à 0
+                                Qm = Ql;
+                                for(int j2 = 0; j2 < 2*Ql+1; j2++){
+                                    //Traverser m de l à -l
+                                    if(APrime.cases[casesIndexe] != 0){
+                                        //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
+                                        trouvéNiveau = true;
+                                    }
+                                    if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
+                                        //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
+                                        
+                                        
+                                    }
+                                    if (APrime.cases[casesIndexe] == 0 && trouvéNiveau) {
+                                        //Si la case possède 0 électrons et qu'elle fait partie de la couche de valence
+                                        CaseVide++;
+                                        
+                                    }
+                                    casesIndexe--; //Prochaine case
+                                    Qm--;          //Prochain m
+                                }
+                                Ql--; //Prochain l
+                            }
+                            if(trouvéNiveau){
+                                //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
+                                i1 = 4;
+                                break;
+                            }
+                            //Sinon,
+                            Qn--; //Prochain n
+
+                            if (Qn==0 && !trouvéNiveau){
+                                CaseVide++;
+                                 //Si aucun électron, CaseVide = 0 , 1S0
+                            }
+                        }
+
+                     
+
+                        if ( positionDoublet.size() > 0 && CaseVide >0){
+
+                        APrime.ajouterÉlectron(); 
+                        retirerÉlectron();   //Doublet se transforme en 2 electron , qui
+                        évaluerValence();
+                        APrime.évaluerValence();    //ÉvaluerValence pour reprend / perde ses doubletts
+                        //System.out.println(33);
+                        ForceSimoideDoublets += 0;
+                        
+                        }
+                    
+                }
+        
+            }
+        }
 
         systèmesConjugués = molécule.obtenirSystèmesConjugués(indexe);
         évaluerRésonance();
-    }
 
+    }
+    
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
     }
-
-    private double forceSigmoide = 5.0;
+    private double forceSigmoide = 15.0;
 
     /**
      * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>
@@ -1004,7 +1044,7 @@ public class Atome{
         }
 
         //Calculer la proportion d'électronégativité que chaque atome aporte à la liaison
-        float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide );
+        float proportion = (float)sigmoide( électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide+ForceSimoideDoublets);
         charge += 1.0-2.0*proportion;               //Ajouter une charge partielle. Dans une liaison, deux électrons seront impliqués. 
         APrime.charge += 1.0-2.0*(1.0-proportion);  //Ces électrons seront plus ou moins attirés par l'un ou l'autre des atomes, d'où la charge partielle
         molécule.fusionnerMolécule(APrime.molécule);//Fusionner les deux molécules
@@ -1018,7 +1058,7 @@ public class Atome{
         Atome APrime = Atome.Environnement.get(liaisonIndexe.get(indexeLiaison)); //Référence à A'
         //Distribuer les électrons entre les deux atomes
         //Calculer la proportion d'électronégativité apportée par l'atome dans le lien. Si les deux on la même, le résultat serat .5, le maximum serat 1 et le minimum serat 0
-        float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
+        float proportion = (float)sigmoide(électronégativité/(électronégativité+APrime.électronégativité),forceSigmoide+ForceSimoideDoublets); //Passer à travers une sigmoide pour mieux séparer les deux atomes.
         charge -= 1.0-2.0*proportion;                                   //Retirer la charge partielle de cet atome (A)
         APrime.charge -= 1.0-2.0*(1.0-proportion);//Retirer la charge partielle de l'autre atome (A')
         retirerÉlectron();                              //Retirer un électron à A
@@ -1039,7 +1079,7 @@ public class Atome{
         }else{
             APrime.ajouterÉlectron();
         }
-
+        
         //Mettre à jour l'ordre de liaison des autres liaisons
         for (int i = 0; i < liaisonIndexe.size(); i++) {
             if(liaisonIndexe.get(i) == APrime.indexe){
@@ -1069,6 +1109,9 @@ public class Atome{
 
         //Séparer la molécule
         molécule.séparerMolécule(this, APrime);
+        APrime.évaluerValence(); //ÉvaluerValence pour reprend / perde ses doubletts
+        évaluerValence();
+        ForceSimoideDoublets -= 0;
     }
 
     /**

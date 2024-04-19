@@ -149,6 +149,49 @@ public class MoléculeRéf extends Molécule{
         return H2O;
     }
 
+    public static MoléculeRéf avoirOHm(){
+        MoléculeRéf OHm = new MoléculeRéf();
+
+        Atome O = new Atome(8);
+        O.ajouterÉlectron();
+        O.évaluerValence();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(1,0,0);
+        
+        
+    
+        
+       
+    
+        
+        
+
+
+        OHm.ajouterAtome(O);
+        OHm.ajouterAtome(H1);
+       
+        
+
+        for (int i = 0; i < OHm.Atomes.size(); i++) {
+            OHm.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(OHm.Atomes);
+        Molécule.MiseÀJourEnvironnement(OHm.Atomes);
+        O.créerLien(1, 0, 0, 1, false);
+       
+        OHm.évaluerSystèmesConjugués();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+        Molécule.MiseÀJourEnvironnement(Environnement);
+
+        OHm.calculerBEAA();
+        OHm.MiseÀJourPos();
+
+        return OHm;
+    }
     public static MoléculeRéf avoirH3Op(){
         MoléculeRéf H3Op = new MoléculeRéf();
 
@@ -160,7 +203,9 @@ public class MoléculeRéf extends Molécule{
         Atome H2 = new Atome(1);
         H2.position = new Vecteur3D(-1,0,0);
         Atome H3 = new Atome(1);
-        H3.position = new Vecteur3D(0,1,0);
+        H3.position = new Vecteur3D(0.707,0.707,0);
+        H3.évaluerValence();
+        
         
 
 
@@ -175,6 +220,7 @@ public class MoléculeRéf extends Molécule{
 
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(H3Op.Atomes);
+        Molécule.MiseÀJourEnvironnement(H3Op.Atomes);
         O.créerLien(1, 0, 0, 1, false);
         O.créerLien(2, 1, 0, 1, false);
         O.créerLien(3, 2, 0, 1, false);
@@ -183,12 +229,15 @@ public class MoléculeRéf extends Molécule{
         H3Op.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+        Molécule.MiseÀJourEnvironnement(Environnement);
 
         H3Op.calculerBEAA();
         H3Op.MiseÀJourPos();
 
         return H3Op;
     }
+
 
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
