@@ -48,7 +48,12 @@ public class App {
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
-        MoléculeRéf H2O = MoléculeRéf.avoir1_3_Dibutyle(); //Molécule de base
+        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
+        MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
+       /* Atome H = new Atome(1);
+        H.retirerÉlectron();
+        H.évaluerValence();
+        Hs.add(H);*/
 
         /*//Initialiser les atomes en grille
         float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
@@ -65,9 +70,9 @@ public class App {
             }
         }
 */
-        
+
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 10;  //Nombre de molécules voulus
+        int NbMolécules = 5;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -75,7 +80,12 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 10) {
             essais++;
-            MoléculeRéf mol = H2O; //Molécule à ajouter dans la simulation
+            MoléculeRéf mol;
+            if (Math.random() <0.5) {
+                 mol = H3Op; //Molécule à ajouter dans la simulation
+            } else {
+                 mol = OHm;
+            }
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -123,7 +133,7 @@ public class App {
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(100, 00, 100, 100));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
