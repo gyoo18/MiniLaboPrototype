@@ -101,6 +101,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         mol.évaluerSystèmesConjugués(); //Détecte la résonance
+        mol.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);
@@ -137,6 +138,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(2, 1, 0, 1, false);
 
         H2O.évaluerSystèmesConjugués();
+        H2O.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -178,6 +180,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(3, 2, 0, 1, false);
 
         H3Op.évaluerSystèmesConjugués();
+        H3Op.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
 
@@ -209,6 +212,7 @@ public class MoléculeRéf extends Molécule{
         Na.créerLien(1, 0, 0, 1, false);
 
         NaCl.évaluerSystèmesConjugués();
+        NaCl.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -243,6 +247,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(2, 1, 0, 1, false);
 
         CH2.évaluerSystèmesConjugués();
+        CH2.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -285,6 +290,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(4, 3, 0, 1, false);
 
         CH4.évaluerSystèmesConjugués();
+        CH4.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -350,6 +356,7 @@ public class MoléculeRéf extends Molécule{
         C4.créerLien(9, 3, 0, 1, false); //Liaison avec H6
 
         C4H6.évaluerSystèmesConjugués();
+        C4H6.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -403,7 +410,8 @@ public class MoléculeRéf extends Molécule{
         C2.créerLien(H2.indexe, 2, 0, 1, false);
         C2.créerLien(H3.indexe, 3, 0, 1, false);
 
-        C2H3O2.évaluerSystèmesConjugués();;
+        C2H3O2.évaluerSystèmesConjugués();
+        C2H3O2.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);

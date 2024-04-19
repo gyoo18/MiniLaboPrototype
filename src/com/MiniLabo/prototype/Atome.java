@@ -223,24 +223,23 @@ public class Atome{
             Vecteur3D dir = Vecteur3D.norm( Vecteur3D.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = Vecteur3D.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(true){ ///dist < 10*A.rayonCovalent){
+            if(dist < 10*A.rayonCovalent){
                 //Si A' se situe à moins de N rayons covalents de A
                 
                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli
                 A.Force.addi( ForceVanDerWall(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
                 A.Force.addi( ForceÉlectrique(A.charge, APrime.charge,dist,dir)); //Appliquer la force électrique
 
+                //Forces des doublets d'A' sur A
                 for (int j = 0; j < APrime.forceDoublet.size(); j++) {
                     dir = Vecteur3D.norm(Vecteur3D.sous( A.position,Vecteur3D.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                     dist = Vecteur3D.distance(A.position, Vecteur3D.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
 
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
                     A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
-                    //APrime.forceDoublet.get(j).sous(ForcePaulie(A.rayonCovalent, APrime.rayonCovalent/4.0, dist, dir.opposé()));
-                    //APrime.forceDoublet.get(j).sous( ForceÉlectrique(A.charge, -2.0,dist,dir.opposé()));
                 }
 
-                //Forces des autres atomes sur les doublets
+                //Forces de A' sur les doublets
                 for (int j = 0; j < A.forceDoublet.size(); j++) {
 
                     Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
@@ -249,14 +248,14 @@ public class Atome{
                     A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli
                     A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
 
+                    //Forces des doublets de A' sur les doublets de A
                     for (int k = 0; k < APrime.forceDoublet.size(); k++) {
-                        eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(k), A.position),Vecteur3D.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                        eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                         eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
 
-                        A.forceDoublet.get(k).addi(  ForceÉlectrique(-2, -2,eDist,eDir) ); //Appliquer la force électrique
+                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                        A.forceDoublet.get(j).addi(  ForceÉlectrique(-2, -2,eDist,eDir) ); //Appliquer la force électrique
                     }
-
-
                 }
             }
         }
@@ -269,9 +268,6 @@ public class Atome{
                 Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre atome (A')
                 double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et A'
 
-                //A.forceDoublet.get(j).addi(new Vecteur3D(50.0*Math.cos((double)System.currentTimeMillis()/300.0),50.0*Math.sin((double)System.currentTimeMillis()/300.0),0.0));
-                //A.forceDoublet.get(j).addi(new Vecteur3D(50.0,0.0,0.0));
-                //A.Force.addi(new Vecteur3D(-50.0*Math.cos((double)System.currentTimeMillis()/300.0),-50.0*Math.sin((double)System.currentTimeMillis()/300.0),0.0));
                 A.forceDoublet.get(j).addi( ForceÉlectrique(-2, -2, eDist, eDir)); //Appliquer la force électrique
             }
         }
@@ -279,8 +275,7 @@ public class Atome{
         //Forces de liaisons
         boolean[] liaisonTraitée = new boolean[A.liaisonIndexe.size()]; //Liste des liaison déjà traités
         //S'il y a plus d'une liaison par atome, A' sera représenté plus d'une fois dans la liste.
-        //Puisque nous ne voulons pas appliquer la force plus d'une fois, il faut indiquer
-        //qu'il a déjà été traité.
+        //Puisque nous ne voulons pas appliquer la force plus d'une fois, il faut indiquer qu'il a déjà été traité.
         for(int i = 0; i < A.liaisonIndexe.size(); i++){
             //Pour toutes les liaisons
 
@@ -302,39 +297,34 @@ public class Atome{
             A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
 
             //Appliquer la force de torsion avec tout les autres liens
-            //Trop instable pour le moment
+            //Trouver le nombre de liens que A a formé
             int nLiens = 0;
-            boolean[] traité = new boolean[A.liaisonIndexe.size()];
             for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                if(A.liaisonIndexe.get(j) != -1 && !traité[j]){
-                    nLiens++;
-                    traité[j] = true;
+                if(A.liaisonIndexe.get(j) != -1 && !A.liaisonType.get(i)){
+                    //Si la liaison existe,
+                    //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
+                    nLiens++; //Incrémenter le nombre de liens
                 }
             }
 
-            //TODO #7 améliorer la stabilité de la force de torsion
-
+            //Torsion entre atomes
             for(int j = 0; j < A.liaisonIndexe.size(); j++){
-                
+                //Pour toutes les liaisons de A
+                //Si la liaison n'existe, qu'elle n'est pas cette liaison et qu'elle est sigma (pour éviter de la compter plus d'une fois),
                 if(A.liaisonIndexe.get(j) == -1 || A.liaisonIndexe.get(i) == A.liaisonIndexe.get(j)){
                     //Si la liaison n'existe pas ou qu'elle est celle que nous évaluons en ce moment, passer à la prochaine
                     continue;
                 }
                 
-                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Environnement.get(A.liaisonIndexe.get(j)).position);
+                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Environnement.get(A.liaisonIndexe.get(j)).position); //Vecteur direction entre les deux atomes au bout des deux liens
+                Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur directeur entre A et IA
+                Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(j)).position, A.position ); //Vecteur directeur entre A et JA
 
-                Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position );
-                //Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
-                //IDir.norm();
-
-                Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(j)).position, A.position );
-                //Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
-                //JDir.norm();
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
-                double angle0;
+                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //angle entre IA et JA
+                double angle0; //Angle d'équilibre entre IA et JA
 
                 //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                //Obtnenir angle d'équilibre
                 switch(nLiens+A.positionDoublet.size()){
                     case 2:
                         angle0 = Math.PI;
@@ -351,28 +341,23 @@ public class Atome{
                         break;
                 }
 
-                double Kij = 1000.0;
-                double D0 = angle0-angle;
+                double Kij = 1000.0; //Force du ressort angulaire
+                double D0 = angle0-angle; //Delta theta
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij));
-                //Atome.Environnement.get(A.liaisonIndexe[j]).Force.addi(Vecteur3D.mult(JDir, D0*Kij));
+                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force à IA
             }
 
+            //Torsion Atome-Doublet
             for(int j = 0; j < A.positionDoublet.size(); j++){
-                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Vecteur3D.addi(A.positionDoublet.get(j),A.position));
+                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Vecteur3D.addi(A.positionDoublet.get(j),A.position)); //Vecteur direction entre l'atome au bout du lien (A') et le doublet
+                Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur direction entre A et A'
+                Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et son doublet
 
-                Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position );
-                //Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
-                //IDir.norm();
-
-                Vecteur3D JAxe = A.positionDoublet.get(j);
-                //Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
-                //JDir.norm();
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
-                double angle0;
+                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre le doublet et A'
+                double angle0; //Angle à l'équilibre
 
                 //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                //Aller chercher l'angle à l'équilibre
                 switch(nLiens+A.positionDoublet.size()){
                     case 2:
                         angle0 = Math.PI;
@@ -389,42 +374,44 @@ public class Atome{
                         break;
                 }
 
-                double Kij = 10000.0;
-                double D0 = angle0-angle;
+                double Kij = 10000.0; //Force du ressort angulaire
+                double D0 = angle0-angle; //Delta theta
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij));
-                A.forceDoublet.get(j).addi(Vecteur3D.mult(lDir.opposé(), D0*Kij));
+                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force à A'
+                A.forceDoublet.get(j).addi(Vecteur3D.mult(lDir.opposé(), D0*Kij)); //Appliquer force au doublet
             }
             
             liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
         }
 
-        //Force de torsion entre les doublets. Stable à cause de la contrainte de distance.
+        //Force de torsion entre les doublets.
+        //Compter le nombre de liens formés par A
         int nLiens = 0;
         boolean[] traité = new boolean[A.liaisonIndexe.size()];
         for (int j = 0; j < A.liaisonIndexe.size(); j++) {
             if(A.liaisonIndexe.get(j) != -1 && !traité[j]){
+                //Si la liaison existe,
+                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
                 nLiens++;
                 traité[j] = true;
             }
         }
-       for (int i = 0; i < A.positionDoublet.size(); i++) {
+        
+        //Calculer la force de torsion entre les doublets
+        for (int i = 0; i < A.positionDoublet.size(); i++) {
             for(int j = 0; j < A.positionDoublet.size(); j++){
+                //Si on regarde le même doublet, passer au prochain
                 if(i==j){continue;}
-                Vecteur3D lDir = Vecteur3D.sous( Vecteur3D.addi(A.positionDoublet.get(i),A.position), Vecteur3D.addi(A.positionDoublet.get(j),A.position));
 
-                Vecteur3D IAxe = A.positionDoublet.get(i);
-                //Vecteur3D IDir = Vecteur3D.sous( lDir, Vecteur3D.mult( IAxe, Vecteur3D.scal(lDir, IAxe)/(IAxe.longueur()*IAxe.longueur()) ) );
-                //IDir.norm();
+                Vecteur3D lDir = Vecteur3D.sous( Vecteur3D.addi(A.positionDoublet.get(i),A.position), Vecteur3D.addi(A.positionDoublet.get(j),A.position)); //Vecteur direction entre les deux doublets
+                Vecteur3D IAxe = A.positionDoublet.get(i); //Vecteur direction entre A et le doublet I
+                Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et le doublet J
 
-                Vecteur3D JAxe = A.positionDoublet.get(j);
-                //Vecteur3D JDir = Vecteur3D.sous( lDir.opposé(), Vecteur3D.mult( JAxe, Vecteur3D.scal(lDir, JAxe)/(JAxe.longueur()*JAxe.longueur()) ) );
-                //JDir.norm();
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()));
-                double angle0;
+                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre I et J
+                double angle0; //Angle à l'équilibre entre I et J
 
                 //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+                //Chercher l'angler à l'équilibre entre I et J
                 switch(nLiens+A.positionDoublet.size()){
                     case 2:
                         angle0 = Math.PI;
@@ -441,21 +428,18 @@ public class Atome{
                         break;
                 }
 
-                double Kij = 10000.0;
-                double D0 = angle0-angle;
+                double Kij = 10000.0; //Force du ressort angulaire
+                double D0 = angle0-angle; //Delta theta
                 
-                A.forceDoublet.get(i).addi(Vecteur3D.mult(lDir, D0*Kij));
-                //A.forceDoublet[j].addi(Vecteur3D.mult(JDir, D0*Kij));
+                A.forceDoublet.get(i).addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force au doublet
             }
         }
 
-        double ModuleFriction = -0.0000000000001;
+        double ModuleFriction = -0.00000000000001;
         A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
-            Vecteur3D vélTangeante = Vecteur3D.sous(A.vélDoublet.get(i), Vecteur3D.mult(A.positionDoublet.get(i), Vecteur3D.scal(A.vélDoublet.get(i), A.positionDoublet.get(i))/(A.positionDoublet.get(i).longueur()*A.positionDoublet.get(i).longueur())) );
-            //A.forceDoublet.get(i).addi(Vecteur3D.mult(vélTangeante, -0.000000000001));
         }
 
         //Appliquer les forces des doublets sur l'atome.
@@ -464,51 +448,15 @@ public class Atome{
             double Sin0;
             Vecteur3D aT;
             if(A.forceDoublet.get(i).longueur() > 0){
-                Sin0 = Vecteur3D.croix(
-                    A.positionDoublet.get(i),A.forceDoublet.get(i)
-                ).longueur()/
-                (A.positionDoublet.get(i).longueur()*A.forceDoublet.get(i).longueur());
-                aT = Vecteur3D.norm(
-                    Vecteur3D.sous(
-                        A.forceDoublet.get(i),Vecteur3D.mult(
-                            A.positionDoublet.get(i),Vecteur3D.scal(
-                                A.positionDoublet.get(i), A.forceDoublet.get(i))/
-                                (A.positionDoublet.get(i).longueur()*A.positionDoublet.get(i).longueur()
-                            )
-                        )
-                    )
-                );
+                Sin0 = Vecteur3D.croix(A.positionDoublet.get(i),A.forceDoublet.get(i)).longueur()/(A.positionDoublet.get(i).longueur()*A.forceDoublet.get(i).longueur());
+                aT = Vecteur3D.norm(Vecteur3D.sous(A.forceDoublet.get(i),Vecteur3D.mult(A.positionDoublet.get(i),Vecteur3D.scal(A.positionDoublet.get(i), A.forceDoublet.get(i))/(A.positionDoublet.get(i).longueur()*A.positionDoublet.get(i).longueur()))));
             }else{
                 Sin0 = 0;
                 aT = new Vecteur3D(0);
             }
-            A.Force.addi(
-                Vecteur3D.mult(
-                    Vecteur3D.addi(
-                        A.forceDoublet.get(i), Vecteur3D.mult(
-                                    aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)
-                                ),(A.m-2.0*mE)/
-                                (A.m)
-                            )
-                    );
-            A.forceDoublet.set(i,
-                Vecteur3D.mult(
-                    Vecteur3D.addi(
-                        A.forceDoublet.get(i), Vecteur3D.mult(
-                            aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/
-                                                    (2.0*mE))
-                            )
-                        ),(2.0*mE)/
-                        (A.m)
-                    )
-                );
-            //A.Force.addi(A.forceDoublet.get(i));
-            //A.Force.addi(force);
-            //A.Force.addi(A.forceDoublet.get(i));
-            //A.forceDoublet.set(i,new Vecteur3D(0));
+            A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
-
-        //A.ÉvaluerContraintes();
     }
 
     /**
@@ -563,6 +511,10 @@ public class Atome{
         return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
 
+    /**
+     * Calcule le moment dipolaire d'une molécule en évaluant les liens qu'il fait.
+     * @return - Moment dipolaire de l'atome
+     */
     private Vecteur3D évaluerMomentDipolaire(){
         //TODO #27 réviser évaluerMomentDipolaire()
         double chargeTotale = charge;
@@ -843,7 +795,7 @@ public class Atome{
         charge += (double)doublets*2.0; //Ajuste la charge de l'atome en fonction des doublets. Ils seront traités séparéments.
         //Remplir les listes
         while (positionDoublet.size()<doublets) {
-            positionDoublet.add(new Vecteur3D( Math.random(),Math.random() ,Math.random() )); //  entre deux repasser position de liaison
+            positionDoublet.add(new Vecteur3D( 2.0*(Math.random()-0.5),2.0*(Math.random()-0.5) ,2.0*(Math.random()-0.5) )); //  entre deux repasser position de liaison
             prevPosDoublet.add(positionDoublet.get(positionDoublet.size()-1));
             vélDoublet.add( new Vecteur3D(0, 0, 0));
             forceDoublet.add( new Vecteur3D(   0, 0, 0));
@@ -857,6 +809,19 @@ public class Atome{
         //System.out.println(doublets + " doublets et " + n + " liaisons possibles.");
     }
     
+    /**Déplace les doublets de l'atome dans la direction de leur force appliquée. À utiliser pour initialiser leur position à l'équilibre */
+    public void déplacerDoublet(){
+        for (int i = 0; i < 1; i++) {
+            ÉvaluerForces(this);
+            for (int j = 0; j < doublets; j++) {
+                forceDoublet.get(j).norm();
+                forceDoublet.get(j).mult(1);
+                positionDoublet.get(j).addi(forceDoublet.get(j));
+            }
+            ÉvaluerContraintes();
+        }
+    }
+
     /**Calcule l'électronégativité de cet atome en utilisant l'électronégativité d'Allred-Rochow et la règle de Slater. L'électronégativité est affectée par le nombre d'électrons. */
     private void calculerÉlectronégativitée(){
         //Implémente l'électronégativité d'Allred-Rochow, avec la règle de Slater.

@@ -452,6 +452,14 @@ public class Molécule {
         }
     }
 
+    public void initialiserDoublets(){
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < Atomes.size(); j++) {
+                Atomes.get(j).déplacerDoublet();
+            }
+        }
+    }
+
     /**
      * Renvois tout les systèmes conjugués dont l'atome fait partis.
      * @param indexe - Indexe de l'atome.

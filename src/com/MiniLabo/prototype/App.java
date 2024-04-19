@@ -14,8 +14,8 @@ public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
-    public static int TailleZ = 30;
-    public static float Zoom = 40f;
+    public static int TailleZ = 512;
+    public static float Zoom = 35f;
     public static int FOV = 30;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -51,26 +51,24 @@ public class App {
         MoléculeRéf H2O = MoléculeRéf.avoirH2O(); //Molécule de base
 
         /*//Initialiser les atomes en grille
-        float [] espacement = {6f,4f,4f};        //Espacement entre les atomes en x,y,z
+        float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
         for(int x = 1; Math.abs(x) < (TailleX/(Zoom*espacement[0])) - 1; x++){
             for(int y = 1; Math.abs(y) < (TailleY/(Zoom*espacement[1])) - 1; y++){
                 for(int z = 1; Math.abs(z) < (TailleZ/(Zoom*espacement[2])) -1 ; z++){
 
                     //int x = 1;int y = 1; int z = 1;
-
-                    //C.position = new Vecteur3D(x*espacement[0] - 1.5 - (TailleX/(2*Zoom)),y*espacement[1] - (TailleY/(2*Zoom)), -((z)*espacement[2] - (TailleZ/(2*Zoom))));
                     H2O.position = new Vecteur3D(-(TailleX/(2.0*Zoom)) + x*espacement[0], -(TailleY/(2.0*Zoom)) + y*espacement[1], -(TailleZ/(2.0*Zoom)) + z*espacement[2]);
                     MoléculeRéf.intégrerÀSimulation(Hs, H2O);
                 }
             }
-        }
-*/
+        }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 40;  //Nombre de molécules voulus
+        int NbMolécules = 100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon = 0.3;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 40) {
@@ -84,7 +82,7 @@ public class App {
                 if(BEAA){
                     //Intersection avec la BEAA
                     Vecteur3D posRel = Vecteur3D.sous(Hs.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
-                    if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent,0) < mol.BEAA.z/2.0){
+                    if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.z/2.0){
                         //S'il y a intersection
                         intersecte = true;
                         break; //Sortir de la boucle en n'ajoutant pas la molécule
@@ -160,6 +158,7 @@ public class App {
             
             //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
+            //try {Thread.sleep(300);} catch (Exception e) {}
         }
     }
 
