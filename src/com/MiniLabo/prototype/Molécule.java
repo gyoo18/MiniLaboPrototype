@@ -418,13 +418,13 @@ public class Molécule {
      *      <li>3 = [ <b>=X </b> ],</li>
      *      <li>4 = [ <b>=+ </b> ],</li>
      *      <li>5 = [ <b>:-+</b> ] </li> </ul>
-     *  <p>système[1 - n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
+     *  <p>système[1 à n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
      *  <ul><li>[ <b>=-=</b> ] -> (A)<b>=</b>(B)<b>-</b>(C)<b>=</b>(D). <b>[ type = 0, indexe (A)=, indexe =(B)-, indexe -(C)=, indexe =(D) ]</b> <i>Dans un sens, comme dans l'autre, s'il existe déjà, il ne serat pas comptabilisé. </i></li>
-     *      <li>[ <b>:-=</b> ] -> <b>:</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 1, indexe :(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>:-=</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 1, indexe :(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
      *      <li>[ <b>=-+</b> ] -> <b>+</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 2, indexe +(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
-     *      <li>[ <b>=X </b> ] -> <b>X</b>(A)<b>=</b>(B). <b>[ type = 3, indexe X(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
-     *      <li>[ <b>=+ </b> ] -> n = 2, <b>+</b>(A)<b>=</b>(B). <b>[ type = 4, indexe +(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
-     *      <li>[ <b>:-+</b> ] -> n = 2, <b>:</b>(A)<b>-</b>(B)<b>+</b>. <b>[ type = 5, indexe :(A)-, indexe -(B)+ ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=X </b> ] . -> <b>X</b>(A)<b>=</b>(B) ........ <b>[ type = 3, indexe X(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=+ </b> ] . -> <b>+</b>(A)<b>=</b>(B) ........ <b>[ type = 4, indexe +(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>:-+</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>+</b> ...... <b>[ type = 5, indexe :(A)-, indexe -(B)+ ]</b> <i>L'autre sens n'est pas accepté.</i></li>
      *  </ul>
      * @param système - Description du système.
      */
@@ -452,7 +452,41 @@ public class Molécule {
         }
     }
 
-    //public int[] obtenirSystèmeConjugué(int a);
+    /**
+     * Renvois tout les systèmes conjugués dont l'atome fait partis.
+     * @param indexe - Indexe de l'atome.
+     * @return - ArrayList<int[]> de systèmes conjugués.
+     * 
+     * <p>Les sytèmes conjugués sont décrits selon la forme suivante:</p>
+     * <p>système[0] = Indexe du type de système.</p>
+     *  <ul><li>0 = [ <b>=-=</b> ],</li>
+     *      <li>1 = [ <b>:-=</b> ],</li>
+     *      <li>2 = [ <b>=-+</b> ],</li>
+     *      <li>3 = [ <b>=X </b> ],</li>
+     *      <li>4 = [ <b>=+ </b> ],</li>
+     *      <li>5 = [ <b>:-+</b> ] </li> </ul>
+     *  <p>système[1 à n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
+     *  <ul><li>[ <b>=-=</b> ] -> (A)<b>=</b>(B)<b>-</b>(C)<b>=</b>(D). <b>[ type = 0, indexe (A)=, indexe =(B)-, indexe -(C)=, indexe =(D) ]</b> <i>Dans un sens, ou dans l'autre, mais un seul des deux serat retourné. </i></li>
+     *      <li>[ <b>:-=</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 1, indexe :(A)-, indexe -(B)=, indexe =(C) ]</b> </li>
+     *      <li>[ <b>=-+</b> ] -> <b>+</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 2, indexe +(A)-, indexe -(B)=, indexe =(C) ]</b> </li>
+     *      <li>[ <b>=X </b> ] . -> <b>X</b>(A)<b>=</b>(B) ........ <b>[ type = 3, indexe X(A)=, indexe =(B) ]</b> </li>
+     *      <li>[ <b>=+ </b> ] . -> <b>+</b>(A)<b>=</b>(B) ........ <b>[ type = 4, indexe +(A)=, indexe =(B) ]</b> </li>
+     *      <li>[ <b>:-+</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>+</b> ...... <b>[ type = 5, indexe :(A)-, indexe -(B)+ ]</b> </li>
+     *  </ul>
+     */
+    public ArrayList<int[]> obtenirSystèmesConjugués(int indexe){
+        ArrayList<int[]> retour = new ArrayList<>();
+        for (int i = 0; i < systèmesConjugués.size(); i++) {
+            for (int j = 1; j < systèmesConjugués.get(i).length; j++) {
+                if(systèmesConjugués.get(i)[j]==indexe){
+                    retour.add(systèmesConjugués.get(i));
+                    break;
+                }
+            }
+        }
+
+        return retour;
+    }
 
     /**
      * Copie la molécule m

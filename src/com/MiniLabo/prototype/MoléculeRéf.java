@@ -116,10 +116,11 @@ public class MoléculeRéf extends Molécule{
         MoléculeRéf H2O = new MoléculeRéf();
 
         Atome O = new Atome(8);
+        O.position = new Vecteur3D(0);
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(1,0,0);
+        H1.position = new Vecteur3D(0.70,-0.70,0);
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(-1,0,0);
+        H2.position = new Vecteur3D(-0.70,-0.70,0);
 
         H2O.ajouterAtome(O);
         H2O.ajouterAtome(H1);
