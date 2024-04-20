@@ -51,6 +51,7 @@ public class Atome{
     public static final double ep0 = 8.854*Math.pow(10.0,-42);     //Permittivité du vide
     public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
     public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman
+    public static final double c = 2.99792458*Math.pow(10.0,18.0);//Vitesse de la lumière
 
     public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
@@ -141,6 +142,8 @@ public class Atome{
         318, 246,      203, 217, 154, 129, 151, 132, 131, 144, 125, 122, 118, 113, 109, 110,
                   320, 112,  42,  40,  38,  36,  34,  32,  32,  28,  29,  31,  71,   0,  76,  58
     };
+    //TODO #29 vérifier si convPolar est en m ou en Å
+    /**Facteur multiplicateur pour convertir la polarisabilité d'unités atomiques vers des unitées agnstromiennes */
     private static final double convPolar = 1.64986832*Math.pow(10.0,-41.0);
 
     /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.*/
@@ -166,19 +169,49 @@ public class Atome{
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ar
     };
 
-    private int Table2 [][] = { 
-        { 0 } , // tableau [0] de int
-        { 0 } , // tableau [1] de int
-        { 0 } , // tableau [2] de int
-        { 0 } , // tableau [3] de int
+    private static boolean initialiséListes = false; //Indique si les listes de données ci-dessous ont été initialisées.
+    /**Fréquence fondamentale de vibration rotative d'un trio de 3 liens en cm^-1. 
+     * Pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b>a</b> représente le nombre de proton de l'atome central et <b>b,c</b>, 
+     * le nombre de protons des atomes d'extrémités; l'ordre est sans importance. La case 18 est réservées pour les doublets électroniques. */
+    private static final double[][][] fréquenceTorsion = new double[19][19][19];
+    /**Données de fréquenceTorsion. Utilisé pour compacter l'espace de stockage nécessaire. 
+     * Organisé ainsi : pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b><code> fréquenceTorsionDonnées[d][] = {f,a,b,c}</code></b>, où <b>f</b> est 
+     * la valeur de fréquenceTorsion à <b>[a][b][c]</b> et où <b>a</b> représente le nombre de protons de l'atome central
+     * et <b>b,c</b>, le nombre de protons des atomes d'extrémités; l'ordre est sans importance.*/
+    private static final double[][] fréquenceTorsionDonnées = {
+        //TODO #30 vérifier que les valeurs dans fréquenceTorsionDonnées
+        { 667, 6, 8, 8},/*CO2 */          { 962, 6, 1, 1},/*CH2 */          { 520, 7, 9, 8},//FNO
+        { 397, 6,16,16},/*CS2 GO*/        { 667, 6, 9, 9},/*CF2 */          { 332, 7,17, 8},//ClNO
+        {  63, 6, 6, 6},/*C3  */          { 333, 6,17,17},/*CCl2*/          //{ 266, 7},//BrNO
+        { 321, 7, 6, 6},/*CNC Lavalin*/   { 990,14, 1, 1},/*SiH2*/          {1419, 7, 1, 9},//HNF 
+        { 423, 6, 7, 7},/*NCN */          { 345,14, 9, 9},/*SiF2*/          {1501, 7, 1, 8},//HNO 
+        { 447, 5, 8, 8},/*BO2mages*/      /*{??}SiCl2*/                     { 886, 8, 1, 9},//HOF 
+        { 120, 5,16,16},/*BS2 */          { 712, 6, 1, 7},/*HCN HNL*/       {1242, 8, 1,17},//HOCl
+        {1595, 8, 1, 1},/*H2O */          { 451, 6, 9, 7},/*FCN */          {1392, 8, 1, 8},//HOO HAA
+        { 461, 8, 9, 9},/*F2O */          { 378, 6,17, 7},/*ClCN*/          { 376, 8, 9, 8},//FOO BAR TUTU & WIBBLE
+        { 296, 8,17,17},/*Cl2O*/          { 230, 6, 6, 7},/*CCN NCC*/       //{??},//ClOO
+        { 701, 8, 8, 8},/*O3  */          { 379, 6, 6, 8},/*CCO CAA*/       {1063,16, 1, 8},//HSO
+        {1183,16, 1, 1},/*H2S */          {1081, 6, 1, 8},/*HCO */          { 366,16, 7, 9},//NSF NHL
+        { 357,16, 9, 9},/*SF2 */          /*{??},/*HCC_         */          { 273,16, 7,17},//NSCl
+        { 208,16,17,17},/*SCl2*/          { 520, 6, 8,16},/*OCS */          {1407, 6, 1, 9},//HCF_
+        { 518,16, 8, 8},/*SO2 secours*/   { 535, 6, 7, 8},/*NCO */          {1201, 6, 1,17},//HCCl
+        /*{1034,34,1,1},H2Se*/            { 589, 7, 7, 8},/*NNO */          {1201, 6, 1,17},//HCCl
+        {1497, 7, 1, 1},/*NH2 */          /*{??},/*HNB_*/                   { 860,14, 1, 9},//HSiF
+        { 750, 7, 8, 8},/*NO2 */          /*{??},/*HNC_*/                   { 808,14, 1,17},//HSiCl
+        { 573, 7, 9, 9},/*NF2 */          { 523, 7, 1,14},/*HNSi*/          //{ }
+        { 445,17, 8, 8},/*ClO2 et martin*/{ 754, 5, 1, 8},/*HBO Max*/       
+        { 404, 5,17, 8},/*ClBO*/          { 500, 5, 9, 8},/*FBO min*/       
     };
-    
+
     /**
      * Créé un nouvel atome.
      * @param nombreProton - Nombre de proton de cet atome. Définit l'élément qu'il représente.
      * @param indexe - Indexe de cet atome dans liste de la simulation
      */
     public Atome(int nombreProton){
+        if(!initialiséListes){
+            initialiserListes();
+        }
         NP = nombreProton;
         m = (double)NP*2.0*mP; //Calculer la masse de l'atome. La masse des électrons est négligeable.
         rayonCovalent = rayonsCovalents[NP-1]/100f; //Rayon covalent de l'atome. Les données sont en pm et nous travaillons en Å
@@ -198,6 +231,18 @@ public class Atome{
 
     /**Initialisation de l'atome uniquement utilisée lorsqu'on le copie*/
     private Atome(){}
+
+    /**Initialise les listes de données qui en ont besoins */
+    private void initialiserListes(){
+        initialiséListes = true;
+        //Initialiser fréquenceTorsion
+        for (int i = 0; i < fréquenceTorsionDonnées.length; i++) {
+            //Placer les valeurs de fréquenceTorsion aux bons endroits
+            //Les indexes des deux atomes d'extrémités peuvent être interchangé et doivent donc être initialiser dans les deux sens
+            fréquenceTorsion[(int)fréquenceTorsionDonnées[i][1]-1][(int)fréquenceTorsionDonnées[i][2]-1][(int)fréquenceTorsionDonnées[i][3]-1] = fréquenceTorsionDonnées[i][0];
+            fréquenceTorsion[(int)fréquenceTorsionDonnées[i][1]-1][(int)fréquenceTorsionDonnées[i][3]-1][(int)fréquenceTorsionDonnées[i][2]-1] = fréquenceTorsionDonnées[i][0];
+        }
+    }
 
     /**Mise à jour de la référence à l'environnement
      * @param E - Liste des atomes de la simulation
@@ -272,10 +317,19 @@ public class Atome{
             }
         }
 
+        //Compter le nombre de liens formés par A
+        int nLiens = 0;
+        boolean[] traité = new boolean[A.liaisonIndexe.size()];
+        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
+                //Si la liaison existe,
+                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
+                nLiens++;
+                traité[j] = true;
+            }
+        }
+
         //Forces de liaisons
-        boolean[] liaisonTraitée = new boolean[A.liaisonIndexe.size()]; //Liste des liaison déjà traités
-        //S'il y a plus d'une liaison par atome, A' sera représenté plus d'une fois dans la liste.
-        //Puisque nous ne voulons pas appliquer la force plus d'une fois, il faut indiquer qu'il a déjà été traité.
         for(int i = 0; i < A.liaisonIndexe.size(); i++){
             //Pour toutes les liaisons
 
@@ -297,141 +351,41 @@ public class Atome{
             A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
 
             //Appliquer la force de torsion avec tout les autres liens
-            //Trouver le nombre de liens que A a formé
-            int nLiens = 0;
-            for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-                if(A.liaisonIndexe.get(j) != -1 && !A.liaisonType.get(i)){
-                    //Si la liaison existe,
-                    //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                    nLiens++; //Incrémenter le nombre de liens
-                }
-            }
-
-            //Torsion entre atomes
             for(int j = 0; j < A.liaisonIndexe.size(); j++){
                 //Pour toutes les liaisons de A
-                //Si la liaison n'existe, qu'elle n'est pas cette liaison et qu'elle est sigma (pour éviter de la compter plus d'une fois),
-                if(A.liaisonIndexe.get(j) == -1 || A.liaisonIndexe.get(i) == A.liaisonIndexe.get(j)){
+                //Si la liaison n'existe pas, qu'elle est cette liaison ou qu'elle est pi (pour éviter de la compter plus d'une fois), passer à la prochaine
+                if(A.liaisonIndexe.get(j) == -1 || A.liaisonIndexe.get(i) == A.liaisonIndexe.get(j) || A.liaisonType.get(j)){
                     //Si la liaison n'existe pas ou qu'elle est celle que nous évaluons en ce moment, passer à la prochaine
                     continue;
                 }
                 
-                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Environnement.get(A.liaisonIndexe.get(j)).position); //Vecteur direction entre les deux atomes au bout des deux liens
                 Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur directeur entre A et IA
                 Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(j)).position, A.position ); //Vecteur directeur entre A et JA
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //angle entre IA et JA
-                double angle0; //Angle d'équilibre entre IA et JA
-
-                //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
-                //Obtnenir angle d'équilibre
-                switch(nLiens+A.positionDoublet.size()){
-                    case 2:
-                        angle0 = Math.PI;
-                        break;
-                    case 3:
-                        angle0 = 2.0*Math.PI/3.0;
-                        break;
-                    case 4:
-                        angle0 = 73.0*Math.PI/120.0;
-                        break;
-                    default:
-                        angle0 = angle;
-                        // System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                        break;
-                }
-
-                double Kij = 1000.0; //Force du ressort angulaire
-                double D0 = angle0-angle; //Delta theta
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force à IA
+                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP)); //Appliquer force de torsion à IA
             }
 
             //Torsion Atome-Doublet
             for(int j = 0; j < A.positionDoublet.size(); j++){
-                Vecteur3D lDir = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, Vecteur3D.addi(A.positionDoublet.get(j),A.position)); //Vecteur direction entre l'atome au bout du lien (A') et le doublet
                 Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur direction entre A et A'
-                Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et son doublet
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre le doublet et A'
-                double angle0; //Angle à l'équilibre
-
-                //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
-                //Aller chercher l'angle à l'équilibre
-                switch(nLiens+A.positionDoublet.size()){
-                    case 2:
-                        angle0 = Math.PI;
-                        break;
-                    case 3:
-                        angle0 = 2.0*Math.PI/3.0;
-                        break;
-                    case 4:
-                        angle0 = 73.0*Math.PI/120.0;
-                        break;
-                    default:
-                        angle0 = angle;
-                        //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                        break;
-                }
-
-                double Kij = 10000.0; //Force du ressort angulaire
-                double D0 = angle0-angle; //Delta theta
+                Vecteur3D JAxe = Vecteur3D.norm(A.positionDoublet.get(j)); //Vecteur direction entre A et son doublet
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force à A'
-                A.forceDoublet.get(j).addi(Vecteur3D.mult(lDir.opposé(), D0*Kij)); //Appliquer force au doublet
-            }
-            
-            liaisonTraitée[i] = true; //Indiquer que la liaison a été traité
-        }
-
-        //Force de torsion entre les doublets.
-        //Compter le nombre de liens formés par A
-        int nLiens = 0;
-        boolean[] traité = new boolean[A.liaisonIndexe.size()];
-        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-            if(A.liaisonIndexe.get(j) != -1 && !traité[j]){
-                //Si la liaison existe,
-                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                nLiens++;
-                traité[j] = true;
+                Vecteur3D force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, 2.0*mE, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, -1); //Calculer force de torsion en prenant X, Y, H
+                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(force); //Appliquer force de torsion à A'
+                A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
             }
         }
         
-        //Calculer la force de torsion entre les doublets
+        //Force de torsion entre les doublets
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             for(int j = 0; j < A.positionDoublet.size(); j++){
                 //Si on regarde le même doublet, passer au prochain
                 if(i==j){continue;}
 
-                Vecteur3D lDir = Vecteur3D.sous( Vecteur3D.addi(A.positionDoublet.get(i),A.position), Vecteur3D.addi(A.positionDoublet.get(j),A.position)); //Vecteur direction entre les deux doublets
                 Vecteur3D IAxe = A.positionDoublet.get(i); //Vecteur direction entre A et le doublet I
                 Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et le doublet J
-
-                double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre I et J
-                double angle0; //Angle à l'équilibre entre I et J
-
-                //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
-                //Chercher l'angler à l'équilibre entre I et J
-                switch(nLiens+A.positionDoublet.size()){
-                    case 2:
-                        angle0 = Math.PI;
-                        break;
-                    case 3:
-                        angle0 = 2.0*Math.PI/3.0;
-                        break;
-                    case 4:
-                        angle0 = 73.0*Math.PI/120.0;
-                        break;
-                    default:
-                        angle0 = angle;
-                    //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                        break;
-                }
-
-                double Kij = 10000.0; //Force du ressort angulaire
-                double D0 = angle0-angle; //Delta theta
                 
-                A.forceDoublet.get(i).addi(Vecteur3D.mult(lDir, D0*Kij)); //Appliquer force au doublet
+                A.forceDoublet.get(i).addi(ForceTorsion(IAxe, JAxe, 2.0*mE, 2.0*mE, nLiens, A.doublets, A.NP, -1, -1)); //Appliquer force au doublet en prenant X, H, H comme configuration
             }
         }
 
@@ -510,7 +464,6 @@ public class Atome{
         return ( Vecteur3D.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
 
-
     /**
      * Calcule le moment dipolaire d'une molécule en évaluant les liens qu'il fait.
      * @return - Moment dipolaire de l'atome
@@ -577,6 +530,43 @@ public class Atome{
         return ( Vecteur3D.mult(dir,module) );
     }
     
+    private static Vecteur3D ForceTorsion(Vecteur3D IAxe, Vecteur3D JAxe, double mA, double mB, int NBLiens, int NBDoublets, int X, int Y, int Z){
+        Vecteur3D lDir = Vecteur3D.sous( IAxe, JAxe); //Vecteur direction entre les deux doublets
+
+        double angle = Math.acos(Vecteur3D.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre I et J (les deux vecteurs sont normés)
+        double angle0; //Angle à l'équilibre entre I et J
+
+        //TODO #6 Vincent faire distinction s'il y a des doublets électroniques
+        //Chercher l'angler à l'équilibre entre I et J
+        switch(NBLiens){
+            case 2:
+                angle0 = Math.PI;
+                break;
+            case 3:
+                angle0 = 2.0*Math.PI/3.0;
+                break;
+            case 4:
+                angle0 = 73.0*Math.PI/120.0;
+                break;
+            default:
+                angle0 = angle;
+            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                break;
+        }
+        double Kij;
+        if(Y == -1 || Z == -1){
+            Kij = 10000.0;
+        }else{
+            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,8.0); //nombre d'onde fondamental en Å^-1
+            double fréquenceFondamentale = c/nbOndeFondamental; //Fréquence fondamentale en Hz
+            double masse = 1.0/((1.0/mA)+(1.0/mB));
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000000000000000.0; //Force du ressort angulaire
+        }
+        double D0 = angle0-angle; //Delta theta
+        
+        return Vecteur3D.mult(lDir, D0*Kij); //Appliquer force au doublet
+    }
+
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
     public void ÉvaluerContraintes(){
         //TODO #10 Le rebond de Verlet perd toujours de l'énergie

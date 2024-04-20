@@ -157,20 +157,9 @@ public class MoléculeRéf extends Molécule{
         O.évaluerValence();
         Atome H1 = new Atome(1);
         H1.position = new Vecteur3D(1,0,0);
-        
-        
-    
-        
-       
-    
-        
-        
-
 
         OHm.ajouterAtome(O);
         OHm.ajouterAtome(H1);
-       
-        
 
         for (int i = 0; i < OHm.Atomes.size(); i++) {
             OHm.Atomes.get(i).indexe = i;
@@ -192,6 +181,7 @@ public class MoléculeRéf extends Molécule{
 
         return OHm;
     }
+
     public static MoléculeRéf avoirH3Op(){
         MoléculeRéf H3Op = new MoléculeRéf();
 
@@ -205,9 +195,6 @@ public class MoléculeRéf extends Molécule{
         Atome H3 = new Atome(1);
         H3.position = new Vecteur3D(0.707,0.707,0);
         H3.évaluerValence();
-        
-        
-
 
         H3Op.ajouterAtome(O);
         H3Op.ajouterAtome(H1);
@@ -237,7 +224,6 @@ public class MoléculeRéf extends Molécule{
 
         return H3Op;
     }
-
 
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();

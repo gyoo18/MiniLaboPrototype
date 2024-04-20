@@ -50,6 +50,7 @@ public class App {
 
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
         MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
+        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -78,7 +79,7 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
-            MoléculeRéf mol;
+            MoléculeRéf mol = H2O;
             if (Math.random() <0.5) {
                  mol = H3Op; //Molécule à ajouter dans la simulation
             } else {
