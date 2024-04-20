@@ -198,9 +198,11 @@ public class Atome{
         /*{1034,34,1,1},H2Se*/            { 589, 7, 7, 8},/*NNO */          {1201, 6, 1,17},//HCCl
         {1497, 7, 1, 1},/*NH2 */          /*{??},/*HNB_*/                   { 860,14, 1, 9},//HSiF
         { 750, 7, 8, 8},/*NO2 */          /*{??},/*HNC_*/                   { 808,14, 1,17},//HSiCl
-        { 573, 7, 9, 9},/*NF2 */          { 523, 7, 1,14},/*HNSi*/          //{ }
-        { 445,17, 8, 8},/*ClO2 et martin*/{ 754, 5, 1, 8},/*HBO Max*/       
-        { 404, 5,17, 8},/*ClBO*/          { 500, 5, 9, 8},/*FBO min*/       
+        { 573, 7, 9, 9},/*NF2 */          { 523, 7, 1,14},/*HNSi*/          { 992,15, 1, 1},//PH2 (!)
+        { 445,17, 8, 8},/*ClO2 et martin*/{ 754, 5, 1, 8},/*HBO Max*/       { 487,15, 9, 9},//PF2 (!)
+        { 404, 5,17, 8},/*ClBO*/          { 500, 5, 9, 8},/*FBO min*/       { 252,15,17,17},//PCl2 (!)
+        { 498, 5, 9, 9},/*BF2 (!)*/       {1500, 6, 6, 1},/*HCC (!)*/       { 584, 6, 9, 8},//FCO (!)
+        { 285, 6,17, 8},/*ClCO (!)*/      { 568, 7, 8, 9},/*|ONF| (!)*/     { 370, 7, 8,17},//ONCl (!)
     };
 
     /**
@@ -362,7 +364,8 @@ public class Atome{
                 Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur directeur entre A et IA
                 Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(j)).position, A.position ); //Vecteur directeur entre A et JA
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP)); //Appliquer force de torsion à IA
+                Vecteur3D Force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP);
+                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Force); //Appliquer force de torsion à IA
             }
 
             //Torsion Atome-Doublet
@@ -389,11 +392,11 @@ public class Atome{
             }
         }
 
-        double ModuleFriction = -0.00000000000001;
+        double ModuleFriction = -0.0000000000001;
         A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
+            //A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Appliquer les forces des doublets sur l'atome.
@@ -557,10 +560,13 @@ public class Atome{
         if(Y == -1 || Z == -1){
             Kij = 1000.0;
         }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,8.0); //nombre d'onde fondamental en Å^-1
-            double fréquenceFondamentale = c/nbOndeFondamental; //Fréquence fondamentale en Hz
+            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
+            if(nbOndeFondamental == 0.0){
+                nbOndeFondamental = 0.0;
+            }
+            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
             double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000000000000000.0; //Force du ressort angulaire
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*100.0; //Force du ressort angulaire
         }
         double D0 = angle0-angle; //Delta theta
         
@@ -733,18 +739,13 @@ public class Atome{
             liaisonType.add(false);
             liaisonOrdre.add(-1);
         }
-        essais = 0;
         while (liaisonIndexe.size()>n) {
             for (int n1 = 0; n1 < liaisonIndexe.size(); n1++) {
-                essais ++;
                 if ( liaisonIndexe.get(n1) == -1){
                     liaisonIndexe.remove(n1);
                     liaisonType.remove(n1);
                     liaisonOrdre.remove(n1);
                     break;
-                }
-                if(essais > 20){
-                    throw new RuntimeException();
                 }
             }
         }
@@ -1123,7 +1124,7 @@ public class Atome{
     }
 
     public double Température(){
-        return vélocité.longueur()*(3.0/2.0)*(1.0/kB)*m;
+        return Math.pow(vélocité.longueur(),2.0)*m/(3.0*kB);
     }
 
     public static double Température(Atome a){
@@ -1131,14 +1132,16 @@ public class Atome{
     }
 
     public static double Température(ArrayList<Atome> A){
-        double v = 0.0;
-        double m = 0.0;
+        double v1 = 0.0;
+        double Ek = 0.0;
         for (int i = 0; i < A.size(); i++) {
-            v += Math.pow(A.get(i).vélocité.longueur(),2.0);
-            m += A.get(i).m;
+            v1 += A.get(i).vélocité.longueur();
+            Ek += Math.pow(A.get(i).vélocité.longueur(),2.0)*A.get(i).m*0.5;
         }
-        v = v/(double)A.size();
-        return v*m*(3.0/2.0)*(1.0/kB);
+        v1 = v1/(double)A.size();
+        Ek = Ek/A.size();
+        //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
+        return Ek*2.0/(3.0*kB);
     }
 
     public static double TempératureEnVitesse(double T, double m){

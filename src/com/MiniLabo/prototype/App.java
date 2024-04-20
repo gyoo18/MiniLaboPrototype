@@ -50,7 +50,7 @@ public class App {
 
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
         MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
-        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+        MoléculeRéf H2O = MoléculeRéf.avoirAcétate();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +70,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 100;  //Nombre de molécules voulus
+        int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -119,7 +119,7 @@ public class App {
 
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
-            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            Hs.get(i).vélocité = Vecteur3D.mult(Vecteur3D.norm(new Vecteur3D(2.0*(Math.random()-0.5),2.0*(Math.random()-0.5),2.0*(Math.random()-0.5))),module);
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -167,7 +167,8 @@ public class App {
             
             //Statistiques sur la vitesse de la simulation
             //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-            
+            System.out.println(String.format("%.0f",Atome.Température(Hs)-273.15) + "°C");
+
             //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
             //try {Thread.sleep(300);} catch (Exception e) {}

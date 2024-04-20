@@ -437,13 +437,13 @@ public class MoléculeRéf extends Molécule{
         ArrayList<Atome> Environnement = new ArrayList<>();
         Atome.MettreÀJourEnvironnement(C2H3O2.Atomes);
         MiseÀJourEnvironnement(C2H3O2.Atomes);
-        C1.créerLien(C2.indexe, 0, 0, 1, false);
-        C1.créerLien(O1.indexe, 1, 0, 2, false);
-        C1.créerLien(O1.indexe, 2, 1, 2, true);
-        C1.créerLien(O2.indexe, 3, 0, 1, false);
-        C2.créerLien(H1.indexe, 1, 0, 1, false);
-        C2.créerLien(H2.indexe, 2, 0, 1, false);
-        C2.créerLien(H3.indexe, 3, 0, 1, false);
+        C1.créerLien( C2.indexe, 0, 0, 1, false);
+        C1.créerLien( O1.indexe, 1, 0, 2, false);
+        C1.créerLien( O1.indexe, 2, 1, 2, true);
+        C1.créerLien( O2.indexe, 3, 0, 1, false);
+        C2.créerLien( H1.indexe, 1, 0, 1, false);
+        C2.créerLien( H2.indexe, 2, 0, 1, false);
+        C2.créerLien( H3.indexe, 3, 0, 1, false);
 
         C2H3O2.évaluerSystèmesConjugués();
         C2H3O2.initialiserDoublets();
