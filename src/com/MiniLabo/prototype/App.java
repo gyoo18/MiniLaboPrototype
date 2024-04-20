@@ -51,6 +51,11 @@ public class App {
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
         MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
         MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+        MoléculeRéf CH4 = MoléculeRéf.avoirCH4();
+        MoléculeRéf CH2 = MoléculeRéf.avoirCH2();
+        MoléculeRéf C4H6 = MoléculeRéf.avoir1_3_Dibutyle();
+        MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
+
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +75,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 100;  //Nombre de molécules voulus
+        int NbMolécules = 1;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -79,12 +84,12 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
-            MoléculeRéf mol = H2O;
-            /* if (Math.random() <0.5) {
-                 mol = H3Op; //Molécule à ajouter dans la simulation
-            } else {
-                 mol = OHm;
-            } */
+            MoléculeRéf mol = C2H6;
+              /*  if (Math.random() <0.5) {
+                    mol = CH4; //Molécule à ajouter dans la simulation
+                } else {
+                    mol = CH2;
+                }   */
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -132,15 +137,14 @@ public class App {
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
             //Sous-étapes. Répète N fois/image
-            for (int N = 0; N < 20; N++) {
+            for (int N = 0; N < 1; N++) {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }

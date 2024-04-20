@@ -350,7 +350,7 @@ public class Atome{
 
             A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
 
-            //Appliquer la force de torsion avec tout les autres liens
+            //Appliquer la force de torsion avec tout les autres liens //TODO #31 FOrce torsion weird
             for(int j = 0; j < A.liaisonIndexe.size(); j++){
                 //Pour toutes les liaisons de A
                 //Si la liaison n'existe pas, qu'elle est cette liaison ou qu'elle est pi (pour éviter de la compter plus d'une fois), passer à la prochaine
@@ -361,8 +361,20 @@ public class Atome{
                 
                 Vecteur3D IAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(i)).position, A.position ); //Vecteur directeur entre A et IA
                 Vecteur3D JAxe = Vecteur3D.sous( Environnement.get(A.liaisonIndexe.get(j)).position, A.position ); //Vecteur directeur entre A et JA
+                /* if (Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.x) || Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.y) || Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.z) ||  Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).vélocité.x) ||  Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).position.x)) {
+                    System.out.println(111);
+                } */
+                //Vecteur3D Force= ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP);
                 
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP)); //Appliquer force de torsion à IA
+                //Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Force); //Appliquer force de torsion à IA
+                /* if (Double.isInfinite(Force.x)){
+                    System.out.println(333);
+                } */
+                //Force= ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP);
+                
+                 /* if (Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.x) || Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.y) || Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.z) ||  Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).vélocité.x) ||  Double.isNaN(Atome.Environnement.get(A.liaisonIndexe.get(i)).position.x)) {
+                    System.out.println(111);
+                } */
             }
 
             //Torsion Atome-Doublet
@@ -371,8 +383,8 @@ public class Atome{
                 Vecteur3D JAxe = Vecteur3D.norm(A.positionDoublet.get(j)); //Vecteur direction entre A et son doublet
                 
                 Vecteur3D force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, 2.0*mE, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, -1); //Calculer force de torsion en prenant X, Y, H
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(force); //Appliquer force de torsion à A'
-                A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
+                //Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(force); //Appliquer force de torsion à A'
+             //   A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
             }
         }
         
@@ -385,15 +397,15 @@ public class Atome{
                 Vecteur3D IAxe = A.positionDoublet.get(i); //Vecteur direction entre A et le doublet I
                 Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et le doublet J
                 
-                A.forceDoublet.get(i).addi(ForceTorsion(IAxe, JAxe, 2.0*mE, 2.0*mE, nLiens, A.doublets, A.NP, -1, -1)); //Appliquer force au doublet en prenant X, H, H comme configuration
+                //A.forceDoublet.get(i).addi(ForceTorsion(IAxe, JAxe, 2.0*mE, 2.0*mE, nLiens, A.doublets, A.NP, -1, -1)); //Appliquer force au doublet en prenant X, H, H comme configuration
             }
         }
 
         double ModuleFriction = -0.00000000000001;
-        A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        //A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
+            //A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Appliquer les forces des doublets sur l'atome.
@@ -408,8 +420,8 @@ public class Atome{
                 Sin0 = 0;
                 aT = new Vecteur3D(0);
             }
-            A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
-            A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
+           // A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            //A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
     }
     /**
@@ -557,8 +569,8 @@ public class Atome{
         if(Y == -1 || Z == -1){
             Kij = 1000.0;
         }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,8.0); //nombre d'onde fondamental en Å^-1
-            double fréquenceFondamentale = c/nbOndeFondamental; //Fréquence fondamentale en Hz
+            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
+            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
             double masse = 1.0/((1.0/mA)+(1.0/mB));
             Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000000000000000.0; //Force du ressort angulaire
         }
@@ -970,7 +982,7 @@ public class Atome{
                                         if (8 <casesIndexe &&casesIndexe <= 13){
                                             CasePotVide = 14;
                                         }
-                                        CaseVide = -CasePotVide+casesIndexe+1;
+                                        CaseVide = CasePotVide-casesIndexe-1;
                                         break; //Cation, charge positive...
                                     }
                                     casesIndexe--; //Prochaine case
