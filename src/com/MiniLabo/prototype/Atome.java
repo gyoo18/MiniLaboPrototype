@@ -949,19 +949,30 @@ public class Atome{
                                     }
                                     if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
                                         //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
-                                        
-                                        
                                     }
-                                    if (APrime.cases[casesIndexe] == 0 && trouvéNiveau) {
-                                        //Si la case possède 0 électrons et qu'elle fait partie de la couche de valence
-                                        CaseVide++;
-                                        
+                                    if (APrime.cases[casesIndexe] != 0){
+                                        int CasePotVide=0;
+                                        if (casesIndexe <= 0){
+                                            CasePotVide = 1;
+                                        }
+                                        if (0 <casesIndexe && casesIndexe <= 4){
+                                            CasePotVide = 5;
+                                        }
+                                        if (4 < casesIndexe &&casesIndexe <= 8){
+                                            CasePotVide = 9;
+                                        }
+                                        if (8 <casesIndexe &&casesIndexe <= 13){
+                                            CasePotVide = 14;
+                                        }
+                                        CaseVide = -CasePotVide+casesIndexe+1;
+                                        break; //Cation, charge positive...
                                     }
                                     casesIndexe--; //Prochaine case
                                     Qm--;          //Prochain m
                                 }
                                 Ql--; //Prochain l
                             }
+                            
                             if(trouvéNiveau){
                                 //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
                                 i1 = 4;
@@ -978,13 +989,13 @@ public class Atome{
 
                      
 
-                        if ( positionDoublet.size() > 0 && CaseVide >0){
+                        if ( positionDoublet.size() > 0 && CaseVide > 0){
 
                         APrime.ajouterÉlectron(); 
                         retirerÉlectron();   //Doublet se transforme en 2 electron , qui
                         évaluerValence();
                         APrime.évaluerValence();    //ÉvaluerValence pour reprend / perde ses doubletts
-                        //System.out.println(33);
+                        System.out.println(APrime.NP);
                         ForceSimoideDoublets += 0;
                         
                         }
@@ -1002,7 +1013,7 @@ public class Atome{
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
     }
-    private double forceSigmoide = 15.0;
+    private double forceSigmoide = 5.0;
 
     /**
      * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>

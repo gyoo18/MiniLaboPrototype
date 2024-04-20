@@ -122,6 +122,7 @@ public class MoléculeRéf extends Molécule{
         H1.position = new Vecteur3D(0.70,-0.70,0);
         Atome H2 = new Atome(1);
         H2.position = new Vecteur3D(-0.70,-0.70,0);
+       
 
         H2O.ajouterAtome(O);
         H2O.ajouterAtome(H1);
@@ -142,9 +143,12 @@ public class MoléculeRéf extends Molécule{
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
+        Molécule.MiseÀJourEnvironnement(Environnement);
 
         H2O.calculerBEAA();
         H2O.MiseÀJourPos();
+      
+
 
         return H2O;
     }
@@ -171,6 +175,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(1, 0, 0, 1, false);
        
         OHm.évaluerSystèmesConjugués();
+        OHm.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
