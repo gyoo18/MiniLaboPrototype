@@ -80,11 +80,11 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
             MoléculeRéf mol = H2O;
-            if (Math.random() <0.5) {
+            /* if (Math.random() <0.5) {
                  mol = H3Op; //Molécule à ajouter dans la simulation
             } else {
                  mol = OHm;
-            }
+            } */
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
