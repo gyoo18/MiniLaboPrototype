@@ -352,7 +352,7 @@ public class Atome{
 
             A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
 
-            //Appliquer la force de torsion avec tout les autres liens
+            //Appliquer la force de torsion avec tout les autres liens //TODO #31 FOrce torsion weird
             for(int j = 0; j < A.liaisonIndexe.size(); j++){
                 //Pour toutes les liaisons de A
                 //Si la liaison n'existe pas, qu'elle est cette liaison ou qu'elle est pi (pour éviter de la compter plus d'une fois), passer à la prochaine
@@ -374,8 +374,8 @@ public class Atome{
                 Vecteur3D JAxe = Vecteur3D.norm(A.positionDoublet.get(j)); //Vecteur direction entre A et son doublet
                 
                 Vecteur3D force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, 2.0*mE, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, -1); //Calculer force de torsion en prenant X, Y, H
-                Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(force); //Appliquer force de torsion à A'
-                A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
+                //Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(force); //Appliquer force de torsion à A'
+             //   A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
             }
         }
         
@@ -388,7 +388,7 @@ public class Atome{
                 Vecteur3D IAxe = A.positionDoublet.get(i); //Vecteur direction entre A et le doublet I
                 Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et le doublet J
                 
-                A.forceDoublet.get(i).addi(ForceTorsion(IAxe, JAxe, 2.0*mE, 2.0*mE, nLiens, A.doublets, A.NP, -1, -1)); //Appliquer force au doublet en prenant X, H, H comme configuration
+                //A.forceDoublet.get(i).addi(ForceTorsion(IAxe, JAxe, 2.0*mE, 2.0*mE, nLiens, A.doublets, A.NP, -1, -1)); //Appliquer force au doublet en prenant X, H, H comme configuration
             }
         }
 
@@ -396,6 +396,7 @@ public class Atome{
         A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
+            //A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
             //A.forceDoublet.get(i).addi(Vecteur3D.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
@@ -411,8 +412,8 @@ public class Atome{
                 Sin0 = 0;
                 aT = new Vecteur3D(0);
             }
-            A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
-            A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
+           // A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            //A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
     }
     /**
@@ -956,19 +957,30 @@ public class Atome{
                                     }
                                     if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
                                         //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
-                                        
-                                        
                                     }
-                                    if (APrime.cases[casesIndexe] == 0 && trouvéNiveau) {
-                                        //Si la case possède 0 électrons et qu'elle fait partie de la couche de valence
-                                        CaseVide++;
-                                        
+                                    if (APrime.cases[casesIndexe] != 0){
+                                        int CasePotVide=0;
+                                        if (casesIndexe <= 0){
+                                            CasePotVide = 1;
+                                        }
+                                        if (0 <casesIndexe && casesIndexe <= 4){
+                                            CasePotVide = 5;
+                                        }
+                                        if (4 < casesIndexe &&casesIndexe <= 8){
+                                            CasePotVide = 9;
+                                        }
+                                        if (8 <casesIndexe &&casesIndexe <= 13){
+                                            CasePotVide = 14;
+                                        }
+                                        CaseVide = CasePotVide-casesIndexe-1;
+                                        break; //Cation, charge positive...
                                     }
                                     casesIndexe--; //Prochaine case
                                     Qm--;          //Prochain m
                                 }
                                 Ql--; //Prochain l
                             }
+                            
                             if(trouvéNiveau){
                                 //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
                                 i1 = 4;
@@ -985,13 +997,13 @@ public class Atome{
 
                      
 
-                        if ( positionDoublet.size() > 0 && CaseVide >0){
+                        if ( positionDoublet.size() > 0 && CaseVide > 0){
 
                         APrime.ajouterÉlectron(); 
                         retirerÉlectron();   //Doublet se transforme en 2 electron , qui
                         évaluerValence();
                         APrime.évaluerValence();    //ÉvaluerValence pour reprend / perde ses doubletts
-                        //System.out.println(33);
+                        System.out.println(APrime.NP);
                         ForceSimoideDoublets += 0;
                         
                         }
@@ -1009,8 +1021,7 @@ public class Atome{
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
     }
-    
-    private double forceSigmoide = 15.0;
+    private double forceSigmoide = 5.0;
 
     /**
      * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>

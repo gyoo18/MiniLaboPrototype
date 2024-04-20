@@ -122,6 +122,7 @@ public class MoléculeRéf extends Molécule{
         H1.position = new Vecteur3D(0.70,-0.70,0);
         Atome H2 = new Atome(1);
         H2.position = new Vecteur3D(-0.70,-0.70,0);
+       
 
         H2O.ajouterAtome(O);
         H2O.ajouterAtome(H1);
@@ -142,9 +143,12 @@ public class MoléculeRéf extends Molécule{
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
+        Molécule.MiseÀJourEnvironnement(Environnement);
 
         H2O.calculerBEAA();
         H2O.MiseÀJourPos();
+      
+
 
         return H2O;
     }
@@ -171,6 +175,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(1, 0, 0, 1, false);
        
         OHm.évaluerSystèmesConjugués();
+        OHm.initialiserDoublets();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -395,9 +400,11 @@ public class MoléculeRéf extends Molécule{
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
+        Molécule.MiseÀJourEnvironnement(Environnement);
 
 
         C4H6.calculerBEAA();
+        C4H6.MiseÀJourPos();
 
         return C4H6;
     }
@@ -455,4 +462,62 @@ public class MoléculeRéf extends Molécule{
 
         return C2H3O2;
     }
+
+    public static MoléculeRéf avoirC2H6(){
+        MoléculeRéf C2H6 = new MoléculeRéf();
+
+        Atome C1 = new Atome(6);
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(1,0,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1,0,0);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(0,-1,0);
+
+        Atome C2 = new Atome(6);
+        C2.position = new Vecteur3D(0,2,0);
+        Atome H4 = new Atome(1);
+        H4.position= Vecteur3D.addi(Vecteur3D.mult(H1.position, -1),C2.position);
+        Atome H5 = new Atome(1);
+        H5.position= Vecteur3D.addi(Vecteur3D.mult(H2.position, -1),C2.position);
+        Atome H6 = new Atome(1);
+        H6.position= Vecteur3D.addi(Vecteur3D.mult(H3.position, -1),C2.position);
+        
+
+        C2H6.ajouterAtome(C1);
+        C2H6.ajouterAtome(H1);
+        C2H6.ajouterAtome(H2);
+        C2H6.ajouterAtome(H3);
+        C2H6.ajouterAtome(C2);
+        C2H6.ajouterAtome(H4);
+        C2H6.ajouterAtome(H5);
+        C2H6.ajouterAtome(H6);
+
+        for (int i = 0; i < C2H6.Atomes.size(); i++) {
+            C2H6.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(C2H6.Atomes);
+        MiseÀJourEnvironnement(C2H6.Atomes);
+        C1.créerLien(H1.indexe, 0, 0, 1, false);
+        C1.créerLien(H2.indexe, 1, 0, 1, false);
+        C1.créerLien(H3.indexe, 2, 0, 1, false);
+        C1.créerLien(C2.indexe, 3, 0, 1, false);
+        C2.créerLien(H4.indexe, 1, 0, 1, false);
+        C2.créerLien(H5.indexe, 2, 0, 1, false);
+        C2.créerLien(H6.indexe, 3, 0, 1, false);
+
+        C2H6.évaluerSystèmesConjugués();
+        C2H6.initialiserDoublets();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        C2H6.calculerBEAA();
+        C2H6.MiseÀJourPos();
+
+        return C2H6;
+    }
+
 }
