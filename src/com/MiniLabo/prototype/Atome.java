@@ -555,7 +555,7 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,8.0); //nombre d'onde fondamental en Å^-1
             double fréquenceFondamentale = c/nbOndeFondamental; //Fréquence fondamentale en Hz
@@ -721,6 +721,7 @@ public class Atome{
     public void évaluerValence(){
         //Évalue le nombre liaisons possibles
         int n = 0;
+        int essais = 0;
         for (int i = 0; i < cases.length; i++) {
             //Pour toutes les cases
             if(cases[i] == 1){
@@ -732,13 +733,18 @@ public class Atome{
             liaisonType.add(false);
             liaisonOrdre.add(-1);
         }
+        essais = 0;
         while (liaisonIndexe.size()>n) {
             for (int n1 = 0; n1 < liaisonIndexe.size(); n1++) {
+                essais ++;
                 if ( liaisonIndexe.get(n1) == -1){
                     liaisonIndexe.remove(n1);
                     liaisonType.remove(n1);
                     liaisonOrdre.remove(n1);
                     break;
+                }
+                if(essais > 20){
+                    throw new RuntimeException();
                 }
             }
         }
@@ -1156,37 +1162,7 @@ public class Atome{
      */
     public Atome copier(boolean copierMolécule){
         Atome a = new Atome();
-        a.prevPosition = this.prevPosition==null?null:this.prevPosition.copier();
-        a.position = this.position.copier();
-        a.vélocité = this.vélocité.copier();
-        a.Force = this.Force.copier();
-        a.positionDoublet = (ArrayList<Vecteur3D>) this.positionDoublet.clone();
-        a.prevPosDoublet = (ArrayList<Vecteur3D>)this.prevPosDoublet.clone();
-        a.vélDoublet =(ArrayList<Vecteur3D>) this.vélDoublet.clone();
-        a.forceDoublet = (ArrayList<Vecteur3D>)this.forceDoublet.clone();
-        a.NP = this.NP;
-        a.NE = this.NE;
-        a.m = this.m;
-        a.électronégativité = this.électronégativité;
-        a.charge = this.charge;
-        a.indexe = this.indexe;
-
-        a.liaisonIndexe = (ArrayList<Integer>)this.liaisonIndexe.clone();
-        a.liaisonType = (ArrayList<Boolean>)this.liaisonType.clone(); // sigma = faux, pi = vrai
-        a.liaisonOrdre = (ArrayList<Integer>)this.liaisonOrdre.clone();
-        a.doublets = this.doublets;
-        a.rayonCovalent = this.rayonCovalent;
-
-        a.cases = this.cases;
-
-        if(copierMolécule){
-            a.molécule = this.molécule.copier();
-            a.molécule.retirerAtome(this);
-            a.molécule.ajouterAtome(a);
-        }else{
-            a.molécule = this.molécule;
-        }
-
+        a.copier(this,copierMolécule);
         return a;
     }
 
@@ -1196,8 +1172,10 @@ public class Atome{
      * @param copierMolécule - Si vrai, copie la molécule, sinon la molécule restera la même référence.
      */
     public void copier(Atome a, boolean copierMolécule){
-        Atome b = (Atome) a;
-        this.prevPosition = b.prevPosition;
+        Atome b = a;
+        if(this.prevPosition != null){
+            this.prevPosition = b.prevPosition.copier();
+        }
         this.position = b.position.copier();
         this.vélocité = b.vélocité.copier();
         this.Force = b.Force.copier();
@@ -1214,10 +1192,11 @@ public class Atome{
 
         this.liaisonIndexe = (ArrayList<Integer>) b.liaisonIndexe.clone();
         this.liaisonType = (ArrayList<Boolean>) b.liaisonType.clone(); // sigma = faux, pi = vrai
+        this.liaisonOrdre = (ArrayList<Integer>) b.liaisonOrdre.clone();
         this.doublets = b.doublets;
         this.rayonCovalent = b.rayonCovalent;
 
-        this.cases = b.cases;
+        this.cases = b.cases.clone();
 
         if(copierMolécule){
             this.molécule = b.molécule.copier();
