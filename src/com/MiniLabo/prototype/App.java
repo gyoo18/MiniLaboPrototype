@@ -137,7 +137,7 @@ public class App {
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.

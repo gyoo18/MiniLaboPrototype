@@ -401,6 +401,50 @@ public class Atome{
             }
         }
 
+        //Force Dièdre
+        for(int i = 0; i < A.liaisonIndexe.size(); i++){
+            //Pour toutes les liaisons
+
+            //S'il n'y a pas de liaison, sauter à la prochaine
+            if(A.liaisonIndexe.get(i) == -1){
+                continue;
+            }
+            //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
+            if(A.liaisonType.get(i)){
+                System.out.println(33);
+            }
+            Atome Ai =Environnement.get(A.liaisonIndexe.get(i));  
+            
+            //int liaisonOrdre = A.liaisonOrdre.get(i);  //Évaluer le nombre de liaison existantes entre A et A1, pas important pour Ai, mais pour Aj
+
+            for ( int j=0; j < A.liaisonIndexe.size(); j++ ){
+                
+                if(A.liaisonIndexe.get(j) == -1){
+                    continue;
+                }
+                if(A.liaisonIndexe.get(j) == A.liaisonIndexe.get(i)){
+                    continue;
+                }
+                Atome Aj =Environnement.get(A.liaisonIndexe.get(j));
+                for ( int k=0; k < Aj.liaisonIndexe.size(); k++){
+                    if(A.liaisonIndexe.get(k) == -1){
+                        continue;
+                    }
+                    if(A.liaisonIndexe.get(k) == A.liaisonIndexe.get(j)){
+                        continue;
+                    }
+                    Atome Ak =Environnement.get(A.liaisonIndexe.get(k));
+
+                    Ai.Force.addi(ForceDiedre(Ai, A, Aj, Ak));
+                    //System.out.println(Vecteur3D.distance(ForceDiedre(Ai, A, Aj, Ak),new Vecteur3D(000)));
+
+
+
+                }
+            }
+ 
+        }
+
         double ModuleFriction = -0.00000000000001;
         //A.Force.addi( Vecteur3D.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
@@ -577,6 +621,20 @@ public class Atome{
         double D0 = angle0-angle; //Delta theta
         
         return Vecteur3D.mult(lDir, D0*Kij); //Appliquer force au doublet
+    }
+    private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
+        double ConstanteDeForce=0.1*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
+        double ConstanteDangle=0;
+        Vecteur3D PlaniAj= new Vecteur3D( Vecteur3D.croix(Vecteur3D.sous(A.position ,Ai.position ), Vecteur3D.sous(Aj.position ,A.position)));
+        Vecteur3D PlanAjk= new Vecteur3D( Vecteur3D.croix(Vecteur3D.sous(Aj.position ,A.position ), Vecteur3D.sous(Ak.position ,Aj.position)));
+        double iAjxAjk = Vecteur3D.scal(Vecteur3D.norm(PlaniAj),Vecteur3D.norm(PlanAjk));
+        double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
+        double FDiedre = ConstanteDeForce*(Angle - ConstanteDangle );
+        /* if (Double.isNaN(FDiedre)){
+            FDiedre=0;
+        } */
+       return ( Vecteur3D.mult(Vecteur3D.norm(PlaniAj), FDiedre ));
+
     }
 
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/
