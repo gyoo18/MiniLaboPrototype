@@ -50,7 +50,7 @@ public class App {
 
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
         MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
-        MoléculeRéf H2O = MoléculeRéf.avoirAcétate();
+        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +70,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 10;  //Nombre de molécules voulus
+        int NbMolécules = 100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -79,7 +79,7 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
-            MoléculeRéf mol = C2H6;
+            MoléculeRéf mol = H2O;
               /*  if (Math.random() <0.5) {
                     mol = CH4; //Molécule à ajouter dans la simulation
                 } else {
@@ -130,21 +130,23 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
+            double T = 0.0; //Température moyenne
             //Sous-étapes. Répète N fois/image
-            for (int N = 0; N < 1; N++) {
+            for (int N = 0; N < 20; N++) {
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
                 temps += dt;
+                T += Atome.Température(Hs);
             }
 
             //Affichage de la simulation
@@ -166,7 +168,7 @@ public class App {
             
             //Statistiques sur la vitesse de la simulation
             //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-            System.out.println(String.format("%.0f",Atome.Température(Hs)-273.15) + "°C");
+            System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C");
 
             //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
