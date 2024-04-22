@@ -50,7 +50,7 @@ public class App {
 
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
         MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
-        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+        MoléculeRéf H2O = MoléculeRéf.avoirC2H6();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +70,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 100;  //Nombre de molécules voulus
+        int NbMolécules = 1;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -130,7 +130,7 @@ public class App {
         //Simulation
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-18.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
