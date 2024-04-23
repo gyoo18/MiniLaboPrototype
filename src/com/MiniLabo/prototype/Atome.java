@@ -248,7 +248,7 @@ public class Atome{
                     Vecteur3D Force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP);
                     
                     Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Force); //Appliquer force de torsion à IA
-                    A.forceDoublet.get(j).addi(force.opposé()); //Appliquer force au doublet
+                    A.forceDoublet.get(j).addi(Force.opposé()); //Appliquer force au doublet
                 }
 
                 //Torsion Atome-Doublet
@@ -266,10 +266,10 @@ public class Atome{
         
         if (ListForce[4]){
             //Force de torsion entre les doublets
-            for (int i1 = 0; i1 < A.positionDoublet.size(); i1++) {
+            for (int i = 0; i < A.positionDoublet.size(); i++) {
                 for(int j = 0; j < A.positionDoublet.size(); j++){
                     //Si on regarde le même doublet, passer au prochain
-                    if(i1==j){continue;}
+                    if(i==j){continue;}
 
                     Vecteur3D IAxe = A.positionDoublet.get(i); //Vecteur direction entre A et le doublet I
                     Vecteur3D JAxe = A.positionDoublet.get(j); //Vecteur direction entre A et le doublet J
@@ -347,15 +347,8 @@ public class Atome{
                 Sin0 = 0;
                 aT = new Vecteur3D(0);
             }
-            A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
-            A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
-        }
-
-        //Mettre à jour la vélocité moyenne
-        if(A.vélocitéMoyenne.longueur()!=0.0){
-            A.vélocitéMoyenne = Vecteur3D.addi(Vecteur3D.mult(A.vélocité,(1.0-A.facteurMixVélMoyen)), Vecteur3D.mult(A.vélocitéMoyenne, A.facteurMixVélMoyen));
-        }else{
-            A.vélocitéMoyenne = A.vélocité.copier();
+           // A.Force.addi(Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            //A.forceDoublet.set(i,Vecteur3D.mult(Vecteur3D.addi(A.forceDoublet.get(i), Vecteur3D.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
     }
     /**
@@ -1178,4 +1171,176 @@ public class Atome{
             prevPosition = Vecteur3D.addi(position, Vecteur3D.mult(vélocité, -h)).copier();
         }
     }
+
+   
+    private int ForceSimoideDoublets;
+    public static final double e = 1.602*Math.pow(10.0, -19.0);    //Charge élémentaire
+    public static final double mP = 1.0*1.672*Math.pow(10.0,-27.0);//Masse du proton
+    public static final double mE = 1.0*9.109*Math.pow(10.0,-31.0);//Masse de l'électron
+    public static final double Ag = Math.pow(10,-15);              //Facteur de conversion en Angströms
+    public static final double K = 8.987*Math.pow(10.0,39.0);    //Constante de Coulomb
+    public static final double ep0 = 8.854*Math.pow(10.0,-42);     //Permittivité du vide
+    public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
+    public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman
+    public static final double c = 2.99792458*Math.pow(10.0,18.0);//Vitesse de la lumière
+
+    public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
+
+
+    /**Électronégativité de Pauling de chaque élément.*/
+    private static final float[] AffinitéÉlectronique = {
+        2.20f,                                                                                                0.00f,
+        0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
+        0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
+        0.82f,1.00f,1.36f,1.54f,1.63f,1.66f,1.55f,1.83f,1.88f,1.91f,1.90f,1.65f,1.81f,2.01f,2.18f,2.55f,2.96f,3.00f,
+        0.82f,0.95f,1.22f,1.33f,1.60f,2.16f,1.90f,2.20f,2.28f,2.20f,1.93f,1.69f,1.78f,1.96f,2.05f,2.10f,2.66f,2.60f,
+        0.79f,0.89f,      1.10f,1.12f,1.13f,1.14f,0.00f,1.20f,0.00f,1.22f,1.23f,1.24f,1.25f,0.00f,1.27f,1.30f,1.50f,
+                    2.36f,1.90f,2.20f,2.20f,2.28f,2.54f,2.00f,1.62f,2.33f,2.02f,2.00f,2.20f,2.20f,0.70f,0.90f,      
+        1.10f,1.30f,      1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f
+    };
+
+    /**Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.*/
+    private static final float[] rayonsCovalents = {
+         32f,                                                                                 46f,
+        133f,102f,                                                   85f, 75f, 71f, 63f, 64f, 67f,
+        155f,139f,                                                  126f,116f,111f,103f, 99f, 96f,
+        196f,171f,148f,136f,134f,122f,119f,116f,111f,110f,112f,118f,124f,121f,121f,116f,114f,117f,
+        210f,185f,163f,154f,147f,138f,128f,125f,125f,120f,128f,136f,142f,140f,140f,136f,133f,131f,
+        232f,196f,     180f,163f,176f,174f,173f,172f,168f,169f,168f,167f,166f,165f,164f,170f,162f,
+                  152f,146f,137f,131f,129f,122f,123f,124f,133f,144f,144f,151f,145f,147f,142f,     
+        223f,201f,     186f,175f,169f,170f,171f,172f,166f,166f,168f,168f,165f,167f,173f,176f,161f,
+                  157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
+    };
+
+    /**Rayon covalent de lien double.*/
+    private static final float[] rayonsCovalents2 = {
+         0f,                                                                                   0f,
+        124f, 90f,                                                   78f, 67f, 60f, 57f, 59f, 96f,
+        160f,132f,                                                  113f,107f,102f, 94f, 95f,107f,
+        193f,147f,116f,117f,112f,111f,105f,109f,103f,101f,115f,120f,117f,111f,114f,107f,109f,121f,
+        202f,157f,130f,127f,125f,121f,120f,114f,110f,117f,139f,144f,136f,130f,133f,128f,129f,135f,
+        209f,161f,     139f,137f,138f,137f,135f,134f,134f,135f,135f,133f,133f,133f,131f,129f,131f,
+                  128f,126f,120f,119f,116f,115f,112f,121f,142f,142f,135f,141f,135f,138f,145f,
+        218f,173f,     153f,143f,138f,134f,136f,135f,135f,136f,139f,140f,140f,  0f,139f,159f,141f,
+                  140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
+    };
+
+    /**Rayon covalent de lien triple*/
+    private static final float[] rayonsCovalents3 = {
+          0f,                                                                                  0f,
+          0f, 85f,                                                   73f, 60f, 54f, 53f, 53f,  0f,
+          0f,127f,                                                  111f,102f, 94f, 95f, 93f, 96f,
+          0f,133f,114f,108f,106f,103f,103f,102f, 96f,101f,120f,  0f,121f,114f,106f,107f,110f,108f,
+          0f,139f,124f,121f,116f,113f,110f,103f,106f,112f,137f,  0f,146f,132f,127f,121f,125f,122f,
+          0f,149f,     139f,131f,128f,  0f,  0f,  0f,  0f,132f,  0f,  0f,  0f,  0f,  0f,  0f,131f,
+                  122f,119f,115f,110f,109f,107f,110f,123f,  0f,150f,137f,135f,129f,138f,133f,
+          0f,159f,     140f,136f,129f,118f,116f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,  0f,
+                  131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
+    };
+
+    /**Constante d'écran utilisé dans le calcul de la charge effective de l'atome.*/
+    private final double ConstanteÉcran[] = {
+        0.000,                                                                                                0.300,
+        1.700,2.050,                                                            2.400,2.750,3.100,3.450,3.800,4.2515,
+        8.800,9.150,                                                            9.500,9.850,10.20,10.55,10.90,11.25,
+        16.80,17.15,18.00,18.85,19.70,20.55,21.40,22.25,23.10,23.95,24.80,25.65,26.00,26.35,26.70,27.05,27.40,27.75,
+        34.80,35.15,36.00,36.85,37.70,38.55,39.40,40.25,41.10,41.95,42.80,43.65,44.00,44.35,44.70,45.05,45.40,45.75,
+        52.80,53.15,      53.50,53.85,54.20,54.55,54.90,55.25,55.60,55.95,56.30,56.65,57.00,57.35,57.70,58.05,58.74,
+                    58.75,59.10,59.45,59.80,60.15,60.50,60.85,61.20,61.55,76.00,76.35,76.70,77.05,77.4,77.75,
+        84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
+    };
+    
+    /**Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.*/
+    private static final double Radii [] = {
+        0.5292,                                                                                                                0.3113,
+        1.6283,1.08550,                                                                     0.8141,0.6513,0.5428,0.4652,0.4071,0.3676,
+        2.1650,1.67110,                                                                     1.3608,1.1477,0.9922,0.8739,0.7808,0.7056,
+        3.2930,2.5419,2.4149,2.2998,2.1953,2.1000,2.0124,1.9319,1.8575,1.7888,1.7250,1.6654,1.4489,1.2823,1.1450,1.0424,0.9532,0.8782,
+        3.8487,2.9709,2.8224,2.6880,2.5658,2.4543,2.3520,2.2579,2.1711,2.0907,2.0160,1.9465,1.6934,1.4986,1.3440,1.2183,1.1141,1.0263,
+        4.2433,3.2753,       2.6673,2.2494,1.9447,1.7129,1.5303,1.3830,1.2615,1.1596,1.0730,0.9984,0.9335,0.8765,0.8261,0.7812,0.7409,
+                      0.7056,0.6716,0.6416,0.6141,0.5890,0.5657,0.5443,0.5244,0.5060,1.8670,1.6523,1.4818,1.3431,1.2283,1.1315,
+        4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
+    };
+
+    /**Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par convPolar pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)*/
+    private static final double Polarisabilité[] = {
+        4.50,                                                                               1.38,
+        164,37.7,                                                  20.5,11.3, 7.4, 5.3,3.74,2.66,
+        163,71.2,                                                  57.8,37.3,  25,19.4,14.6,11.1,
+        290, 161,  97, 100,  87,  83,  68,  62,  55,  49,  47,38.7,  50,  40,  30,  29,  21,16.8,
+        320, 197, 162, 112,  98,  87,  79,  72,  66,26.1,  55,  46,  65,  53,  43,  38,32.9,27.3,
+        401, 272,      215, 205, 216, 208, 200, 192, 184, 158, 170, 165, 156, 150, 144, 139,
+                  137, 103,  74,  68,  62,  57,  54,  48,  36,33.9,  50,  47,  48,  44,  42,  35,
+        318, 246,      203, 217, 154, 129, 151, 132, 131, 144, 125, 122, 118, 113, 109, 110,
+                  320, 112,  42,  40,  38,  36,  34,  32,  32,  28,  29,  31,  71,   0,  76,  58
+    };
+    //TODO #29 vérifier si convPolar est en m ou en Å
+    /**Facteur multiplicateur pour convertir la polarisabilité d'unités atomiques vers des unitées agnstromiennes */
+    private static final double convPolar = 1.64986832*Math.pow(10.0,-41.0);
+
+    /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.*/
+    private static final double[][] ConstanteDeForce = {
+      //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,  Mg,  Al,  Si,   P,   S,  Cl,  Ar
+        {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,   0,   0,   0,3.22,4.26,5.16,   0},//H
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//He
+        {1.03,   0,0.26,   0,   0,   0,   0,   0,2.50,   0,0.21,   0,   0,   0,   0,   0,1.43,   0},//Li
+        {2.27,   0,   0,   0,   0,   0,   0,7.51,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Be
+        {3.05,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//B
+        {5.27,   0,   0,   0,   0,8.36,14.6,14.2,6.57,   0,   0,   0,   0,   0,7.83,7.94,3.80,   0},//C
+        {5.97,   0,   0,   0,   0,14.6,20.8,27.7,   0,   0,   0,   0,   0,   0,5.56,   0,   0,   0},//N
+        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0,   0,3.48,   0,9.24,9.45,9.32,   0,   0},//O
+        {9.66,   0,2.50,   0,   0,6.57,   0,   0,4.70,   0,1.76,   0,   0,4.90,   0,   0,4.48,   0},//F
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ne
+        {0.78,   0,0.21,   0,   0,   0,   0,   0,1.76,   0,0.17,   0,   0,   0,   0,   0,1.09,   0},//Na
+        {   0,   0,   0,   0,   0,   0,   0,3.48,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Mg
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Al
+        {   0,   0,   0,   0,   0,   0,   0,9.24,4.90,   0,   0,   0,   0,2.15,   0,   0,2.63,   0},//Si
+        {3.22,   0,   0,   0,   0,7.83,5.56,9.45,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//P
+        {4.26,   0,   0,   0,   0,7.94,   0,9.32,   0,   0,   0,   0,   0,   0,   0,4.96,   0,   0},//S
+        {5.16,   0,1.43,   0,   0,3.80,   0,   0,4.48,   0,1.09,   0,   0,2.63,   0,   0,3.23,   0},//Cl
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ar
+    };
+
+    private static boolean initialiséListes = false; //Indique si les listes de données ci-dessous ont été initialisées.
+    /**Fréquence fondamentale de vibration rotative d'un trio de 3 liens en cm^-1. 
+     * Pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b>a</b> représente le nombre de proton de l'atome central et <b>b,c</b>, 
+     * le nombre de protons des atomes d'extrémités; l'ordre est sans importance. La case 18 est réservées pour les doublets électroniques. */
+    private static final double[][][] fréquenceTorsion = new double[19][19][19];
+    /**Données de fréquenceTorsion. Utilisé pour compacter l'espace de stockage nécessaire. 
+     * Organisé ainsi : pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b><code> fréquenceTorsionDonnées[d][] = {f,a,b,c}</code></b>, où <b>f</b> est 
+     * la valeur de fréquenceTorsion à <b>[a][b][c]</b> et où <b>a</b> représente le nombre de protons de l'atome central
+     * et <b>b,c</b>, le nombre de protons des atomes d'extrémités; l'ordre est sans importance.*/
+    private static final double[][] fréquenceTorsionDonnées = {
+        //TODO #30 vérifier que les valeurs dans fréquenceTorsionDonnées
+        { 667, 6, 8, 8},/*CO2 */          { 962, 6, 1, 1},/*CH2 */          { 520, 7, 9, 8},//FNO
+        { 397, 6,16,16},/*CS2 GO*/        { 667, 6, 9, 9},/*CF2 */          { 332, 7,17, 8},//ClNO
+        {  63, 6, 6, 6},/*C3  */          { 333, 6,17,17},/*CCl2*/          //{ 266, 7},//BrNO
+        { 321, 7, 6, 6},/*CNC Lavalin*/   { 990,14, 1, 1},/*SiH2*/          {1419, 7, 1, 9},//HNF 
+        { 423, 6, 7, 7},/*NCN */          { 345,14, 9, 9},/*SiF2*/          {1501, 7, 1, 8},//HNO 
+        { 447, 5, 8, 8},/*BO2mages*/      /*{??}SiCl2*/                     { 886, 8, 1, 9},//HOF 
+        { 120, 5,16,16},/*BS2 */          { 712, 6, 1, 7},/*HCN HNL*/       {1242, 8, 1,17},//HOCl
+        {1595, 8, 1, 1},/*H2O */          { 451, 6, 9, 7},/*FCN */          {1392, 8, 1, 8},//HOO HAA
+        { 461, 8, 9, 9},/*F2O */          { 378, 6,17, 7},/*ClCN*/          { 376, 8, 9, 8},//FOO BAR TUTU & WIBBLE
+        { 296, 8,17,17},/*Cl2O*/          { 230, 6, 6, 7},/*CCN NCC*/       //{??},//ClOO
+        { 701, 8, 8, 8},/*O3  */          { 379, 6, 6, 8},/*CCO CAA*/       {1063,16, 1, 8},//HSO
+        {1183,16, 1, 1},/*H2S */          {1081, 6, 1, 8},/*HCO */          { 366,16, 7, 9},//NSF NHL
+        { 357,16, 9, 9},/*SF2 */          /*{??},/*HCC_         */          { 273,16, 7,17},//NSCl
+        { 208,16,17,17},/*SCl2*/          { 520, 6, 8,16},/*OCS */          {1407, 6, 1, 9},//HCF_
+        { 518,16, 8, 8},/*SO2 secours*/   { 535, 6, 7, 8},/*NCO */          {1201, 6, 1,17},//HCCl
+        /*{1034,34,1,1},H2Se*/            { 589, 7, 7, 8},/*NNO */          {1201, 6, 1,17},//HCCl
+        {1497, 7, 1, 1},/*NH2 */          /*{??},/*HNB_*/                   { 860,14, 1, 9},//HSiF
+        { 750, 7, 8, 8},/*NO2 */          /*{??},/*HNC_*/                   { 808,14, 1,17},//HSiCl
+        { 573, 7, 9, 9},/*NF2 */          { 523, 7, 1,14},/*HNSi*/          { 992,15, 1, 1},//PH2 (!)
+        { 445,17, 8, 8},/*ClO2 et martin*/{ 754, 5, 1, 8},/*HBO Max*/       { 487,15, 9, 9},//PF2 (!)
+        { 404, 5,17, 8},/*ClBO*/          { 500, 5, 9, 8},/*FBO min*/       { 252,15,17,17},//PCl2 (!)
+        { 498, 5, 9, 9},/*BF2 (!)*/       {1500, 6, 6, 1},/*HCC (!)*/       { 584, 6, 9, 8},//FCO (!)
+        { 285, 6,17, 8},/*ClCO (!)*/      { 568, 7, 8, 9},/*|ONF| (!)*/     { 370, 7, 8,17},//ONCl (!)
+    };
+
+
+
+
+
+
+
 }
