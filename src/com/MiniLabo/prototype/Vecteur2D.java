@@ -25,6 +25,15 @@ public class Vecteur2D {
         this.y = xy;
     }
 
+     /**
+     * Créé un nouveau vecteur en clonant le vecteur clone
+     * @param clone
+     */
+    public Vecteur2D(Vecteur2D clone){
+        this.x = clone.x;
+        this.y = clone.y;
+    }
+
     /**
      * Créé un nouveau vecteur à partir de composantes polaires
      * @param angle - Angle selon l'angle conventionel
