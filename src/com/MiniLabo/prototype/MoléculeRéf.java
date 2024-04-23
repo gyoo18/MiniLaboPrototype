@@ -520,4 +520,44 @@ public class MoléculeRéf extends Molécule{
         return C2H6;
     }
 
+    public static MoléculeRéf avoirH2(){
+        MoléculeRéf mol = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome H1 = new Atome(1);    //Créer et donner un nom à chaque atome.
+        H1.position = new Vecteur3D(-0.32,0,0);//Donner une position à chaque atome. Elle serat relative au centre de la molécule.
+        Atome H2 = new Atome(1);    //Créer et donner un nom à chaque atome.
+        H2.position = new Vecteur3D(0.32,0,0);//Donner une position à chaque atome. Elle serat relative au centre de la molécule.
+
+        //Ajouter chaque atome à la molécule
+        mol.ajouterAtome(H1);
+        mol.ajouterAtome(H2);
+
+        //Ne pas changer
+        for (int i = 0; i < mol.Atomes.size(); i++) {
+            mol.Atomes.get(i).indexe = i; //Donne un indexe à chaque atome
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement; //Modifie temporairement la référence à
+        Atome.MettreÀJourEnvironnement(mol.Atomes);           //l'environnement pour détecter la résonance
+        MiseÀJourEnvironnement(mol.Atomes);
+
+        //Créer les liens entre chaque atome
+        H1.créerLien(1, 0, 0, 1, false);
+
+        //Ne pas changer
+        mol.évaluerSystèmesConjugués(); //Détecte la résonance
+        mol.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        mol.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        mol.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return mol; //Renvoie la molécule
+    }
+
 }
