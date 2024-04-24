@@ -48,8 +48,8 @@ public class App {
         ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
         ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
-        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op(); //Molécule de base
-        MoléculeRéf OHm = MoléculeRéf.avoirOHm(); 
+         //Molécule de base
+    
         MoléculeRéf H2O = MoléculeRéf.avoirC2H6();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();

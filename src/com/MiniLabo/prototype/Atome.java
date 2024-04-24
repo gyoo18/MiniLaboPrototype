@@ -45,11 +45,11 @@ public class Atome{
     private int[] cases;
 
     public static boolean[] ListForce = {
-        false, //Force Paulie
-        false, //Force Vanderval
-        false, //Force électrique
+        true, //Force Paulie
+        true, //Force Vanderval
+        true, //Force électrique
         true, //Force de Morse
-        false, //Force de Torsion
+        true, //Force de Torsion
         true, //Force Diedre
         
 
@@ -509,21 +509,33 @@ public class Atome{
         return Vecteur3D.mult(lDir, D0*Kij); //Appliquer force au doublet
     }
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
-        double ConstanteDeForce=1000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
+        double ConstanteDeForce=10*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
         double ConstanteDangle=0;
+        double sens = 1;
         Vecteur3D PlaniAj= new Vecteur3D( Vecteur3D.croix(Vecteur3D.sous(Aj.position ,A.position), Vecteur3D.sous(Ai.position,A.position)));
         Vecteur3D PlanAjk= new Vecteur3D( Vecteur3D.croix(Vecteur3D.sous(Aj.position ,A.position ), Vecteur3D.sous(Ak.position ,Aj.position)));
+        
+        if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)>0 ){
+            sens=+1;
+        }
+        if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)<0 ){
+            sens=-1;
+           
+        }
+        if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)==0 ){
+            sens=0;
+        }
+        Vecteur3D direction = new Vecteur3D(Vecteur3D.mult(Vecteur3D.norm(PlaniAj),sens));
         double iAjxAjk = Vecteur3D.scal(Vecteur3D.norm(PlaniAj),Vecteur3D.norm(PlanAjk));
         double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
 
-        double FDiedre = ConstanteDeForce*(Angle - ConstanteDangle );
-        double FDiedre2 = ConstanteDeForce*-Math.sin(Angle - ConstanteDangle );
-
+        double FDiedre = ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
+        
         /* if (Double.isNaN(FDiedre)){
             FDiedre=0;
         } */
-       return ( Vecteur3D.mult(Vecteur3D.norm(PlaniAj), FDiedre2 ));
-
+       return ( Vecteur3D.mult(direction, FDiedre ));
+       
     }
 
     /**Applique des contraintes de mouvement, comme des bords de domaines.*/

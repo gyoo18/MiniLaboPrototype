@@ -207,6 +207,20 @@ public class Vecteur3D {
     public static Vecteur3D croix(Vecteur3D a, Vecteur3D b){
         return new Vecteur3D(a.y*b.z - a.z*b.y, a.x*b.z - a.z*b.x, a.x*b.y - a.y*b.x);
     }
+    /**
+     * Renvoi le produit mixte entre les vecteur a, b et c
+     * @param a  
+     * @param b
+     * @param c
+     * @return a•(b^c)
+     */
+    /* |ax ay az|
+     * |bx by bz|     |by bz|     |bx bz|     |bx by|
+     * |cx cy cz| = ax|cy cz| + ay|cx cz| + az|cx cy| = ax(by*cz-bz*cy) + ay(bx*cz-bz*cx) + az(bx*cy-by*cx)
+     * */
+    public static double mixte(Vecteur3D a, Vecteur3D b, Vecteur3D c){
+        return  a.x*(b.y*c.z-b.z*c.y) + a.y*(b.x*c.z-b.z*c.x) + a.z*(b.x*c.y-b.y*c.x);
+    }
 
     /**
      * Retourne le vecteur a normalisé
