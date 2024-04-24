@@ -286,7 +286,7 @@ public class Atome{
             }
             //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
             if(A.liaisonType.get(i)){
-                System.out.println(33);
+                //System.out.println(1450491);
             }
             Atome Ai =Environnement.get(A.liaisonIndexe.get(i));  
             
@@ -302,13 +302,13 @@ public class Atome{
                 }
                 Atome Aj =Environnement.get(A.liaisonIndexe.get(j));
                 for ( int k=0; k < Aj.liaisonIndexe.size(); k++){
-                    if(A.liaisonIndexe.get(k) == -1){
+                    if(Aj.liaisonIndexe.get(k) == -1){
                         continue;
                     }
-                    if(A.liaisonIndexe.get(k) == A.liaisonIndexe.get(j)){
+                    if(Environnement.get(Aj.liaisonIndexe.get(k)) == A){
                         continue;
                     }
-                    Atome Ak =Environnement.get(A.liaisonIndexe.get(k));
+                    Atome Ak =Environnement.get(Aj.liaisonIndexe.get(k));
 
                     Ai.Force.addi(ForceDiedre(Ai, A, Aj, Ak));
                     //System.out.println(V3.distance(ForceDiedre(Ai, A, Aj, Ak),new V3(000)));
@@ -501,14 +501,13 @@ public class Atome{
     }
     
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
-        double ConstanteDeForce=10*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
+        double ConstanteDeForce=1000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
         double ConstanteDangle=0;
         double sens = 1;
         Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
         Vecteur3D PlanAjk= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position ), V3.sous(Ak.position ,Aj.position)));
-        
         if(Vecteur3D.mixte(PlaniAj, V3.sous(Aj.position ,A.position ), PlanAjk)>0 ){
-            sens=+1;
+            sens=1;
         }
         if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)<0 ){
             sens=-1;
@@ -517,11 +516,13 @@ public class Atome{
         if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)==0 ){
             sens=0;
         }
-        Vecteur3D direction = new Vecteur3D(Vecteur3D.mult(Vecteur3D.norm(PlaniAj),sens));
+        Vecteur3D direction = new Vecteur3D(Vecteur3D.norm(PlaniAj));
         double iAjxAjk = V3.scal(V3.norm(PlaniAj),V3.norm(PlanAjk));
         double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
 
-        double FDiedre = ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
+        //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
+        //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
+        double FDiedre = sens*ConstanteDeForce*((Math.PI-Angle));
         
         /* if (Double.isNaN(FDiedre)){
             FDiedre=0;
@@ -959,7 +960,7 @@ public class Atome{
                         retirerÉlectron();   //Doublet se transforme en 2 electron , qui
                         évaluerValence();
                         APrime.évaluerValence();    //ÉvaluerValence pour reprend / perde ses doubletts
-                        System.out.println(APrime.NP);
+                        //System.out.println(APrime.NP);
                         ForceSimoideDoublets += 0;
                         
                         }
@@ -968,9 +969,10 @@ public class Atome{
         
             }
         }
-
+        
         systèmesConjugués = molécule.obtenirSystèmesConjugués(indexe);
         évaluerRésonance();
+        
 
     }
     

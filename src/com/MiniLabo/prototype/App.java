@@ -70,7 +70,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 1;  //Nombre de molécules voulus
+        int NbMolécules = 15;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -131,7 +131,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-18.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-19.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -167,18 +167,18 @@ public class App {
 
             
             mailman++;
-            if (mailman ==1000){
+            if (mailman ==100){
 
                 mailman =0;
-                System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C");
+                System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
 
 
-             //Statistiques sur la vitesse de la simulation
-             //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+              //Statistiques sur la vitesse de la simulation
+             // System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
             
 
 
-                énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
+               // énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             
             }
 

@@ -84,7 +84,7 @@ public class Molécule {
             MiseÀJourPos(); //Recalculer la position relative de chaque atome.
             évaluerFormuleChimique(); //Mettre à jour la formule chimique
         }else{
-            System.out.println("Ne peut pas fusionner la même molécule.");
+    //        System.out.println("Ne peut pas fusionner la même molécule.");
         }
     }
 
