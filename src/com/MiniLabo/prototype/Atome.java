@@ -225,7 +225,7 @@ public class Atome{
                 A.Force.addi( ForceDeMorse(dist, dir, liaisonOrdre, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP) ); //Appliquer la force de Morse
             }
             
-
+            //si force torsion
             if (ListForce[4]){
                 //Appliquer la force de torsion avec tout les autres liens //TODO #31 FOrce torsion weird
                 for(int j = 0; j < A.liaisonIndexe.size(); j++){
@@ -241,8 +241,10 @@ public class Atome{
                     
                     Vecteur3D Force = ForceTorsion(IAxe, JAxe, Environnement.get(A.liaisonIndexe.get(i)).m, Environnement.get(A.liaisonIndexe.get(j)).m, nLiens, A.doublets, A.NP, Environnement.get(A.liaisonIndexe.get(i)).NP, Environnement.get(A.liaisonIndexe.get(j)).NP);
                     
+                    
                     Atome.Environnement.get(A.liaisonIndexe.get(i)).Force.addi(Force); //Appliquer force de torsion à IA
-                    A.forceDoublet.get(j).addi(Force.opposé()); //Appliquer force au doublet
+                    //A.forceDoublet.get(j).addi(Force.opposé()); //Appliquer force au doublet
+                    
                 }
 
                 //Torsion Atome-Doublet
@@ -460,7 +462,8 @@ public class Atome{
     private static Vecteur3D ForceTorsion(Vecteur3D IAxe, Vecteur3D JAxe, double mA, double mB, int NBLiens, int NBDoublets, int X, int Y, int Z){
         Vecteur3D lDir = Vecteur3D.sous( IAxe, JAxe); //Vecteur direction entre les deux doublets
 
-        double angle = Math.acos(V3.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur())); //Angle entre I et J (les deux vecteurs sont normés)
+        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(IAxe), V3.norm(JAxe)),-1),1)); //Angle entre I et J (les deux vecteurs sont normés)
+        
         double angle0; //Angle à l'équilibre entre I et J
 
         //TODO #6 Vincent faire distinction s'il y a des doublets électroniques

@@ -128,6 +128,7 @@ public class App {
         }
         
         //Simulation
+        double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt = 3.0*Math.pow(10.0,-18.0);     //Delta temps de la simulation
@@ -147,6 +148,9 @@ public class App {
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
                 temps += dt;
                 T += Atome.Température(Hs);
+                
+                    
+                
             }
 
             //Affichage de la simulation
@@ -161,16 +165,28 @@ public class App {
                 }
             }
 
+            
+            mailman++;
+            if (mailman ==1000){
+
+                mailman =0;
+                System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C");
+
+
+             //Statistiques sur la vitesse de la simulation
+             //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+            
+
+
+                énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
+            
+            }
+
             //Dessiner les atomes dans l'ordre
             for (int i = 0; i < indexe.size(); i++) {
                 DessinerAtome(Hs.get(indexe.get(i)), Hs);
             }
             
-            //Statistiques sur la vitesse de la simulation
-            //System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-            System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C");
-
-            //énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
             //try {Thread.sleep(300);} catch (Exception e) {}
         }
