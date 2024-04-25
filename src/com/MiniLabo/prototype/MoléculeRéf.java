@@ -469,13 +469,21 @@ public class MoléculeRéf extends Molécule{
         Atome C1 = new Atome(6);
         Atome H1 = new Atome(1);
         H1.position = new Vecteur3D(0.49,-0.7,0.49);
+        //H1.position = new Vecteur3D(0.49,0.49,-0.7);
+        //H1.position = new Vecteur3D(-0.7,0.49,0.49);
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(0,-0.7,0.7);
+        H2.position = new Vecteur3D(0,-0.7,-0.7);
+        //H2.position = new Vecteur3D(0,-0.7,-0.7);
+        //H2.position = new Vecteur3D(-0.7,-0.7,0);
         Atome H3 = new Atome(1);
         H3.position = new Vecteur3D(-0.49,-0.7,0.49);
+        //H3.position = new Vecteur3D(-0.49,0.49,-0.7);
+        //H3.position = new Vecteur3D(-0.7,0.49,-0.49);
 
         Atome C2 = new Atome(6);
         C2.position = new Vecteur3D(0,1.7,0);
+        //C2.position = new Vecteur3D(0,0,1.7);
+        //C2.position = new Vecteur3D(1.7,0,0);
         Atome H4 = new Atome(1);
         H4.position= Vecteur3D.addi(Vecteur3D.mult(H1.position, -1),C2.position);
         Atome H5 = new Atome(1);
@@ -500,13 +508,13 @@ public class MoléculeRéf extends Molécule{
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(C2H6.Atomes);
         MiseÀJourEnvironnement(C2H6.Atomes);
-        //C1.créerLien(H1.indexe, 0, 0, 1, false);
-        //C1.créerLien(H2.indexe, 1, 0, 1, false);
-        //C1.créerLien(H3.indexe, 2, 0, 1, false);
-       // C1.créerLien(C2.indexe, 3, 0, 1, false);
-       // C2.créerLien(H4.indexe, 1, 0, 1, false);
-        //C2.créerLien(H5.indexe, 2, 0, 1, false);
-       // C2.créerLien(H6.indexe, 3, 0, 1, false);
+        C1.créerLien(H1.indexe, 0, 0, 1, false);
+        C1.créerLien(H2.indexe, 1, 0, 1, false);
+        C1.créerLien(H3.indexe, 2, 0, 1, false);
+        C1.créerLien(C2.indexe, 3, 0, 1, false);
+        C2.créerLien(H4.indexe, 1, 0, 1, false);
+        C2.créerLien(H5.indexe, 2, 0, 1, false);
+        C2.créerLien(H6.indexe, 3, 0, 1, false);
 
         C2H6.évaluerSystèmesConjugués();
         C2H6.initialiserDoublets();

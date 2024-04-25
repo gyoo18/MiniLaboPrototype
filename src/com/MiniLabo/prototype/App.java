@@ -70,7 +70,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 15;  //Nombre de molécules voulus
+        int NbMolécules = 5;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -131,7 +131,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-19.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-20);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -168,7 +168,7 @@ public class App {
             
             mailman++;
             if (mailman ==100){
-
+                
                 mailman =0;
                 System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
 
@@ -358,6 +358,13 @@ public class App {
                 g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             }
         }
+        //Dessiner force resultante
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.norm(A.Force),A.position);
+        double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+        g.setStroke(new BasicStroke());
+        g.setColor(Color.WHITE);       //Couleur de la force
+        g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+
     }
 
     /**
