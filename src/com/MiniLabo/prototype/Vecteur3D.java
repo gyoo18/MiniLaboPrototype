@@ -202,7 +202,7 @@ public class Vecteur3D {
      */
     /* |i  j  k |
      * |ax ay az|    |ay az|    |ax az|    |ax ay|
-     * |bx by bz| = i|by bz| + j|bx bz| + k|bx by| = i(ay*bz-az*by) + j(ax*bz-az*bx) + k(ax*by-ay*bx)
+     * |bx by bz| = i|by bz| - j|bx bz| + k|bx by| = i(ay*bz-az*by) - j(ax*bz-az*bx) + k(ax*by-ay*bx)
      * */
     public static Vecteur3D croix(Vecteur3D a, Vecteur3D b){
         return new Vecteur3D(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);

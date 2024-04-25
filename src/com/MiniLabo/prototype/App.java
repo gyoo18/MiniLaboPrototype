@@ -50,7 +50,9 @@ public class App {
 
          //Molécule de base
     
-        MoléculeRéf H2O = MoléculeRéf.avoirC2H6();
+        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
+        MoléculeRéf OHm = MoléculeRéf.avoirOHm();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +72,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 5;  //Nombre de molécules voulus
+        int NbMolécules = 20;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -80,11 +82,16 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
             MoléculeRéf mol = H2O;
-              /*  if (Math.random() <0.5) {
-                    mol = CH4; //Molécule à ajouter dans la simulation
+                if (Math.random() <0.5) {
+        
+                    if (Math.random() <0.5) {
+                        mol = H3Op; //Molécule à ajouter dans la simulation
+                    } else {
+                        mol = OHm;
+                    } 
                 } else {
-                    mol = CH2;
-                }   */
+                    mol = H2O;
+                }   
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -131,7 +138,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-20);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-18);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -359,7 +366,7 @@ public class App {
             }
         }
         //Dessiner force resultante
-        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.norm(A.Force),A.position);
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(A.Force.longueur()+1)),A.position);
         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
         g.setStroke(new BasicStroke());
         g.setColor(Color.WHITE);       //Couleur de la force
