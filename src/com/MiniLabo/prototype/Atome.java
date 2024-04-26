@@ -142,7 +142,18 @@ public class Atome{
                     }
                     
                     if (ListForce[2]){
-                        A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                        boolean voisin=false;
+                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                            
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                             voisin=true;   
+                                
+                            }
+                        }
+                        if (!voisin){
+                            A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                        }
+                        
                     }
                     
                 }
@@ -157,7 +168,17 @@ public class Atome{
                     }
                     
                     if (ListForce[2]){
-                        A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                        boolean voisin=false;
+                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                            
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                             voisin=true;   
+                                
+                            }
+                        }
+                        if (!voisin){
+                            A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                        }
                     }
                   
 
@@ -183,10 +204,10 @@ public class Atome{
                 //Si On regarde le même doublet, passer au prochain
                 if(k==j){continue;}
 
-                Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre atome (A')
-                double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et A'
+                Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre doublet
+                double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et lautre doublet
                 if (ListForce[2]){
-                    A.forceDoublet.get(j).addi( ForceÉlectrique(-2, -2, eDist, eDir)); //Appliquer la force électrique     
+                    A.forceDoublet.get(j).addi( ForceÉlectrique(-2, -2, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
                 }
                 
             }
@@ -317,11 +338,11 @@ public class Atome{
          }
         }
 
-        double ModuleFriction = -0.0000000000001;
+        double ModuleFriction = -0.000000000000001;
         //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+           // A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
@@ -337,8 +358,8 @@ public class Atome{
                 Sin0 = 0;
                 aT = new Vecteur3D(0);
             }
-            //A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
-            //A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
+            A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
     }
     /**
@@ -440,12 +461,13 @@ public class Atome{
     private static Vecteur3D ForceDeMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
         double l = 0; //Longueur de liaison
         if(nLiaisons == 1){
-            l = rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]; //Longueur d'ordre 1
+            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
         }else if(nLiaisons == 2){
-            l = rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]; //Longueur d'ordre 2
+            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*86/100; //Longueur d'ordre 2
         }else if(nLiaisons == 3){
-            l = rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1];  //Longueur d'ordre 3;
+            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*78/100;  //Longueur d'ordre 3;
         }
+
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = 40000.0*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
@@ -542,7 +564,7 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -600,7 +622,7 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -658,7 +680,7 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -715,7 +737,7 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -734,7 +756,6 @@ public class Atome{
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
         double ConstanteDeForce=100000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
-        double ConstanteDangle=0;
         double sens = 1;
         Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
         Vecteur3D PlanAjk= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position ), V3.sous(Ak.position ,Aj.position)));
@@ -755,7 +776,7 @@ public class Atome{
         double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
         //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
         //double FDiedre = sens*ConstanteDeForce*((Math.PI-Angle));
-        
+       // double FDiedre = sens*ConstanteDeForce*2*((Angle)) / ( 4*Math.pow(Math.PI,2) )*(1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) );
         /* if (Double.isNaN(FDiedre)){
             FDiedre=0;
         } */
@@ -1211,7 +1232,7 @@ public class Atome{
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
     }
-    private double forceSigmoide = 5.0;
+    private double forceSigmoide = 5;
 
     /**
      * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>
