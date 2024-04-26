@@ -144,7 +144,9 @@ public class Atome{
                     if (ListForce[2]){
                         boolean voisin=false;
                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                            
+                            if(A.liaisonIndexe.get(i1)==-1){
+                                continue;
+                            }
                             if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
                              voisin=true;   
                                 
@@ -170,10 +172,12 @@ public class Atome{
                     if (ListForce[2]){
                         boolean voisin=false;
                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                            
+                            if(A.liaisonIndexe.get(i1)==-1){
+                                continue;
+                            }
                             if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
                              voisin=true;   
-                                
+                            
                             }
                         }
                         if (!voisin){
@@ -1358,7 +1362,7 @@ public class Atome{
         double Ek = 0.0;
         for (int i = 0; i < A.size(); i++) {
             v1 += A.get(i).vélocité.longueur();
-            Ek += Math.pow(A.get(i).vélocité.longueur(),2.0)*A.get(i).m*0.5;
+            Ek += Math.pow(A.get(i).vélocité.longueur()*Math.pow(10,-0),2.0)*A.get(i).m*0.5;
         }
         v1 = v1/(double)A.size();
         Ek = Ek/A.size();
@@ -1367,7 +1371,7 @@ public class Atome{
     }
 
     public static double TempératureEnVitesse(double T, double m){
-        return Math.sqrt(3.0*kB*T/m);
+        return Math.sqrt(3.0*kB*T*Math.pow(10, 0)/m);
     }
 
     /**

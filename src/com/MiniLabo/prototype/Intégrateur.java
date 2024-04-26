@@ -192,9 +192,6 @@ public class Intégrateur {
         }
 
         for (Atome o : O) {
-            if(Double.isNaN(o.Force.longueur())){
-
-            }
             Atome.ÉvaluerForces(o);
             o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.m)));
 
