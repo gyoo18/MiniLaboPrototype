@@ -579,4 +579,126 @@ public class MoléculeRéf extends Molécule{
         return mol; //Renvoie la molécule
     }
 
+    public static MoléculeRéf avoirHCl(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf HCl = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome H = new Atome(1);    
+        H.position = new Vecteur3D(0,0,0);
+        Atome Cl = new Atome(17);    
+        Cl.position = new Vecteur3D(1,0,0);
+
+        //Ajouter chaque atome à la molécule
+        HCl.ajouterAtome(H);
+        HCl.ajouterAtome(Cl);
+
+        //Ne pas changer
+        for (int i = 0; i < HCl.Atomes.size(); i++) {
+            HCl.Atomes.get(i).indexe = i;
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(HCl.Atomes);           
+        MiseÀJourEnvironnement(HCl.Atomes);
+
+        //Créer les liens entre chaque atome
+        H.créerLien(Cl.indexe, 0, 0, 1, false);
+
+        //Ne pas changer
+        HCl.évaluerSystèmesConjugués(); //Détecte la résonance
+        HCl.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        HCl.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        HCl.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return HCl; //Renvoie la molécule
+    }
+
+    public static MoléculeRéf avoirCl2(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf Cl2 = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome ClA = new Atome(17);    
+        ClA.position = new Vecteur3D(0,0,0);
+        Atome ClB = new Atome(17);    
+        ClB.position = new Vecteur3D(1,0,0);
+
+        //Ajouter chaque atome à la molécule
+        Cl2.ajouterAtome(ClA);
+        Cl2.ajouterAtome(ClB);
+
+        //Ne pas changer
+        for (int i = 0; i < Cl2.Atomes.size(); i++) {
+            Cl2.Atomes.get(i).indexe = i;
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(Cl2.Atomes);           
+        MiseÀJourEnvironnement(Cl2.Atomes);
+
+        //Créer les liens entre chaque atome
+        ClA.créerLien(ClB.indexe, 0, 0, 1, false);
+
+        //Ne pas changer
+        Cl2.évaluerSystèmesConjugués(); //Détecte la résonance
+        Cl2.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        Cl2.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        Cl2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return Cl2; //Renvoie la molécule
+    }
+
+    public static MoléculeRéf avoirCl2(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf Cl2 = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome ClA = new Atome(17);    
+        ClA.position = new Vecteur3D(0,0,0);
+        Atome ClB = new Atome(17);    
+        ClB.position = new Vecteur3D(1,0,0);
+
+        //Ajouter chaque atome à la molécule
+        Cl2.ajouterAtome(ClA);
+        Cl2.ajouterAtome(ClB);
+
+        //Ne pas changer
+        for (int i = 0; i < Cl2.Atomes.size(); i++) {
+            Cl2.Atomes.get(i).indexe = i;
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(Cl2.Atomes);           
+        MiseÀJourEnvironnement(Cl2.Atomes);
+
+        //Créer les liens entre chaque atome
+        ClA.créerLien(ClB.indexe, 0, 0, 1, false);
+
+        //Ne pas changer
+        Cl2.évaluerSystèmesConjugués(); //Détecte la résonance
+        Cl2.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        Cl2.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        Cl2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return Cl2; //Renvoie la molécule
+    }
 }
