@@ -230,6 +230,45 @@ public class MoléculeRéf extends Molécule{
         return H3Op;
     }
 
+
+    public static MoléculeRéf avoirNaOH(){
+        MoléculeRéf NaOH = new MoléculeRéf();
+
+        Atome Na = new Atome(11);
+        Atome O = new Atome(8);
+        Atome H = new Atome(1);
+
+        Na.position = new Vecteur3D(0);
+        O.position = new Vecteur3D(2.1,0,0);
+        H.position = new Vecteur3D(V3.addi(O.position,new V3(0.7,0.7,0)));
+
+        NaOH.ajouterAtome(Na);
+        NaOH.ajouterAtome(O);
+        NaOH.ajouterAtome(H);
+
+        for (int i = 0; i < NaOH.Atomes.size(); i++) {
+            NaOH.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(NaOH.Atomes);
+        MiseÀJourEnvironnement(NaOH.Atomes);
+        Na.créerLien(1, 0, 0, 1, false);
+        O.créerLien(2, 1, 0, 1, false);
+
+        NaOH.évaluerSystèmesConjugués();
+        NaOH.initialiserDoublets();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        NaOH.calculerBEAA();
+        NaOH.MiseÀJourPos();
+
+        return NaOH;
+    }
+
+
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
 
@@ -537,6 +576,67 @@ public class MoléculeRéf extends Molécule{
         C2H6.MiseÀJourPos();
 
         return C2H6;
+    }
+
+
+    public static MoléculeRéf avoirC2H4(){
+        MoléculeRéf C2H4 = new MoléculeRéf();
+
+        Atome C1 = new Atome(6);
+        C1.évaluerValence();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(0.7,-0.7,0);
+        H1.évaluerValence();
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-0.7,-0.7,0);
+        H2.évaluerValence();
+       
+
+        Atome C2 = new Atome(6);
+        C2.position = new Vecteur3D(0,1.54,0);
+        C2.évaluerValence();
+        Atome H3 = new Atome(1);
+       // H3.position = Vecteur3D.addi(new Vecteur3D(0.1,-0.7,0.65),C2.position);
+       H3.position = Vecteur3D.addi(H1.position.opposé(),C2.position);
+        H3.évaluerValence();
+        Atome H4 = new Atome(1);
+       // H4.position = Vecteur3D.addi(new Vecteur3D(-0.1,-0.7,-0.65),C2.position);
+       H4.position = Vecteur3D.addi(H2.position.opposé(),C2.position);
+        H4.évaluerValence();
+        
+        
+
+        C2H4.ajouterAtome(C1);
+        C2H4.ajouterAtome(H1);
+        C2H4.ajouterAtome(H2);
+        C2H4.ajouterAtome(C2);
+        C2H4.ajouterAtome(H3);
+        C2H4.ajouterAtome(H4);
+
+        for (int i = 0; i < C2H4.Atomes.size(); i++) {
+            C2H4.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(C2H4.Atomes);
+        MiseÀJourEnvironnement(C2H4.Atomes);
+        C1.créerLien(H1.indexe, 0, 0, 1, false);
+        C1.créerLien(H2.indexe, 1, 0, 1, false);
+        C1.créerLien(C2.indexe, 2, 0, 2, false);
+        C1.créerLien(C2.indexe, 3, 1, 2, true);
+        C2.créerLien(H3.indexe, 2, 0, 1, false);
+        C2.créerLien(H4.indexe, 3, 0, 1, false);
+
+        C2H4.évaluerSystèmesConjugués();
+        C2H4.initialiserDoublets();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        C2H4.calculerBEAA();
+        C2H4.MiseÀJourPos();
+
+        return C2H4;
     }
 
     public static MoléculeRéf avoirH2(){

@@ -121,7 +121,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(dist < 10*A.rayonCovalent){
+            if(dist < 10*(A.rayonCovalent+APrime.rayonCovalent)){
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -143,7 +143,7 @@ public class Atome{
                     
                     if (ListForce[2]){
                         boolean voisin=false;
-                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                        /* for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
@@ -151,7 +151,7 @@ public class Atome{
                              voisin=true;   
                                 
                             }
-                        }
+                        } */
                         if (!voisin){
                             A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
                         }
@@ -171,7 +171,7 @@ public class Atome{
                     
                     if (ListForce[2]){
                         boolean voisin=false;
-                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                        /* for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
@@ -179,7 +179,7 @@ public class Atome{
                              voisin=true;   
                             
                             }
-                        }
+                        } */
                         if (!voisin){
                             A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
                         }
@@ -342,9 +342,9 @@ public class Atome{
          }
         }
 
-        double ModuleFriction = -0.000000000000001;
+        double ModuleFriction = -0.00000000000001;
         //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
+        A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
            // A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
@@ -465,11 +465,11 @@ public class Atome{
     private static Vecteur3D ForceDeMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
         double l = 0; //Longueur de liaison
         if(nLiaisons == 1){
-            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
+            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
         }else if(nLiaisons == 2){
-            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*86/100; //Longueur d'ordre 2
+            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]));//*(86/100); //Longueur d'ordre 2
         }else if(nLiaisons == 3){
-            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*78/100;  //Longueur d'ordre 3;
+            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]));//*(78/100);  //Longueur d'ordre 3;
         }
 
 
@@ -741,6 +741,8 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
+            
+            double masse = 1.0/((1.0/mA)+(1.0/mB));
             Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
@@ -773,11 +775,33 @@ public class Atome{
         if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)==0 ){
             sens=0;
         }
+        
+        double AngleO=0;
         Vecteur3D direction = new Vecteur3D(Vecteur3D.norm(PlaniAj));
         double iAjxAjk = V3.scal(V3.norm(PlaniAj),V3.norm(PlanAjk));
         double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
+        for (int j=0; j < A.liaisonIndexe.size();j++){
+            if (Environnement.get(A.liaisonIndexe.get(j))==Aj){
+                if (A.liaisonOrdre.get(j)==2){
+                     AngleO=1*Math.PI;
+                     ConstanteDeForce=1000000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
+                     sens=sens*-1;
+                    if (Angle>0.5*Math.PI){
+                        //A.briserLien(j);
+                       // System.out.println(33);
+                    }
+                } else {
+                    AngleO=1*Math.PI;
+                }
+            }
+        }
+        
 
-        double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
+
+       
+        
+        
+        double FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
         //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
         //double FDiedre = sens*ConstanteDeForce*((Math.PI-Angle));
        // double FDiedre = sens*ConstanteDeForce*2*((Angle)) / ( 4*Math.pow(Math.PI,2) )*(1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) );
@@ -1177,13 +1201,23 @@ public class Atome{
                                         if (casesIndexe <= 0){
                                             CasePotVide = 1;
                                         }
-                                        if (0 <casesIndexe && casesIndexe <= 4){
+                                        if (0 <casesIndexe && casesIndexe <= 1){
+                                            CasePotVide = 2;
+                                        }
+                                        if (1 <casesIndexe && casesIndexe <= 4){
                                             CasePotVide = 5;
                                         }
-                                        if (4 < casesIndexe &&casesIndexe <= 8){
+                                        if (4 < casesIndexe &&casesIndexe <= 5){
+                                            CasePotVide = 6;
+                                        }
+
+                                        if (5 < casesIndexe &&casesIndexe <= 8){
                                             CasePotVide = 9;
                                         }
-                                        if (8 <casesIndexe &&casesIndexe <= 13){
+                                        if (8 < casesIndexe &&casesIndexe <= 9){
+                                            CasePotVide = 10;
+                                        }
+                                        if (9 <casesIndexe &&casesIndexe <= 13){
                                             CasePotVide = 14;
                                         }
                                         CaseVide = CasePotVide-casesIndexe-1;
@@ -1236,7 +1270,7 @@ public class Atome{
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
     }
-    private double forceSigmoide = 5;
+    private double forceSigmoide = 5.0;
 
     /**
      * <p>Créé un lien avec l'atome spécifié par indexeAtome.</p>
@@ -1543,25 +1577,25 @@ public class Atome{
 
     /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.*/
     private static final double[][] ConstanteDeForce = {
-      //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,  Mg,  Al,  Si,   P,   S,  Cl,  Ar
-        {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,   0,   0,   0,3.22,4.26,5.16,   0},//H
-        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//He
-        {1.03,   0,0.26,   0,   0,   0,   0,   0,2.50,   0,0.21,   0,   0,   0,   0,   0,1.43,   0},//Li
-        {2.27,   0,   0,   0,   0,   0,   0,7.51,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Be
-        {3.05,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//B
-        {5.27,   0,   0,   0,   0,8.36,14.6,14.2,6.57,   0,   0,   0,   0,   0,7.83,7.94,3.80,   0},//C
-        {5.97,   0,   0,   0,   0,14.6,20.8,27.7,   0,   0,   0,   0,   0,   0,5.56,   0,   0,   0},//N
-        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0,   0,3.48,   0,9.24,9.45,9.32,   0,   0},//O
-        {9.66,   0,2.50,   0,   0,6.57,   0,   0,4.70,   0,1.76,   0,   0,4.90,   0,   0,4.48,   0},//F
-        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ne
-        {0.78,   0,0.21,   0,   0,   0,   0,   0,1.76,   0,0.17,   0,   0,   0,   0,   0,1.09,   0},//Na
-        {   0,   0,   0,   0,   0,   0,   0,3.48,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Mg
-        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Al
-        {   0,   0,   0,   0,   0,   0,   0,9.24,4.90,   0,   0,   0,   0,2.15,   0,   0,2.63,   0},//Si
-        {3.22,   0,   0,   0,   0,7.83,5.56,9.45,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//P
-        {4.26,   0,   0,   0,   0,7.94,   0,9.32,   0,   0,   0,   0,   0,   0,   0,4.96,   0,   0},//S
-        {5.16,   0,1.43,   0,   0,3.80,   0,   0,4.48,   0,1.09,   0,   0,2.63,   0,   0,3.23,   0},//Cl
-        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},//Ar
+      //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,             Mg,  Al,  Si,   P,   S,  Cl,  Ar
+        {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,              0,   0,   0,3.22,4.26,5.16,   0},//H
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//He
+        {1.03,   0,0.26,   0,   0,   0,   0,   0,2.50,   0,0.21,              0,   0,   0,   0,   0,1.43,   0},//Li
+        {2.27,   0,   0,   0,   0,   0,   0,7.51,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Be
+        {3.05,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//B
+        {5.27,   0,   0,   0,   0,8.36,14.6,14.2,6.57,   0,   0,              0,   0,   0,7.83,7.94,3.80,   0},//C
+        {5.97,   0,   0,   0,   0,14.6,20.8,27.7,   0,   0,   0,              0,   0,   0,5.56,   0,   0,   0},//N
+        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0, 1.5, /*pasbon */3.48,   0,9.24,9.45,9.32,   0,   0},//O
+        {9.66,   0,2.50,   0,   0,6.57,   0,   0,4.70,   0,1.76,              0,   0,4.90,   0,   0,4.48,   0},//F
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Ne
+        {0.78,   0,0.21,   0,   0,   0,   0,   1.5/*pas bon*/,1.76,   0,0.17,              0,   0,   0,   0,   0,1.09,   0},//Na
+        {   0,   0,   0,   0,   0,   0,   0,3.48,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Mg
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Al
+        {   0,   0,   0,   0,   0,   0,   0,9.24,4.90,   0,   0,              0,   0,2.15,   0,   0,2.63,   0},//Si
+        {3.22,   0,   0,   0,   0,7.83,5.56,9.45,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//P
+        {4.26,   0,   0,   0,   0,7.94,   0,9.32,   0,   0,   0,              0,   0,   0,   0,4.96,   0,   0},//S
+        {5.16,   0,1.43,   0,   0,3.80,   0,   0,4.48,   0,1.09,              0,   0,2.63,   0,   0,3.23,   0},//Cl
+        {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Ar
     };
 
     private static boolean initialiséListes = false; //Indique si les listes de données ci-dessous ont été initialisées.

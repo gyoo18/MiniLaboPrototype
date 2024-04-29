@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 25f;
+    public static float Zoom = 35f;
     public static int FOV = 70;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -55,7 +55,8 @@ public class App {
         MoléculeRéf OHm = MoléculeRéf.avoirOHm();
         MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
         MoléculeRéf NaOH = MoléculeRéf.avoirNaOH();
-        MoléculeRéf HCl = MoléculeRéf.avoirHCl();
+        //MoléculeRéf HCl = MoléculeRéf.avoirHCl();
+        MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
 
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
@@ -76,32 +77,41 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 4;  //Nombre de molécules voulus
+        int NbMolécules =1;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
-        int essais = 20;        //Nombre d'essais à placer la molécule
+        int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
         double tampon = 0.1;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
-            MoléculeRéf mol = C2H6;
-                 /* if (Math.random() <0.01) {
+            MoléculeRéf mol = C2H4;
+                 if (Math.random() <0.01) {
         
                     if (Math.random() <0.5) {
                         mol = H3Op; //Molécule à ajouter dans la simulation
                     } else {
-                        mol = OHm;
+                        if (Math.random() <0.5) {
+                            mol = H3Op; //Molécule à ajouter dans la simulation
+                        } else {
+                            mol = OHm;
+                        } 
+        
                     } 
                 } else {
-                    if (Math.random() < 0.5){
+                    if (Math.random() < 0.9){
                         //mol = H2O;
-                        mol = C2H6;
+                        mol = H2O;
                     } else{
-                        mol = C2H6;
+                        if (Math.random() <0.5) {
+                            mol = H2O; //Molécule à ajouter dans la simulation
+                        } else {
+                            mol = NaOH;
+                        } 
                     }
                     
-                }  */  
+                } 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -136,7 +146,7 @@ public class App {
 
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(2500000.0+273.15, Hs.get(i).m);
-            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -148,7 +158,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 0.25*Math.pow(10.0,-18);     //Delta temps de la simulation
+        double dt = 0.0625*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -344,8 +354,12 @@ public class App {
         double PR = A.rayonCovalent*multPersZ;  //Rayon 2D de l'atome
         //Dessiner l'atome
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
-
-        //Dessin des doublets en arrières de l'atome
+       
+       /*  g.setColor(new Color(0,0,0,200));
+        g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
+        g.fillOval((int)(((A.position.x)*multPersZ - 0*PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
+        g.drawLine((int) ((A.position.x)*multPersZ - PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)), (int)((A.position.x)*multPersZ - 0*PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)));
+         *///Dessin des doublets en arrières de l'atome
         g.setColor(Color.YELLOW); //Couleur de l'électron
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             if(A.positionDoublet.get(i) .z <= 0.0){
@@ -381,6 +395,9 @@ public class App {
         g.setStroke(new BasicStroke());
         g.setColor(Color.WHITE);       //Couleur de la force
         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+
+
+
 
     }
 
