@@ -119,7 +119,7 @@ public class Vecteur3D {
     public Vecteur3D croix(Vecteur3D c){
         Vecteur3D r = new Vecteur3D(0,0,0);
         r.x = (y*c.z)-(z*c.y);
-        r.y = (x*c.z)-(z*c.x);
+        r.y = (z*c.x)-(x*c.z);
         r.z = (x*c.y)-(y*c.x);
         return r;
     }
@@ -202,10 +202,10 @@ public class Vecteur3D {
      */
     /* |i  j  k |
      * |ax ay az|    |ay az|    |ax az|    |ax ay|
-     * |bx by bz| = i|by bz| + j|bx bz| + k|bx by| = i(ay*bz-az*by) + j(ax*bz-az*bx) + k(ax*by-ay*bx)
+     * |bx by bz| = i|by bz| - j|bx bz| + k|bx by| = i(ay*bz-az*by) - j(ax*bz-az*bx) + k(ax*by-ay*bx)
      * */
     public static Vecteur3D croix(Vecteur3D a, Vecteur3D b){
-        return new Vecteur3D(a.y*b.z - a.z*b.y, a.x*b.z - a.z*b.x, a.x*b.y - a.y*b.x);
+        return new Vecteur3D(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
     }
     /**
      * Renvoi le produit mixte entre les vecteur a, b et c
@@ -219,7 +219,7 @@ public class Vecteur3D {
      * |cx cy cz| = ax|cy cz| + ay|cx cz| + az|cx cy| = ax(by*cz-bz*cy) + ay(bx*cz-bz*cx) + az(bx*cy-by*cx)
      * */
     public static double mixte(Vecteur3D a, Vecteur3D b, Vecteur3D c){
-        return  a.x*(b.y*c.z-b.z*c.y) + a.y*(b.x*c.z-b.z*c.x) + a.z*(b.x*c.y-b.y*c.x);
+        return  a.x*(b.y*c.z-b.z*c.y) + a.y*(b.z*c.x-b.x*c.z) + a.z*(b.x*c.y-b.y*c.x);
     }
 
     /**
