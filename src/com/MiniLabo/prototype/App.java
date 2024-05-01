@@ -100,7 +100,7 @@ public class App {
                         } 
         
                     }  */
-                    mol=C6H6;
+                    mol=C2H4;
                 } else {
                     /* if (Math.random() < 0.8){
                         //mol = H2O;
@@ -196,7 +196,7 @@ public class App {
                 
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
                 temps += dt;
-                T += Atome.Température(Hs);
+               // T += Atome.Température(Hs);
                 /* mailmanresonant++; */
                 
                     
@@ -220,7 +220,7 @@ public class App {
             if (mailman ==1000){
                 
                 mailman =0;
-                System.out.println(String.format("%.0f",(T/20.0)-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
 
 
               //Statistiques sur la vitesse de la simulation
