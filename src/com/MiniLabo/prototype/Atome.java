@@ -120,7 +120,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(dist < 10*A.rayonCovalent){
+            if(true){ //dist < 10*A.rayonCovalent){
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   

@@ -12,8 +12,8 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 512; //Taille de simulation 
-    public static int TailleY = 512;
+    public static int TailleX = 1920-500; //Taille de simulation 
+    public static int TailleY = 1080-350;
     public static int TailleZ = 512;
     public static float Zoom = 35f;
     public static int FOV = 30;     //Champ de vision de la caméra
@@ -50,7 +50,8 @@ public class App {
 
          //Molécule de base
     
-        MoléculeRéf H2O = MoléculeRéf.avoirC2H6();
+        MoléculeRéf H2O = MoléculeRéf.avoirAcétate();
+        //MoléculeRéf OHm = MoléculeRéf.avoirOHm();
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -70,7 +71,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 15;  //Nombre de molécules voulus
+        int NbMolécules = 100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -80,11 +81,11 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
             MoléculeRéf mol = H2O;
-              /*  if (Math.random() <0.5) {
-                    mol = CH4; //Molécule à ajouter dans la simulation
+                /*if (Math.random() <0.5) {
+                    mol = H2O; //Molécule à ajouter dans la simulation
                 } else {
-                    mol = CH2;
-                }   */
+                    mol = OHm;
+                }  */
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -131,7 +132,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-19.0);     //Delta temps de la simulation
+        double dt = 3.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
