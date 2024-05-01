@@ -12,8 +12,8 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 1920-500; //Taille de simulation 
-    public static int TailleY = 1080-350;
+    public static int TailleX = 512; //Taille de simulation 
+    public static int TailleY = 512;
     public static int TailleZ = 512;
     public static float Zoom = 45f;
     public static int FOV = 100;     //Champ de vision de la caméra
@@ -50,8 +50,15 @@ public class App {
 
          //Molécule de base
     
-        MoléculeRéf H2O = MoléculeRéf.avoirAcétate();
-        //MoléculeRéf OHm = MoléculeRéf.avoirOHm();
+        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
+        MoléculeRéf OHm = MoléculeRéf.avoirOHm();
+        MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
+        MoléculeRéf NaOH = MoléculeRéf.avoirNaOH();
+        MoléculeRéf HCl = MoléculeRéf.avoirHCl();
+        MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
+        MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
+
        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
@@ -71,7 +78,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 100;  //Nombre de molécules voulus
+        int NbMolécules =1;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -95,8 +102,19 @@ public class App {
                     }  */
                     mol=C2H4;
                 } else {
-                    mol = OHm;
-                }  */
+                    /* if (Math.random() < 0.8){
+                        //mol = H2O;
+                        mol = H2O;
+                    } else{
+                        if (Math.random() <0.5) {
+                            mol = NaOH; //Molécule à ajouter dans la simulation
+                        } else {
+                            mol = HCl;
+                        } 
+                    } */
+                    mol=HCl;
+                    
+                } 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -143,7 +161,7 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 3.0*Math.pow(10.0,-17.0);     //Delta temps de la simulation
+        double dt = 0.0625*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
