@@ -509,36 +509,38 @@ public class MoléculeRéf extends Molécule{
         C1.évaluerValence();
         Atome H1 = new Atome(1);
         //H1.position = new Vecteur3D(0.49,-0.7,0.49);
-        H1.position = new Vecteur3D(0.49,0.49,-0.7);
+        H1.position = new Vecteur3D(0,0.94264,-0.3338);
         //H1.position = new Vecteur3D(-0.7,0.49,0.49);
         H1.évaluerValence();
         Atome H2 = new Atome(1);
         //H2.position = new Vecteur3D(0,-0.7,-0.7);
-        H2.position = new Vecteur3D(0,-0.7,-0.7);
+        H2.position= new V3(V3.addi(V3.mult((V3.norm(V3.addi(new V3(0,0,1),H1.position))).opposé(),Math.cos(54.75*2*Math.PI/360.0)),new V3(Math.sin(54.75*2*Math.PI/360.0),0,0)));
+       // H2.position = new Vecteur3D(0,-0.7,-0.7);
         //H2.position = new Vecteur3D(-0.7,-0.7,0);
         H2.évaluerValence();
         Atome H3 = new Atome(1);
         //H3.position = new Vecteur3D(-0.49,-0.7,0.49);
-        H3.position = new Vecteur3D(-0.49,0.49,-0.7);
+        //H3.position = new Vecteur3D(-0.49,0.499,-0.7);
+        H3.position= new V3(V3.addi(V3.mult((V3.norm(V3.addi(new V3(0,0,1),H1.position))).opposé(),Math.cos(54.75*2*Math.PI/360.0)),new V3(Math.sin(-54.75*2*Math.PI/360.0),0,0)));
         //H3.position = new Vecteur3D(-0.7,0.49,-0.49);
         H3.évaluerValence();
 
         Atome C2 = new Atome(6);
         //C2.position = new Vecteur3D(0,1.7,0);
-        C2.position = new Vecteur3D(0,0,1.7);
+        C2.position = new Vecteur3D(0,0,1.54);
         //C2.position = new Vecteur3D(1.7,0,0);
         C2.évaluerValence();
         Atome H4 = new Atome(1);
-       // H4.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H1.position, 1),C2.position), new Vecteur3D(0) );
-        H4.position = Vecteur3D.addi(new V3(0.48,0.49,0.7),C2.position);
+        H4.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H1.position, -1),C2.position), new Vecteur3D(0) );
+       // H4.position = Vecteur3D.addi(new V3(0.48,0.49,0.7),C2.position);
         H4.évaluerValence();
         Atome H5 = new Atome(1);
-        //H5.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H2.position, 1),C2.position), new Vecteur3D(0)  );
-        H5.position = Vecteur3D.addi(new V3(0.1,-0.7,0.7),C2.position);
+        H5.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H2.position, -1),C2.position), new Vecteur3D(0)  );
+        //H5.position = Vecteur3D.addi(new V3(0.1,-0.7,0.7),C2.position);
         H5.évaluerValence();
         Atome H6 = new Atome(1);
-       // H6.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H3.position, 1),C2.position),  new Vecteur3D(0) );
-        H6.position = Vecteur3D.addi(new V3(-0.49,0.48,0.7),C2.position);
+        H6.position= Vecteur3D.addi(V3.addi(Vecteur3D.mult(H3.position, -1),C2.position),  new Vecteur3D(0) );
+       // H6.position = Vecteur3D.addi(new V3(-0.49,0.48,0.7),C2.position);
         H6.évaluerValence();
         
 
@@ -585,23 +587,25 @@ public class MoléculeRéf extends Molécule{
         Atome C1 = new Atome(6);
         C1.évaluerValence();
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(0.7,-0.7,0);
+        //H1.position = new Vecteur3D(0.7,-0.7,0);
+        H1.position = new Vecteur3D(0.7,0,-0.7);
         H1.évaluerValence();
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(-0.7,-0.7,0);
+        //2.position = new Vecteur3D(-0.7,-0.7,0);
+        H2.position = new Vecteur3D(-0.7,0,-0.7);
         H2.évaluerValence();
        
 
         Atome C2 = new Atome(6);
-        C2.position = new Vecteur3D(0,1.54,0);
+        C2.position = new Vecteur3D(0,0,1.54);
         C2.évaluerValence();
         Atome H3 = new Atome(1);
        // H3.position = Vecteur3D.addi(new Vecteur3D(0.1,-0.7,0.65),C2.position);
-       H3.position = Vecteur3D.addi(H1.position.opposé(),C2.position);
+       H3.position =V3.addi(Vecteur3D.addi(H1.position.opposé(),C2.position),new V3(0.1,-0.3,0));
         H3.évaluerValence();
         Atome H4 = new Atome(1);
        // H4.position = Vecteur3D.addi(new Vecteur3D(-0.1,-0.7,-0.65),C2.position);
-       H4.position = Vecteur3D.addi(H2.position.opposé(),C2.position);
+       H4.position = V3.addi(Vecteur3D.addi(H2.position.opposé(),C2.position),new V3(-0.1,0.3,0));
         H4.évaluerValence();
         
         
@@ -620,12 +624,12 @@ public class MoléculeRéf extends Molécule{
         ArrayList<Atome> Environnement = Atome.Environnement;
         Atome.MettreÀJourEnvironnement(C2H4.Atomes);
         MiseÀJourEnvironnement(C2H4.Atomes);
-        C1.créerLien(H1.indexe, 0, 0, 1, false);
-        C1.créerLien(H2.indexe, 1, 0, 1, false);
-        C1.créerLien(C2.indexe, 2, 0, 2, false);
-        C1.créerLien(C2.indexe, 3, 1, 2, true);
-        C2.créerLien(H3.indexe, 2, 0, 1, false);
-        C2.créerLien(H4.indexe, 3, 0, 1, false);
+        //C1.créerLien(H1.indexe, 0, 0, 1, false);
+        //C1.créerLien(H2.indexe, 1, 0, 1, false);
+        //C1.créerLien(C2.indexe, 2, 0, 1, false);
+       // C1.créerLien(C2.indexe, 3, 1, 2, true);
+        //C2.créerLien(H3.indexe, 2, 0, 1, false);
+        //C2.créerLien(H4.indexe, 3, 0, 1, false);
 
         C2H4.évaluerSystèmesConjugués();
         C2H4.initialiserDoublets();
@@ -761,7 +765,101 @@ public class MoléculeRéf extends Molécule{
         return Cl2; //Renvoie la molécule
     }
 
-    public static MoléculeRéf avoirCl2(){
+    public static MoléculeRéf avoirC6H6(){
+        MoléculeRéf C6H6 = new MoléculeRéf();
+
+        Atome C1 = new Atome(6);
+        C1.évaluerValence();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(0.7,0.7,0);
+        H1.évaluerValence();
+        Atome C2 = new Atome(6);
+        C2.position = V3.addi(new Vecteur3D(-1.5,0,0),C1.position);
+        C2.évaluerValence();
+        Atome H2 = new Atome(1);
+        H2.position = V3.addi(new Vecteur3D(-0.7,0.7,0),C2.position);
+        H2.évaluerValence();
+        Atome C3 = new Atome(6);
+        C3.position = V3.addi(new Vecteur3D(-0.7*1.5,-0.7*1.5,0),C2.position);
+        C3.évaluerValence();
+        Atome H3 = new Atome(1);
+        H3.position = V3.addi(new Vecteur3D(-1,0,0),C3.position);
+        H3.évaluerValence();
+        Atome C4 = new Atome(6);
+        C4.position = V3.addi(new Vecteur3D(0.7*1.5,-0.7*1.5,0),C3.position);
+        C4.évaluerValence();
+        Atome H4 = new Atome(1);
+        H4.position = V3.addi(new Vecteur3D(-0.7,-0.7,0),C4.position);
+        H4.évaluerValence();
+        Atome C5 = new Atome(6);
+        C5.position = V3.addi(new Vecteur3D(1*1.5,0,0),C4.position);
+        C5.évaluerValence();
+        Atome H5 = new Atome(1);
+        H5.position = V3.addi(new Vecteur3D(0.7,-0.7,0),C5.position);
+        H5.évaluerValence();
+        Atome C6 = new Atome(6);
+        C6.position = V3.addi(new Vecteur3D(0.7*1.5,0.7*1.5,0),C5.position);
+        C6.évaluerValence();
+        Atome H6 = new Atome(1);
+        H6.position = V3.addi(new Vecteur3D(1,0,0),C6.position);
+        H6.évaluerValence();
+        
+        
+
+        C6H6.ajouterAtome(C1);
+        C6H6.ajouterAtome(H1);
+        C6H6.ajouterAtome(C2);
+        C6H6.ajouterAtome(H2);
+        C6H6.ajouterAtome(C3);
+        C6H6.ajouterAtome(H3);
+        C6H6.ajouterAtome(C4);
+        C6H6.ajouterAtome(H4);
+        C6H6.ajouterAtome(C5);
+        C6H6.ajouterAtome(H5);
+        C6H6.ajouterAtome(C6);
+        C6H6.ajouterAtome(H6);
+
+        for (int i = 0; i < C6H6.Atomes.size(); i++) {
+            C6H6.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(C6H6.Atomes);
+        MiseÀJourEnvironnement(C6H6.Atomes);
+        C1.créerLien(H1.indexe, 0, 0, 0, false);
+        C1.créerLien(C2.indexe, 1, 1, 0, false);
+        C2.créerLien(H2.indexe, 0, 0, 0, false);
+        C2.créerLien(C3.indexe, 2, 1, 0, false);
+        C3.créerLien(H3.indexe, 0, 0, 0, false);
+        C3.créerLien(C4.indexe, 2, 1, 0, false);
+        C4.créerLien(H4.indexe, 0, 0, 0, false);
+        C4.créerLien(C5.indexe, 2, 1, 0, false);
+        C5.créerLien(H5.indexe, 0, 0, 0, false);
+        C5.créerLien(C6.indexe, 2, 1, 0, false);
+        C6.créerLien(H6.indexe, 0, 0, 0, false);
+        C6.créerLien(C1.indexe, 2, 2, 0, false);
+       /*  C1.créerLien(H1.indexe, 0, 0, 1, false);
+        C1.créerLien(H2.indexe, 1, 0, 1, false);
+        C1.créerLien(H3.indexe, 2, 0, 1, false);
+        C1.créerLien(C2.indexe, 3, 0, 1, false);
+        C2.créerLien(H4.indexe, 1, 0, 1, false);
+        C2.créerLien(H5.indexe, 2, 0, 1, false);
+        C2.créerLien(H6.indexe, 3, 0, 1, false); */
+
+        C6H6.évaluerSystèmesConjugués();
+        C6H6.initialiserDoublets();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        C6H6.calculerBEAA();
+        C6H6.MiseÀJourPos();
+
+        return C6H6;
+    }
+
+
+    /* public static MoléculeRéf avoirCl2(){
         //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
         MoléculeRéf Cl2 = new MoléculeRéf(); //Création de la molécule
 
@@ -800,5 +898,5 @@ public class MoléculeRéf extends Molécule{
         Cl2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
 
         return Cl2; //Renvoie la molécule
-    }
+    } */
 }

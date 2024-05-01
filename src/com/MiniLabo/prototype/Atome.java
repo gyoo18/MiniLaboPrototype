@@ -46,7 +46,7 @@ public class Atome{
     private int[] cases;
 
     public static boolean[] ListForce = {
-        true, //Force Paulie
+       true, //Force Paulie
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
@@ -344,9 +344,9 @@ public class Atome{
 
         double ModuleFriction = -0.00000000000001;
         //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
+        //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-           // A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
@@ -411,9 +411,9 @@ public class Atome{
         double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
         double a2 = Polarisabilité[NPA-1]*convPolar;  //Polarisabilité électronique de la particule 2
         double T = Température(Environnement);   //Température du système en °K
-        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3*Math.pow(4*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
-        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
-        double London = ((3*h)/2.0)*((a1*a2)/Math.pow(4*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
+        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
+        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4.0*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
+        double London = ((3.0*h)/2.0)*((a1*a2)/Math.pow(4.0*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         return ( V3.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
     }
@@ -523,7 +523,7 @@ public class Atome{
         }
 
         double D0 = angle0-angle; //Delta theta      
-        
+        //TODO doublet angle different doublet doublet, doublet atome
        return ( Vecteur3D.mult(potdirection, -D0*Kij ));
     }
     
@@ -548,7 +548,7 @@ public class Atome{
         
         Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(V3.sous(Ai.position,A.position),PlanAjAi)));
 
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(Ai.position,A.position)), V3.norm(V3.sous(Aj.position ,A.position))),-1),1));
+        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(Ai.position,A.position)), V3.norm(V3.sous(Aj.position ,A.position))),-1.0),1.0));
         double angle0; //Angle à l'équilibre entre I et J
         //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
         switch(NBLiens+A.doublets){
@@ -761,47 +761,55 @@ public class Atome{
   
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
-        double ConstanteDeForce=100000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
-        double sens = 1;
+        double ConstanteDeForce=10000*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
+        double sens = 1.0;
         Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
         Vecteur3D PlanAjk= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position ), V3.sous(Ak.position ,Aj.position)));
         if(Vecteur3D.mixte(PlaniAj, V3.sous(Aj.position ,A.position ), PlanAjk)>0 ){
-            sens=1;
+            sens=1.0;
         }
         if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)<0 ){
-            sens=-1;
+            sens=-1.0;
            
         }
         if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)==0 ){
-            sens=0;
+            sens=0.0;
         }
         
-        double AngleO=0;
+        double AngleO=1.0*Math.PI;
         Vecteur3D direction = new Vecteur3D(Vecteur3D.norm(PlaniAj));
         double iAjxAjk = V3.scal(V3.norm(PlaniAj),V3.norm(PlanAjk));
         double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
+        double FDiedre=0.0;
+        Boolean Liasondouble = false;
         for (int j=0; j < A.liaisonIndexe.size();j++){
-            if (Environnement.get(A.liaisonIndexe.get(j))==Aj){
-                if (A.liaisonOrdre.get(j)==2){
-                     AngleO=1*Math.PI;
-                     ConstanteDeForce=1000000*Math.pow(10,20)*1/6.022*Math.pow(10 ,-23 );
-                     sens=sens*-1;
-                    if (Angle>0.5*Math.PI){
-                        //A.briserLien(j);
-                       // System.out.println(33);
-                    }
-                } else {
-                    AngleO=1*Math.PI;
+            if (A.liaisonIndexe.get(j)!=-1){
+                if (Environnement.get(A.liaisonIndexe.get(j))==Aj){
+                    if (A.liaisonOrdre.get(j)==2){
+                      Liasondouble=true;
+                        if (Angle>0.5*Math.PI){
+                            //A.briserLien(j);
+                           // System.out.println(33);
+                           
+                        }
+                    } 
                 }
             }
+           
         }
-        
+        if (Liasondouble){
+            AngleO=0.5*Math.PI; //1/2 = 0.5 sa faisait bugger :()
+            ConstanteDeForce=1.0;///6.022*Math.pow(10 ,-20 );
+            FDiedre = -sens*ConstanteDeForce*Math.pow((AngleO-Angle),-3);
+        } else {
+            FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4.0*Math.pow(Math.PI,2) ) ),2));
+        }
 
 
        
         
         
-        double FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),2));
+        
         //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
         //double FDiedre = sens*ConstanteDeForce*((Math.PI-Angle));
        // double FDiedre = sens*ConstanteDeForce*2*((Angle)) / ( 4*Math.pow(Math.PI,2) )*(1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) );
