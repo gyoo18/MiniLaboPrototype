@@ -10,7 +10,8 @@ public class Atome{
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
-    public Vecteur3D vélocitéMoyen = new V3(000);
+    private Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
+    private double facteurMixVélMoyen = 0.5;                   //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
     public int NP;                      //Nombre de protons. Définis le type d'atomes.
@@ -27,32 +28,61 @@ public class Atome{
     public ArrayList<Vecteur3D> vélDoublet  = new ArrayList<>();     //Vélocité des doublets
     public ArrayList<Vecteur3D> forceDoublet  = new ArrayList<>();    //Force appliqué sur les doublets
 
+    //État des liaisons
+    /**  Indexe des atomes liés à cet atome. Chaque case représente une possibilité de liaison. 
+    * Une liaison double ou triple utilisera deux et trois cases respectivement. 
+    * Est -1 s'il n'y a aucune liaison.*/
     public ArrayList<Integer> liaisonIndexe  = new ArrayList<>();
-    // Indexe des atomes liés à cet atome. Chaque case représente une possibilité de liaison. 
-    // Une liaison double ou triple utilisera deux et trois cases respectivement. 
-    // Est -1 s'il n'y a aucune liaison.
-
     public ArrayList<Boolean> liaisonType  = new ArrayList<>();   // Types de liaisons. Sigma = faux, Pi = vrai
     public ArrayList<Integer> liaisonOrdre = new ArrayList<>();   // Ordres de liaisons. 1 = liaison simple, 2 = liaison double, 3 = liaison triple
     public int doublets;            // Nombre de doublets électroniques
     public double rayonCovalent;    // Rayon covalent d'ordre 1 sur cet atome.
 
+
+
+
+    /**Liste des systèmes conjugués dont l'atome fait partis.
+     * <p>Ordonnés comme suit : </p>
+     * système[0] = Indexe du type de système.
+     *  <ul><li>0 = [ <b>=-=</b> ],</li>
+     *      <li>1 = [ <b>:-=</b> ],</li>
+     *      <li>2 = [ <b>=-+</b> ],</li>
+     *      <li>3 = [ <b>=X </b> ],</li>
+     *      <li>4 = [ <b>=+ </b> ],</li>
+     *      <li>5 = [ <b>:-+</b> ] </li> </ul>
+     *  <p>système[1 à n] = Indexe des atomes impliqués dans le système dans l'ordre suivant: </p>
+     *  <ul><li>[ <b>=-=</b> ] -> (A)<b>=</b>(B)<b>-</b>(C)<b>=</b>(D). <b>[ type = 0, indexe (A)=, indexe =(B)-, indexe -(C)=, indexe =(D) ]</b> <i>Dans un sens, comme dans l'autre, s'il existe déjà, il ne serat pas comptabilisé. </i></li>
+     *      <li>[ <b>:-=</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 1, indexe :(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=-+</b> ] -> <b>+</b>(A)<b>-</b>(B)<b>=</b>(C). <b>[ type = 2, indexe +(A)-, indexe -(B)=, indexe =(C) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=X </b> ] . -> <b>X</b>(A)<b>=</b>(B) ........ <b>[ type = 3, indexe X(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>=+ </b> ] . -> <b>+</b>(A)<b>=</b>(B) ........ <b>[ type = 4, indexe +(A)=, indexe =(B) ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *      <li>[ <b>:-+</b> ] . -> . <b>:</b>(A)<b>-</b>(B)<b>+</b> ...... <b>[ type = 5, indexe :(A)-, indexe -(B)+ ]</b> <i>L'autre sens n'est pas accepté.</i></li>
+     *  </ul>
+     */
     public ArrayList<int[]> systèmesConjugués = new ArrayList<>(); //Liste des systèmes conjugués dont l'atome fait partis.
     
-    public Molécule molécule;       //Molécule de l'atome.
+    /**Molécule dont fait partis cet atome */
+    public Molécule molécule;
 
+    /**Valeure maximale du nombre quantique princial n. Indique le nombre le lignes du tableau périodique permises. */
     private final int MAX_N = 3;    //Nombre principal maximal. Indique le nombre de ligne du tableau prériodique utilisé.
+    /**Nombre maximal de cases quantiques. Dépendend de <b><code>MAX_N</code></b>. */
     private final int MAX_CASE = (MAX_N*(MAX_N+1)*(2*MAX_N+1))/6 - 1;   //Nombre maximal de cases quantiques
 
     /**Représentation des cases quantiques. Chaque case peut contenir un ou deux électrons. <b>0</b> = 0 électrons, <b>1</b> = 1 électron, <b>2</b> = 2 électrons. */
     private int[] cases;
 
+
+    /**
+     * List boolean des force en jeu dans la simulation
+     * Paulie, Vanderwal, Electrique, Morse, Torsion, Diedre
+     */
     public static boolean[] ListForce = {
        true, //Force Paulie
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
-        true    , //Force de Torsion
+        true, //Force de Torsion
         true, //Force Diedre
         
 
@@ -123,7 +153,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(true){ //dist < 10*A.rayonCovalent){
+            if(dist < 3*(A.rayonCovalent+APrime.rayonCovalent)){ //true){ //
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -145,7 +175,7 @@ public class Atome{
                     
                     if (ListForce[2]){
                         boolean voisin=false;
-                        /* for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
@@ -153,7 +183,7 @@ public class Atome{
                              voisin=true;   
                                 
                             }
-                        } */
+                        }
                         if (!voisin){
                             A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
                         }
@@ -173,7 +203,7 @@ public class Atome{
                     
                     if (ListForce[2]){
                         boolean voisin=false;
-                        /* for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
@@ -181,7 +211,7 @@ public class Atome{
                              voisin=true;   
                             
                             }
-                        } */
+                        } 
                         if (!voisin){
                             A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
                         }
@@ -197,7 +227,9 @@ public class Atome{
                         }
                        
                         if (ListForce[2]){
+                           
                             A.forceDoublet.get(j).addi(  ForceÉlectrique(-2, -2,eDist,eDir) ); //Appliquer la force électrique
+                            
                         }
                         
                     }
@@ -256,7 +288,7 @@ public class Atome{
             
             //si force torsion
             if (ListForce[4]){
-                //Appliquer la force de torsion avec tout les autres liens //TODO #31 FOrce torsion weird
+                //Appliquer la force de torsion avec tout les autres liens
                 for(int j = 0; j < A.liaisonIndexe.size(); j++){
                     //Pour toutes les liaisons de A
                     //Si la liaison n'existe pas, qu'elle est cette liaison ou qu'elle est pi (pour éviter de la compter plus d'une fois), passer à la prochaine
@@ -362,7 +394,7 @@ public class Atome{
                 Sin0 = V3.croix(A.positionDoublet.get(i),A.forceDoublet.get(i)).longueur()/(A.positionDoublet.get(i).longueur()*A.forceDoublet.get(i).longueur());
                 aT = V3.norm(V3.sous(A.forceDoublet.get(i),V3.mult(A.positionDoublet.get(i),V3.scal(A.positionDoublet.get(i), A.forceDoublet.get(i))/(A.positionDoublet.get(i).longueur()*A.positionDoublet.get(i).longueur()))));
             }else{
-                Sin0 = 0;
+                Sin0 = 0.0;
                 aT = new Vecteur3D(0);
             }
             A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
@@ -371,8 +403,12 @@ public class Atome{
 
 
 
-        //Évaluer vitesse moyen
-        A.vélocitéMoyen= V3.mult(V3.addi(A.vélocitéMoyen,A.vélocité),0.5);
+        //Mettre à jour la vélocité moyenne
+        if(A.vélocitéMoyenne.longueur()!=0.0){
+            A.vélocitéMoyenne = Vecteur3D.addi(Vecteur3D.mult(A.vélocité,(1.0-A.facteurMixVélMoyen)), Vecteur3D.mult(A.vélocitéMoyenne, A.facteurMixVélMoyen));
+        }else{
+            A.vélocitéMoyenne = A.vélocité.copier();
+        }
     }
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
@@ -381,6 +417,7 @@ public class Atome{
      * @param r - Distance entre les deux particule en Angströms
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième charge vers la première.
      * @return - Vecteur de force en Newtons Angströmiens
+     * @see <a href = "https://www.erpi.com/fr/bundle-physique-1-m-can-ens-e-man-6m-d5-9782761354998.html">Source : <i>H. Benson, M. Lachance</i> (2015) Physique I, Mécanique, 5e Édition</a>
      */
     private static Vecteur3D ForceÉlectrique(double q1, double q2, double r, Vecteur3D dir){
         return ( V3.mult(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
@@ -395,9 +432,12 @@ public class Atome{
      * @param dist - Distance entre les deux particules en Angströms.
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
      * @return Vecteur de force en Newtons Angströmiens
+     * @see <h3>Sources :</h3> 
+     *      <p>•<a href="https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/Pauli_exclusive_principle.html"><i>W. Pauli</i> (1924) Pauli Exclusion Principle</a>;</p>
+     *      <p>•<a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        return ( V3.mult(dir, (1.0*Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+        return ( V3.mult(dir, (2.0*Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
     }
     
     /**
@@ -407,6 +447,7 @@ public class Atome{
      * @param dist - Distance entre les deux particules en Angströms.
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
      * @return Vecteur de force en Newtons Angströmiens
+     * @see <a href="https://staff.ulsu.ru/moliver/ref/corr/lond36.pdf">Source : <i>F. London</i> (1937) The General Theory of Molecular Forces</a>
      */
     private static Vecteur3D ForceVanDerWall(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
         //TODO #11 Implémenter moments dipolaires
@@ -414,16 +455,22 @@ public class Atome{
         //TODO #26 Décider quelle température prendre pour Van der Walls
         double mu1 = Environnement.get(indexeA).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 1
         double mu2 = Environnement.get(indexeB).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 2
-        double nu1 = 1.0; //Fréquence d'ionisation de la particule 1
-        double nu2 = 1.0; //Fréquence d'ionisation de la particule 2
+        double m = Environnement.get(indexeA).m*Environnement.get(indexeB).m/(Environnement.get(indexeA).m+Environnement.get(indexeB).m);
         double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
         double a2 = Polarisabilité[NPA-1]*convPolar;  //Polarisabilité électronique de la particule 2
-        double T = Température(Environnement);   //Température du système en °K
-        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*kB*T);             //Forces de Keesom
-        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/Math.pow(4.0*Math.PI*ep0*ep0,2.0);                   //Forces de Debye
-        double London = ((3.0*h)/2.0)*((a1*a2)/Math.pow(4.0*Math.PI*ep0*ep0,2.0))*((nu1*nu2)/(nu1+nu2));//Forces de London
+        double nu1 = e/Math.sqrt(m*a1); //Fréquence d'ionisation de la particule 1
+        double nu2 = e/Math.sqrt(m*a2);; //Fréquence d'ionisation de la particule 2
+
+        ArrayList<Atome> paire = new ArrayList<>();
+        paire.add(Environnement.get(indexeA));
+        paire.add(Environnement.get(indexeB));
+
+        double T = Math.max(Température(paire),50000.0);   //Température du système en °K
+        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/*kB*T);             //Forces de Keesom
+        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/;                   //Forces de Debye
+        double London = ((3.0*h)/2.0)*((a1*a2))/*Math.pow(4.0*Math.PI*ep0*ep0,2.0))*/*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
-        return ( V3.mult(dir, (-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )));
+        return ( V3.mult(dir, 6.0*module/Math.pow(dist,7.0))); //(-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )
     }
 
     /**
@@ -433,14 +480,14 @@ public class Atome{
     private Vecteur3D évaluerMomentDipolaire(){
         //TODO #27 réviser évaluerMomentDipolaire()
         double chargeTotale = charge;
-        //chargeTotale += -2.0*doublets;
+        chargeTotale += -2.0*doublets;
         for (int i = 0; i < liaisonIndexe.size(); i++) {
             if(liaisonIndexe.get(i) == -1){
                 continue;
             }
             Atome Ap = Environnement.get(liaisonIndexe.get(i));
             chargeTotale += Ap.charge;
-            //chargeTotale += -2.0*Ap.doublets;
+            chargeTotale += -2.0*Ap.doublets;
         }
 
         double équilibre = -chargeTotale/(liaisonIndexe.size()+1.0);
@@ -469,20 +516,22 @@ public class Atome{
      * @param NP - Nombre de protons du premier atome.
      * @param NPA - Nombre de protons du deuxième atome.
      * @return Vecteur de force en Newtons Angströmiens.
+     * @see <a href="https://journals.aps.org/pr/abstract/10.1103/PhysRev.34.57">Source : <i>P. M. Morse</i> (1929) Diatomic Molecules According to the Wave Mechanics. II. Vibrational Levels</a> Repéré sur <a href="https://en.wikipedia.org/wiki/Morse_potential">Wikipedia (2024)</a>
+     *
      */
     private static Vecteur3D ForceDeMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
         double l = 0; //Longueur de liaison
         if(nLiaisons == 1){
-            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
+            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/); //Longueur d'ordre 1
         }else if(nLiaisons == 2){
-            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*(86/100); //Longueur d'ordre 2
+            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/); //Longueur d'ordre 2
         }else if(nLiaisons == 3){
-            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*(78/100);  //Longueur d'ordre 3;
+            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/);  //Longueur d'ordre 3;
         }
 
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = 40000.0*Math.pow(10.0,12.0);     //Énergie de dissociation du lien.
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
         double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
@@ -519,15 +568,15 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 10000.0;
+            Kij = 2000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            double masse = (mA*mB)/(mA+mB);
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
@@ -576,15 +625,15 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 1000.0;
+            Kij = 2000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            double masse = (mA*mB)/(mA+mB);
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
@@ -634,15 +683,15 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 1000.0;
+            Kij = 2000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            double masse =(mA*mB)/(mA+mB);
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
@@ -692,15 +741,15 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            Kij = 1000.0;
+            Kij = 2000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            double masse = (mA*mB)/(mA+mB);
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
         double D0 = angle0*1.05-angle; //Delta theta      
@@ -749,17 +798,15 @@ public class Atome{
         }
         double Kij;
         if(Y == -1 || Z == -1){
-            
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = 1000.0;
+            Kij = 2000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = 1.0/((1.0/mA)+(1.0/mB));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            double masse = (mA*mB)/(mA+mB);
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
         double D0 = angle0*1.1-angle; //Delta theta      
@@ -769,7 +816,7 @@ public class Atome{
   
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
-        double ConstanteDeForce=10000*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
+        double ConstanteDeForce=1000*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
         double sens = 1.0;
         Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
         Vecteur3D PlanAjk= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position ), V3.sous(Ak.position ,Aj.position)));
@@ -1298,6 +1345,91 @@ public class Atome{
     
     private void évaluerRésonance(){
         //TODO #28 implémenter évaluerRésonance
+        int n = 0; //Nombre de formes limites de résonances de cet atome
+        for (int i = 0; i < systèmesConjugués.size(); i++) {
+            //TODO compter le nombre de formes limites de résonnances
+            switch (systèmesConjugués.get(i)[0]) {
+                case 0:
+                    n += 3;
+                    break;
+                case 1:
+                    n += 0;
+                    break;
+                case 2:
+                    n += 0;
+                    break;
+                case 3:
+                    n += 0;
+                    break;
+                case 4:
+                    n += 0;
+                    break;
+                case 5:
+                    n += 0;
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (int i = 0; i < systèmesConjugués.size(); i++) {
+            for (int j = 0; j < systèmesConjugués.get(i).length; j++) {
+                if (systèmesConjugués.get(i)[j] == indexe) {
+                    switch (systèmesConjugués.get(i)[0]) {
+                        case 0:
+                            //=-=
+                            //Formes limites : =-=, +-=-:(-) et (-):-=-+
+                            //Hybride : ( |:)(=|-)(-|=)(=|-)(:| )
+                            switch(j){
+                                case 1:
+                                    //( |:)A(=|-)
+                                    //Ajouter 1/n :
+                                    //Retirer 1/n -
+                                case 2:
+                                    //(=|-)B(-|=)
+                                    //Retirer 1/n -
+                                    //Ajouter 1/n -
+                                case 3:
+                                    //(-|=)C(=|-)
+                                    //Ajouter 1/n -
+                                    //Retirer 1/n -
+                                case 4:
+                                    //(=|-)D(:| )
+                                    //Retirer 1/n -
+                                    //Ajouter 1/n :
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 1: 
+                            //:-=
+                            //Formes limites : :-= et +=-:(-)
+                            //Hybrides : (:|+)(-|=)(=|-:(-))
+                            switch (j) {
+                                case 1:
+                                    //(:|+)A(-|=)
+                                    //Retirer 1/n :
+                                    //Ajouter 1/n +
+                                    //Ajouter 1/n -
+                                    break;
+                                case 2:
+                                    //(-|=)B(=|)
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    
     }
     private double forceSigmoide = 5.0;
 
@@ -1406,7 +1538,7 @@ public class Atome{
      * @param x - Valeur à contraster. Doit être entre 0 et 1.
      * @param facteur - Facteur de contraste
      * @return Une version contrasté de x. La valeur serat comprise entre 0 et 1 et sigmoide(0) = 0; sigmoide(1) = 1
-     */
+     * */
     private double sigmoide(double x, double facteur){
         double fNorm = 0.5/ ( Math.exp(facteur*(0.5))/(1+Math.exp(facteur*(0.5))) - 0.5);
         return fNorm*( Math.exp(facteur*(x-0.5))/(1+Math.exp(facteur*(x-0.5))) - 0.5 ) + 0.5;
@@ -1421,25 +1553,20 @@ public class Atome{
     }
 
     public static double Température(ArrayList<Atome> A){
+
+
         double v1 = 0.0;
         double Ek = 0.0;
-        double EkMoyen=0;
-        ArrayList<Double> EK1 = new ArrayList<>(
-        );
-        
-
         for (int i = 0; i < A.size(); i++) {
-            /* v1 += A.get(i).vélocité.longueur();
-            Ek += Math.pow(A.get(i).vélocité.longueur(),2.0)*A.get(i).m*0.5; */
-            EK1.add(Math.pow(A.get(i).vélocitéMoyen.longueur(),2.0)*A.get(i).m*0.5);
-            
+            v1 += A.get(i).vélocitéMoyenne.longueur();
+            Ek += Math.pow(A.get(i).vélocitéMoyenne.longueur(),2.0)*A.get(i).m*0.5;
+        }
+        v1 = v1/(double)A.size();
+        Ek = Ek/A.size();
+        //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         
-        }
-       
-        for (int i = 0; i < EK1.size(); i++) {
-        EkMoyen =+ EK1.get(i)/EK1.size(); 
+        return Ek*2.0/(3.0*kB);
 
-        }
         /* for (int j=0; j < A.size()*0.5; j++){
         for (int i = 0; i < EK1.size()-1; i++) {
             if(EK1.get(i) < EK1.get((i+1))){
@@ -1453,39 +1580,21 @@ public class Atome{
         }
         } */
 
-
-        //EK1.
-
-
-
-
-
-        //EK1.sort(1<3 <Atome> A.get(2) );
-        if (EK1.getLast()>100){
-           // System.out.println(3);
-        }
-        double Temperature=EkMoyen*2.0/(3.0*kB);
-        return (Temperature);
-
         /* v1 = v1/(double)A.size();
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
-        return Ek*2.0/(3.0*kB); 
- */
-        
-       
-
+        return Ek*2.0/(3.0*kB); */
     }
 
     public static double TempératureEnVitesse(double T, double m){
-        return Math.sqrt(3.0*kB*T*Math.pow(10, 0)/m);
+        return Math.sqrt(3.0*kB*T/m);
     }
 
     /**
      * Renvoie une copie de l'atome
      * @param copierMolécule - Si vrai, copie la molécule, sinon la molécule restera la même référence
      * @return Un atome copié
-     */
+     * */
     public Atome copier(boolean copierMolécule){
         Atome a = new Atome();
         a.copier(this,copierMolécule);
@@ -1496,7 +1605,7 @@ public class Atome{
      * Copie l'atome.
      * @param a - Atome à copier
      * @param copierMolécule - Si vrai, copie la molécule, sinon la molécule restera la même référence.
-     */
+     * */
     public void copier(Atome a, boolean copierMolécule){
         Atome b = a;
         if(this.prevPosition != null){
@@ -1504,7 +1613,6 @@ public class Atome{
         }
         this.position = b.position.copier();
         this.vélocité = b.vélocité.copier();
-        this.vélocitéMoyen = b.vélocitéMoyen.copier();
         this.Force = b.Force.copier();
         this.positionDoublet = (ArrayList<Vecteur3D>) b.positionDoublet.clone();
         this.prevPosDoublet = (ArrayList<Vecteur3D>) b.prevPosDoublet.clone();
@@ -1536,7 +1644,7 @@ public class Atome{
 
     /**Initialise la position précédente initiale avec une certaine vitesse. Est utilisé pour Verlet.
      * @param h - delta temps
-    */
+     * */
     public void prevPositionInit(double h){
         if(prevPosition == null){
             prevPosition = Vecteur3D.addi(position, Vecteur3D.mult(vélocité, -h)).copier();
@@ -1545,24 +1653,38 @@ public class Atome{
 
    
     private int ForceSimoideDoublets;
+        /**Charge élémentaire : <b>1.602*10^-19</b> C */
     public static final double e = 1.602*Math.pow(10.0, -19.0);    //Charge élémentaire
+        /**Masse du proton : <b>1.672*10^-27</b> kg */
     public static final double mP = 1.0*1.672*Math.pow(10.0,-27.0);//Masse du proton
+        /**Masse de l'électron : <b>9.109*10^-31</b> kg */
     public static final double mE = 1.0*9.109*Math.pow(10.0,-31.0);//Masse de l'électron
-    public static final double Ag = Math.pow(10,-15);              //Facteur de conversion en Angströms
+        /**Facteur de conversion en Angströms : <b>10^-10</b> (1m = 10^10 Å) */
+    public static final double Ag = Math.pow(10,-10);              //Facteur de conversion en Angströms
+        /**Constante de Coulomb : <b>8.987*10^39</b> kg * Å^4 * s^-2 * C^-2 */
     public static final double K = 8.987*Math.pow(10.0,39.0);    //Constante de Coulomb
+       /**Permittivité du vide, epsilon 0 : <b>8.854 * 10^-42</b> C^2 * s^2 * kg^-2 */
     public static final double ep0 = 8.854*Math.pow(10.0,-42);     //Permittivité du vide
+       /**Constante de Planck : <b>6.626*10^-14</b> kg * m^2 * s^-1*/
     public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
-    public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman en Jarmstrong
+       /**Constante de Boltzman : <b>1.380649*10^-3</b> kg * m^2 * s^-2 * °K^-1*/
+    public static final double kB = 1.380649*Math.pow(10.0,-3);       //Constante de Boltzman en Jarmstrong
+   
     public static final double kBJ = 1.380*Math.pow(10.0,-23);       //Constante de Boltzman en J
+       /**Vitesse de la lumière :<b>2.99792458*10^18</b> Å/s*/
     public static final double c = 2.99792458*Math.pow(10.0,18.0);//Vitesse de la lumière
+       /**Nombre d'Avogadro : <b>6.02214076</b> mol^-1 */
     public static final double Navodagro = 6.02214076*Math.pow(10,23); //nombre d'avogadro en Mol-1
+   
     public static final double R=Navodagro*kB;
-
+    /**Référence à la liste des autres atomes de la simulation. */
     public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
 
-    /**Électronégativité de Pauling de chaque élément.*/
-    private static final float[] AffinitéÉlectronique = {
+    /**Électronégativité de Pauling de chaque élément.<
+     *<p><a href="https://archive.org/details/CRCHandbookOfChemistryAndPhysics97thEdition2016/page/n1595/mode/2up"> Source : <i>W. M. Haynes</i> (2016), CRC Handbook of Chemistry and Physics 97th Edition</a>.</p>
+     * */
+    private static final float[] ÉlectronégativitéPauling = {
         2.20f,                                                                                                0.00f,
         0.98f,1.57f,                                                            2.04f,2.55f,3.04f,3.50f,3.98f,0.00f,
         0.93f,2.31f,                                                            1.61f,1.90f,2.19f,2.58f,3.16f,0.00f,
@@ -1573,7 +1695,10 @@ public class Atome{
         1.10f,1.30f,      1.50f,1.38f,1.36f,1.28f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f,1.30f
     };
 
-    /**Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.*/
+    /**Rayon covalent de chaque élément en pm. Doit être divisé par 100 pour travailler en Å.
+     * <p><a href="https://pubmed.ncbi.nlm.nih.gov/19058281/"> Source : <i>P. Pyykkö & M. Atsumi</i> (2009) Molecular single-bond covalent radii for elements 1-118</a>,
+     * repéré sur <a href="https://fr.wikipedia.org/wiki/Rayon_de_covalence">Wikipedia (2024)</a></p>
+     * */
     private static final float[] rayonsCovalents = {
          32f,                                                                                 46f,
         133f,102f,                                                   85f, 75f, 71f, 63f, 64f, 67f,
@@ -1586,7 +1711,10 @@ public class Atome{
                   157f,149f,143f,141f,134f,129f,128f,121f,122f,136f,143f,162f,175f,165f,157f
     };
 
-    /**Rayon covalent de lien double.*/
+    /**Rayon covalent de liens doubles.
+    * <p><a href="https://pubmed.ncbi.nlm.nih.gov/19058281/"> Source : <i>P. Pyykkö & M. Atsumi</i> (2009) Molecular single-bond covalent radii for elements 1-118</a>,
+    * repéré sur <a href="https://fr.wikipedia.org/wiki/Rayon_de_covalence">Wikipedia (2024)</a></p>
+    * */
     private static final float[] rayonsCovalents2 = {
          0f,                                                                                   0f,
         124f, 90f,                                                   78f, 67f, 60f, 57f, 59f, 96f,
@@ -1599,7 +1727,10 @@ public class Atome{
                   140f,136f,128f,128f,125f,125f,116f,116f,137f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    /**Rayon covalent de lien triple*/
+    /**Rayon covalent de liens triples.
+     * <p><a href="https://pubmed.ncbi.nlm.nih.gov/19058281/"> Source : <i>P. Pyykkö & M. Atsumi</i> (2009) Molecular single-bond covalent radii for elements 1-118</a>,
+     * repéré sur <a href="https://fr.wikipedia.org/wiki/Rayon_de_covalence">Wikipedia (2024)</a></p>
+     * */
     private static final float[] rayonsCovalents3 = {
           0f,                                                                                  0f,
           0f, 85f,                                                   73f, 60f, 54f, 53f, 53f,  0f,
@@ -1612,7 +1743,9 @@ public class Atome{
                   131f,126f,121f,119f,118f,113f,112f,118f,130f,  0f,  0f,  0f,  0f,  0f,  0f
     };
 
-    /**Constante d'écran utilisé dans le calcul de la charge effective de l'atome.*/
+     /**Constante d'écran utilisé dans le calcul de la charge effective de l'atome.
+     * <p><a href="https://link.springer.com/article/10.1007/s00214-009-0610-4"> Source : <i>D. C. Ghosh et al.</i> (2009) The Electronegativity Scale of Allred and Rochow : Revisited</a></p>.
+     * */
     private final double ConstanteÉcran[] = {
         0.000,                                                                                                0.300,
         1.700,2.050,                                                            2.400,2.750,3.100,3.450,3.800,4.2515,
@@ -1624,7 +1757,9 @@ public class Atome{
         84.80,83.15,      84.00,84.85,84.70,85.05,85.40,85.25,85.60,86.45,86.30,86.65,87.00,87.35,87.70,88.05,88.90
     };
     
-    /**Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.*/
+    /**Rayon atomique absolut en Å. Utilisé dans le calcul de l'électronégativité.
+     * <p><a href="https://link.springer.com/article/10.1007/s00214-009-0610-4"> Source : <i>D. C. Ghosh et al.</i> (2009) The Electronegativity Scale of Allred and Rochow : Revisited</a></p>.
+     * */
     private static final double Radii [] = {
         0.5292,                                                                                                                0.3113,
         1.6283,1.08550,                                                                     0.8141,0.6513,0.5428,0.4652,0.4071,0.3676,
@@ -1636,7 +1771,9 @@ public class Atome{
         4.4479,3.4332,       3.2615,3.1061,2.2756,1.9767,1.7473,1.4496,1.2915,1.2960,1.1247,1.0465,0.9785,0.9188,0.8659,0.8188,0.8086,
     };
 
-    /**Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par convPolar pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)*/
+    /**Polarisabilité électronique des éléments en unités atomiques (e^2 * a0^2 * Eh^-1). Multiplier par <b><code>convPolar</code></b> pour convertir en (C^2 * s^2 * kg^-1) ou (C*m^2*V^-1)
+     * <p><a href="https://www.tandfonline.com/doi/full/10.1080/00268976.2018.1535143">Source : <i>P. Schwerdtfeger & J. K. Nagle</i> (2018) Table of static dipole polarizabilities of the neutral elements in the periodic table</a></p>
+     * */
     private static final double Polarisabilité[] = {
         4.50,                                                                               1.38,
         164,37.7,                                                  20.5,11.3, 7.4, 5.3,3.74,2.66,
@@ -1648,11 +1785,12 @@ public class Atome{
         318, 246,      203, 217, 154, 129, 151, 132, 131, 144, 125, 122, 118, 113, 109, 110,
                   320, 112,  42,  40,  38,  36,  34,  32,  32,  28,  29,  31,  71,   0,  76,  58
     };
-    //TODO #29 vérifier si convPolar est en m ou en Å
     /**Facteur multiplicateur pour convertir la polarisabilité d'unités atomiques vers des unitées agnstromiennes */
     private static final double convPolar = 1.64986832*Math.pow(10.0,-41.0);
 
-    /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.*/
+    /**Constante de force de Morse exprimée en N/cm. Doit être convertis en multipliant par 100 pour travailler en Å.
+     * <p><a href="https://archive.org/details/CRCHandbookOfChemistryAndPhysics97thEdition2016/page/n1597/mode/2up"> Source : <i>W. M. Haynes</i> (2016), CRC Handbook of Chemistry and Physics 97th Edition</a>.</p>
+     * */
     private static final double[][] ConstanteDeForce = {
       //    H,  He,  Li,  Be,   B,   C,   N,   O,   F,  Ne,  Na,             Mg,  Al,  Si,   P,   S,  Cl,  Ar
         {5.75,   0,1.03,2.27,3.05,5.27,5.97,8.13,9.66,   0,0.78,              0,   0,   0,3.22,4.26,5.16,   0},//H
@@ -1662,10 +1800,10 @@ public class Atome{
         {3.05,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//B
         {5.27,   0,   0,   0,   0,8.36,14.6,14.2,6.57,   0,   0,              0,   0,   0,7.83,7.94,3.80,   0},//C
         {5.97,   0,   0,   0,   0,14.6,20.8,27.7,   0,   0,   0,              0,   0,   0,5.56,   0,   0,   0},//N
-        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0, 1.5, /*pasbon */3.48,   0,9.24,9.45,9.32,   0,   0},//O
+        {8.13,   0,   0,7.51,   0,14.2,27.7,8.76,   0,   0,1.500,          3.48,   0,9.24,9.45,9.32,  0,   0},//O
         {9.66,   0,2.50,   0,   0,6.57,   0,   0,4.70,   0,1.76,              0,   0,4.90,   0,   0,4.48,   0},//F
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Ne
-        {0.78,   0,0.21,   0,   0,   0,   0,   1.5/*pas bon*/,1.76,   0,0.17,              0,   0,   0,   0,   0,1.09,   0},//Na
+        {0.78,   0,0.21,   0,   0,   0,   0,1.50,1.76,   0,0.17,              0,   0,   0,   0,   0,1.09,   0},//Na
         {   0,   0,   0,   0,   0,   0,   0,3.48,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Mg
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Al
         {   0,   0,   0,   0,   0,   0,   0,9.24,4.90,   0,   0,              0,   0,2.15,   0,   0,2.63,   0},//Si
@@ -1674,17 +1812,24 @@ public class Atome{
         {5.16,   0,1.43,   0,   0,3.80,   0,   0,4.48,   0,1.09,              0,   0,2.63,   0,   0,3.23,   0},//Cl
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,              0,   0,   0,   0,   0,   0,   0},//Ar
     };
-
+    /** Indique si les listes de données à initialiser ont été initialiées. */
     private static boolean initialiséListes = false; //Indique si les listes de données ci-dessous ont été initialisées.
     /**Fréquence fondamentale de vibration rotative d'un trio de 3 liens en cm^-1. 
      * Pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b>a</b> représente le nombre de proton de l'atome central et <b>b,c</b>, 
-     * le nombre de protons des atomes d'extrémités; l'ordre est sans importance. La case 18 est réservées pour les doublets électroniques. */
-    private static final double[][][] fréquenceTorsion = new double[19][19][19];
+     * le nombre de protons des atomes d'extrémités; l'ordre est sans importance. La case 18 est réservées pour les doublets électroniques.
+     * <p><a href="https://archive.org/details/CRCHandbookOfChemistryAndPhysics97thEdition2016/page/n1597/mode/2up"> Source : <i>W. M. Haynes</i> (2016), CRC Handbook of Chemistry and Physics 97th Edition</a>.</p>
+     * */
+   
+   
+     private static final double[][][] fréquenceTorsion = new double[19][19][19];
     /**Données de fréquenceTorsion. Utilisé pour compacter l'espace de stockage nécessaire. 
      * Organisé ainsi : pour <b>{@code fréquenceTorsion[a][b][c]}</b>, <b><code> fréquenceTorsionDonnées[d][] = {f,a,b,c}</code></b>, où <b>f</b> est 
      * la valeur de fréquenceTorsion à <b>[a][b][c]</b> et où <b>a</b> représente le nombre de protons de l'atome central
-     * et <b>b,c</b>, le nombre de protons des atomes d'extrémités; l'ordre est sans importance.*/
-    private static final double[][] fréquenceTorsionDonnées = {
+     * et <b>b,c</b>, le nombre de protons des atomes d'extrémités; l'ordre est sans importance.
+     * <p><a href="https://archive.org/details/CRCHandbookOfChemistryAndPhysics97thEdition2016/page/n1597/mode/2up"> Source : <i>W. M. Haynes</i> (2016), CRC Handbook of Chemistry and Physics 97th Edition</a>.</p>
+     * */
+   
+     private static final double[][] fréquenceTorsionDonnées = {
         //TODO #30 vérifier que les valeurs dans fréquenceTorsionDonnées
         { 667, 6, 8, 8},/*CO2 */          { 962, 6, 1, 1},/*CH2 */          { 520, 7, 9, 8},//FNO
         { 397, 6,16,16},/*CS2 GO*/        { 667, 6, 9, 9},/*CF2 */          { 332, 7,17, 8},//ClNO
@@ -1710,7 +1855,30 @@ public class Atome{
         { 498, 5, 9, 9},/*BF2 (!)*/       {1500, 6, 6, 1},/*HCC (!)*/       { 584, 6, 9, 8},//FCO (!)
         { 285, 6,17, 8},/*ClCO (!)*/      { 568, 7, 8, 9},/*|ONF| (!)*/     { 370, 7, 8,17},//ONCl (!)
     };
-
+    /**Énergie de dissociation des liens en kJ/mol. Ces valeurs sont celles des molécules diatomiques correspondantes et sont par conséquent imprécises. 
+     * <p><a href="https://archive.org/details/CRCHandbookOfChemistryAndPhysics97thEdition2016/page/n1565/mode/2up"> Source : <i>W. M. Haynes</i> (2016), CRC Handbook of Chemistry and Physics 97th Edition</a>.</p>
+     */
+    public static final double[][] ÉnergieDeDissociation = {
+        //        H,   He,     Li,   Be,    B,     C,     N,      O,     F,   Ne,    Na,   Mg,   Al,   Si,    P,    S,     Cl,   Ar
+    /*H */{435.7799,    0,238.039,    0,345.2, 338.72, 358.8, 429.74,569.68,    0,192.71,    0,  288,293.3,  297,    0,431.361,    0},
+    /*He*/{       0,3.809,      0,  221,    0,      0,     0,      0,     0,    0,     0,    0,    0,    0,    0,    0,      0, 3.96},
+    /*Li*/{ 238.039,    0,    105,    0,    0,      0,     0,  340.5,     0,    0,87.181, 67.4, 76.1,  149,    0,312.5,    469, 7.82},
+    /*Be*/{       0,  221,      0,   59,    0,      0,     0,    437,   573,    0,     0,    0,    0,    0,    0,  372,    384,    0},
+    /*B */{   345.2,    0,      0,    0,  290,    448, 377.9,    809,   732, 3.97,     0,    0,    0,  317,  347,  577,    427, 4.62},
+    /*C */{  338.72,    0,      0,    0,  448, 605.03,749.31,1076.63, 513.8,    0,     0,    0,267.7,  447,507.5,713.3,  394.9,5.158},
+    /*N */{   358.8,    0,      0,    0,377.9, 749.31,944.87, 630.57,     0,    0,     0,    0,  368,437.1,617.1,  467,  333.9,    0},
+    /*O */{  429.74,    0,  340.5,  437,  809,1076.63,630.57,498.458,   220,    0,   270,358.2,501.9,799.6,  589,517.9, 267.47,    0},
+    /*F */{  569.68,    0,      0,  573,  732,  513.8,     0,    220,158.67,    0, 477.3,445.6,  675,  405,    0,    0, 260.83,    0},
+    /*Ne*/{       0,    0,      0,    0, 3.97,      0,     0,      0,     0,    0,   3.8,  4.1,  3.9,    0,    0,    0,      0, 4.27},
+    /*Na*/{  192.71,    0, 87.181,    0,    0,      0,     0,    270, 477.3,  3.8,74.805,    0,    0,    0,    0,    0,  412.1,  4.2},
+    /*Mg*/{       0,    0,   67.4,    0,    0,      0,     0,  358.2, 445.6,  4.1,     0, 11.3,    0,    0,    0,    0,    312,  3.7},
+    /*Al*/{     288,    0,   76.1,    0,    0,  267.7,   368,  501.9,   675,  3.9,     0,    0,264.3,    0,216.7,  332,    502, 5.69},
+    /*Si*/{   293.3,    0,    149,    0,  317,    447, 437.1,  799.6,   405,    0,     0,    0,    0,    0,363.6,    0,  416.7, 5.86},
+    /*P */{     297,    0,      0,    0,  347,  507.5, 617.1,    589,     0,    0,     0,    0,216.7,363.6,489.1,    0,    376,    0},
+    /*S */{       0,    0,  312.5,  372,  577,  713.3,   467,  517.9,     0,    0,     0,    0,  332,    0,    0,    0,  241.8,    0},
+    /*Cl*/{ 431.361,    0,    469,  384,  427,  394.9, 333.9, 267.47,260.83,    0, 412.1,  312,  502,416.7,  376,241.8,242.851,    0},
+    /*Ar*/{       0, 3.96,   7.82,    0, 4.62,  5.158,     0,      0,     0, 4.27,   4.2,  3.7, 5.69, 5.86,    0,    0,      0, 5.50},
+};
 
 
 

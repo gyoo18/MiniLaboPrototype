@@ -691,7 +691,7 @@ public class MoléculeRéf extends Molécule{
         Atome H = new Atome(1);    
         H.position = new Vecteur3D(0,0,0);
         Atome Cl = new Atome(17);    
-        Cl.position = new Vecteur3D(1,0,0);
+        Cl.position = new Vecteur3D(2.29,0,0);
 
         //Ajouter chaque atome à la molécule
         HCl.ajouterAtome(H);
@@ -763,6 +763,47 @@ public class MoléculeRéf extends Molécule{
         Cl2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
 
         return Cl2; //Renvoie la molécule
+    }
+
+    public static MoléculeRéf avoir2eNaCl(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf NaCl = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome Cl = new Atome(17);    
+        Cl.position = new Vecteur3D(0,0,0);
+        Atome Na = new Atome(11);    
+        Na.position = new Vecteur3D(1,0,0);
+
+        //Ajouter chaque atome à la molécule
+        NaCl.ajouterAtome(Cl);
+        NaCl.ajouterAtome(Na);
+
+        //Ne pas changer
+        for (int i = 0; i < NaCl.Atomes.size(); i++) {
+            NaCl.Atomes.get(i).indexe = i;
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(NaCl.Atomes);           
+        MiseÀJourEnvironnement(NaCl.Atomes);
+
+        //Créer les liens entre chaque atome
+        Cl.créerLien(Na.indexe, 0, 0, 1, false);
+
+        //Ne pas changer
+        NaCl.évaluerSystèmesConjugués(); //Détecte la résonance
+        NaCl.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        NaCl.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        NaCl.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return NaCl; //Renvoie la molécule
     }
 
     public static MoléculeRéf avoirC6H6(){
