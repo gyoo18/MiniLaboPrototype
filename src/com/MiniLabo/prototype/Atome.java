@@ -17,7 +17,7 @@ public class Atome{
     public double charge = 0;           //Charge de l'atome
     public float électronégativité = 0; //Électronégativité de l'atome peut varier avec le nombre d'électrons
 
-    public int indexe = -1; //Indexe de cet atome dans la liste de la simulation
+    public int indexe = -1; //Indexe de cet atome  dans la liste de la simulation
 
     //État des doublets
     public ArrayList<Vecteur3D> positionDoublet = new ArrayList<>(); //Position des doublets relatif au noyau
