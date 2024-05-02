@@ -88,33 +88,6 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 40) {
             essais++;
             MoléculeRéf mol = H2O;
-                if (Math.random() <0.9) {
-        
-                   /*  if (Math.random() <0.5) {
-                        mol = H2O; //Molécule à ajouter dans la simulation
-                    } else {
-                        if (Math.random() <0.5) {
-                            mol = H3Op; //Molécule à ajouter dans la simulation
-                        } else {
-                            mol = OHm;
-                        } 
-        
-                    }  */
-                    mol=C2H4;
-                } else {
-                    /* if (Math.random() < 0.8){
-                        //mol = H2O;
-                        mol = H2O;
-                    } else{
-                        if (Math.random() <0.5) {
-                            mol = NaOH; //Molécule à ajouter dans la simulation
-                        } else {
-                            mol = HCl;
-                        } 
-                    } */
-                    mol=HCl;
-                    
-                } 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -148,8 +121,8 @@ public class App {
         }
 
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(250000.0+273.15, Hs.get(i).m);
-            //Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
+            Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
         }
 
         //Ajouter les atomes dans l'ordre de dessin
