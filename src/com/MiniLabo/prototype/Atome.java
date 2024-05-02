@@ -123,7 +123,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(true){ //dist < 10*A.rayonCovalent){
+            if(dist < 10*A.rayonCovalent){
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -370,8 +370,10 @@ public class Atome{
         }
 
         //Évaluer vitesse moyen
-        A.vélocitéMoyen= V3.mult(V3.addi(A.vélocitéMoyen,A.vélocité),0.5);
+        double mix = 0.999;
+        A.vélocitéMoyen= V3.addi(V3.mult(A.vélocité,(1.0-mix)),V3.mult(A.vélocitéMoyen, mix));
     }
+
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
      * @param q1 - Charge de la première particule en nombre de charges élémentaires. Sera multiplié par la charge élémentaire e.
@@ -874,15 +876,16 @@ public class Atome{
     }
     
     /**Déplace les doublets de l'atome dans la direction de leur force appliquée. À utiliser pour initialiser leur position à l'équilibre */
-    public void déplacerDoublet(){
+    public void déplacerVersÉquilibre(){
         for (int i = 0; i < 1; i++) {
-            ÉvaluerForces(this);
             for (int j = 0; j < doublets; j++) {
                 forceDoublet.get(j).norm();
-                forceDoublet.get(j).mult(1);
+                forceDoublet.get(j).mult(0.03);
                 positionDoublet.get(j).addi(forceDoublet.get(j));
             }
-            ÉvaluerContraintes();
+            Force.norm();
+            Force.mult(0.03);
+            position.addi(Force);
         }
     }
 
@@ -1220,64 +1223,19 @@ public class Atome{
     }
 
     public static double Température(ArrayList<Atome> A){
-        double v1 = 0.0;
         double Ek = 0.0;
-        double EkMoyen=0;
-        ArrayList<Double> EK1 = new ArrayList<>(
-        );
-        
 
         for (int i = 0; i < A.size(); i++) {
-            /* v1 += A.get(i).vélocité.longueur();
-            Ek += Math.pow(A.get(i).vélocité.longueur(),2.0)*A.get(i).m*0.5; */
-            EK1.add(Math.pow(A.get(i).vélocitéMoyen.longueur(),2.0)*A.get(i).m*0.5);
-            
-        
+            Ek += Math.pow(A.get(i).vélocitéMoyen.longueur(),2.0)*A.get(i).m*0.5;
         }
-       
-        for (int i = 0; i < EK1.size(); i++) {
-        EkMoyen =+ EK1.get(i)/EK1.size(); 
-
-        }
-        /* for (int j=0; j < A.size()*0.5; j++){
-        for (int i = 0; i < EK1.size()-1; i++) {
-            if(EK1.get(i) < EK1.get((i+1))){
-                
-                
-                double a = EK1.get(i);
-                EK1.set( i, EK1.get(i+1));
-                EK1.set( i+1 , a );
-            
-            }
-        }
-        } */
-
-
-        //EK1.
-
-
-
-
-
-        //EK1.sort(1<3 <Atome> A.get(2) );
-        if (EK1.getLast()>100){
-           // System.out.println(3);
-        }
-        double Temperature=EkMoyen*2.0/(3.0*kB);
-        return (Temperature);
-
-        /* v1 = v1/(double)A.size();
         Ek = Ek/A.size();
-        //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
-        return Ek*2.0/(3.0*kB); 
- */
-        
-       
 
+        double Temperature = Ek*2.0/(3.0*kB);
+        return Temperature;
     }
 
     public static double TempératureEnVitesse(double T, double m){
-        return Math.sqrt(3.0*kB*T*Math.pow(10, 0)/m);
+        return Math.sqrt(3.0*kB*T/m);
     }
 
     /**

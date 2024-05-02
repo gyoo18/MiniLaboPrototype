@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 45f;
+    public static float Zoom = 35f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -78,7 +78,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =1;  //Nombre de molécules voulus
+        int NbMolécules =100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -120,21 +120,36 @@ public class App {
             }
         }
 
+        Atome.MettreÀJourEnvironnement(Hs);
+        Molécule.MiseÀJourEnvironnement(Hs);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < Hs.size(); j++) {
+                Atome.ÉvaluerForces(Hs.get(j));
+            }
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).déplacerVersÉquilibre();
+            }
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).ÉvaluerContraintes();
+            }
+        }
+
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
-            Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(module,0.0,0.0);
         }
 
         //Ajouter les atomes dans l'ordre de dessin
         for (int i = 0; i < Hs.size(); i++) {
             indexe.add(i);
         }
-        
+
         //Simulation
-        double mailman=0; //utiliser pour projeter dans terminal
+        long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 0.0625*Math.pow(10.0,-17);     //Delta temps de la simulation
+        double dt = 1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -161,10 +176,8 @@ public class App {
                         }
                         mailmanresonant=0;
                     } */
-                    
-
-                    
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                    //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
@@ -188,21 +201,15 @@ public class App {
                 }
             }
 
-            
-            mailman++;
-            if (mailman ==1000){
+            if (System.currentTimeMillis()-mailman > 1000){
                 
-                mailman =0;
-                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-
+                mailman = System.currentTimeMillis();
+                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");
 
               //Statistiques sur la vitesse de la simulation
-             // System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-            
-
-
+                System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+    
                 énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
-            
             }
 
             //Dessiner les atomes dans l'ordre
@@ -386,15 +393,11 @@ public class App {
             }
         }
         //Dessiner force resultante
-        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(Zoom*A.Force.longueur()+1)),A.position);
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocitéMoyen),0.01*Math.log(Zoom*A.vélocitéMoyen.longueur()+1)),A.position);
         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
         g.setStroke(new BasicStroke());
         g.setColor(Color.WHITE);       //Couleur de la force
         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-
-
-
-
     }
 
     /**
