@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 25f;
+    public static float Zoom = 35f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -60,10 +60,21 @@ public class App {
         MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
         MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
-       /* Atome H = new Atome(1);
+        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
-        Hs.add(H);*/
+        Hs.add(H);
+        Atome H1 = new Atome(1);
+        H1.position= new V3(4,1,0);
+       
+        Hs.add(H1);
+        
+
+        Atome Cl = new Atome(17);
+        Cl.position= new V3(1,5,0);
+        Cl.retirerÉlectron();
+        Cl.évaluerValence();
+        Hs.add(Cl); */
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -78,15 +89,16 @@ public class App {
             }
         }*/
         
+        
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =100;  //Nombre de molécules voulus
+        int NbMolécules =10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.015;  //Zone tampon entre les atomes
+        double tampon = 0.50025;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
-        while (totalMolécules < NbMolécules && essais < 1080) {
+        while (totalMolécules < NbMolécules && essais < 180) {
             essais++;
             MoléculeRéf mol = H2O;
                 if (Math.random() <0) {
@@ -107,11 +119,11 @@ public class App {
                         //mol = H2O;
                         mol = H2O;
                     } else{
-                        if (Math.random() <2) {
-                            mol = NaCl; //Molécule à ajouter dans la simulation
-                            //mol=NaOH;
+                        if (Math.random() <0.5) {
+                            //mol = NaCl; //Molécule à ajouter dans la simulation
+                            mol=NaOH;
                         } else {
-                            //mol = HCl;
+                            mol = HCl;
                         } 
                     } 
                    // mol=HCl;
@@ -150,8 +162,12 @@ public class App {
         }
 
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(250000.0+273.15, Hs.get(i).m);
-            //Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            //double module = Atome.TempératureE6Vitesse(250.0+273.15, Hs.get(i).m);
+            double module=Math.pow(10, 15);
+            double Angle1=Math.random()*2*Math.PI;
+            double Angle2=Math.random()*2*Math.PI;
+           // Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -163,9 +179,9 @@ public class App {
         double mailman=0; //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*0.0625*Math.pow(10.0,-16);     //Delta temps de la simulation
+        double dt =0.25*0.0625*Math.pow(10.0,-18);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
@@ -219,7 +235,7 @@ public class App {
 
             
             mailman++;
-            if (mailman ==1000){
+            if (mailman ==100){
                 
                 mailman =0;
                 System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");

@@ -11,7 +11,7 @@ public class Atome{
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
     private Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
-    private double facteurMixVélMoyen = 0.5;                   //Facteur de mélange entre les vieilles vélocités et la nouvelle
+    private double facteurMixVélMoyen = 0.5;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
     public int NP;                      //Nombre de protons. Définis le type d'atomes.
@@ -153,7 +153,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if(dist < 3*(A.rayonCovalent+APrime.rayonCovalent)){ //true){ //
+            if( true ){ //true){ // dist <2.0*(A.rayonCovalent+APrime.rayonCovalent)
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -409,6 +409,7 @@ public class Atome{
         }else{
             A.vélocitéMoyenne = A.vélocité.copier();
         }
+        
     }
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
@@ -465,7 +466,10 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),50000.0);   //Température du système en °K
+        double T = Math.max(Température(paire),1);   //Température du système en °K    //paire
+        if (Double.isNaN(T)){
+            System.out.println("TempératurenNan");
+        }
         double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/*kB*T);             //Forces de Keesom
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/;                   //Forces de Debye
         double London = ((3.0*h)/2.0)*((a1*a2))/*Math.pow(4.0*Math.PI*ep0*ep0,2.0))*/*((nu1*nu2)/(nu1+nu2));//Forces de London
@@ -532,7 +536,7 @@ public class Atome{
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
-        double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
+        double p = ConstanteDeForce[NP-1][NPA-1]*10000;//10000.0;
         //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
         // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
         // quasiment identique à s'il n'était pas lié.
@@ -694,7 +698,7 @@ public class Atome{
             Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
         }
 
-        double D0 = angle0-angle; //Delta theta      
+        double D0 = angle0*1.05-angle; //Delta theta      
         
        return ( Vecteur3D.mult(potdirection, -D0*Kij ));
     }
@@ -1557,15 +1561,68 @@ public class Atome{
 
         double v1 = 0.0;
         double Ek = 0.0;
+
+        double Kstruges=1.0 + 4.3*Math.log10(A.size());
+        //double Yule = 
+        double KsA= Math.ceil(Kstruges);
+        double Delta =0.0 ;
+        double MinEk=Double.MAX_VALUE;
+        double MaxEk=Double.MIN_VALUE;
+        double[] EkMod= new double[(int) KsA];
+        double EkMode=0.0;
         for (int i = 0; i < A.size(); i++) {
-            v1 += A.get(i).vélocitéMoyenne.longueur();
-            Ek += Math.pow(A.get(i).vélocitéMoyenne.longueur(),2.0)*A.get(i).m*0.5;
+        MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
+        MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
         }
-        v1 = v1/(double)A.size();
-        Ek = Ek/A.size();
-        //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
+        Delta=(MaxEk-MinEk)/KsA;
+        for (int i = 0; i < A.size(); i++) {
+            for (int j = 0; j<KsA; j++){
+                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
+                EkMod[j]++;          
+                }
+
+
+            }
+            
         
-        return Ek*2.0/(3.0*kB);
+        }
+            /** Donne la popularite de la/les cases les plus remplis*/
+        double Population=0.0;
+
+        for (int i = 0; i <KsA  ; i++) {
+            Population=Math.max(Population,EkMod[i]);
+        }
+
+        //double n=0.0;
+        for (int i = 0; i <KsA  ; i++) {
+            if ( EkMod[i]==Population){
+                EkMode=0.5*(MinEk+i*Delta+MinEk+(i+1)*Delta);
+                break;
+                //n++;
+            }
+        }
+        //EkMode=EkMode/n;
+
+
+
+
+
+         /* for (int i = 0; i < A.size(); i++) {
+            v1 += A.get(i).vélocitéMoyenne.longueur();
+            Ek += Math.pow(VitesseMode,2)*A.get(i).m*0.5;
+            
+        }  */
+        
+      //  Ek = Math.pow(   ,2.0)*A.get(i).m*0.5;
+        //v1 = v1/(double)A.size();
+        //Ek = Ek/A.size();
+ 
+
+        //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s"); Ek*2.0/(3.0*kB)
+        if (Double.isNaN(EkMode*2.0/(3.0*kB))){
+            System.out.println("EnenergiCinetiqueNAN");
+        }
+        return ((EkMode*2.0/(3.0*kB)));
 
         /* for (int j=0; j < A.size()*0.5; j++){
         for (int i = 0; i < EK1.size()-1; i++) {
