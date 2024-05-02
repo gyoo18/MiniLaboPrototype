@@ -1,6 +1,7 @@
 package com.MiniLabo.prototype;
 import java.lang.invoke.MethodHandles.Lookup.ClassOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.text.Position;
 
@@ -9,6 +10,7 @@ public class Atome{
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
+    public Vecteur3D vélocitéMoyen = new V3(000);
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
     public int NP;                      //Nombre de protons. Définis le type d'atomes.
@@ -50,7 +52,7 @@ public class Atome{
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
-        true, //Force de Torsion
+        true    , //Force de Torsion
         true, //Force Diedre
         
 
@@ -336,6 +338,7 @@ public class Atome{
                     Atome Ak =Environnement.get(Aj.liaisonIndexe.get(k));
 
                     Ai.Force.addi(ForceDiedre(Ai, A, Aj, Ak));
+                    A.Force.addi(ForceDiedre(Ai,A,Aj,Ak).opposé());
                     //System.out.println(V3.distance(ForceDiedre(Ai, A, Aj, Ak),new V3(000)));
                 }
             }
@@ -365,6 +368,11 @@ public class Atome{
             A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
             A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
+
+
+
+        //Évaluer vitesse moyen
+        A.vélocitéMoyen= V3.mult(V3.addi(A.vélocitéMoyen,A.vélocité),0.5);
     }
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
@@ -465,11 +473,11 @@ public class Atome{
     private static Vecteur3D ForceDeMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
         double l = 0; //Longueur de liaison
         if(nLiaisons == 1){
-            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
+            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])); //Longueur d'ordre 1
         }else if(nLiaisons == 2){
-            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]));//*(86/100); //Longueur d'ordre 2
+            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*(86/100); //Longueur d'ordre 2
         }else if(nLiaisons == 3){
-            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-0*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]));//*(78/100);  //Longueur d'ordre 3;
+            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1]-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA]))*(78/100);  //Longueur d'ordre 3;
         }
 
 
@@ -546,7 +554,7 @@ public class Atome{
         }
         Vecteur3D PlanAjAi= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
         
-        Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(V3.sous(Ai.position,A.position),PlanAjAi)));
+        Vecteur3D potdirection = new Vecteur3D(  V3.norm(       V3.croix(V3.sous(Ai.position,A.position),PlanAjAi)      )     );
 
         double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(Ai.position,A.position)), V3.norm(V3.sous(Aj.position ,A.position))),-1.0),1.0));
         double angle0; //Angle à l'équilibre entre I et J
@@ -695,7 +703,7 @@ public class Atome{
             Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
         }
 
-        double D0 = angle0-angle; //Delta theta      
+        double D0 = angle0*1.05-angle; //Delta theta      
         
        return ( Vecteur3D.mult(potdirection, -D0*Kij ));
     }
@@ -754,7 +762,7 @@ public class Atome{
             Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
         }
 
-        double D0 = angle0-angle; //Delta theta      
+        double D0 = angle0*1.1-angle; //Delta theta      
         
        return ( Vecteur3D.mult(potdirection, -D0*Kij ));
     }
@@ -779,7 +787,7 @@ public class Atome{
         double AngleO=1.0*Math.PI;
         Vecteur3D direction = new Vecteur3D(Vecteur3D.norm(PlaniAj));
         double iAjxAjk = V3.scal(V3.norm(PlaniAj),V3.norm(PlanAjk));
-        double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1),1));
+        double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1.0),1.0));
         double FDiedre=0.0;
         Boolean Liasondouble = false;
         for (int j=0; j < A.liaisonIndexe.size();j++){
@@ -799,8 +807,21 @@ public class Atome{
         }
         if (Liasondouble){
             AngleO=0.5*Math.PI; //1/2 = 0.5 sa faisait bugger :()
-            ConstanteDeForce=1.0;///6.022*Math.pow(10 ,-20 );
-            FDiedre = -sens*ConstanteDeForce*Math.pow((AngleO-Angle),-3);
+            ConstanteDeForce=10*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
+            double AngleP=1.0/AngleO;
+            double AngleX=Angle*(2/Math.PI);
+            if (AngleO-Angle==0){
+               FDiedre=0;
+            } else{
+
+                //FDiedre = -sens*ConstanteDeForce*Math.pow((AngleO-Angle),-1);
+                FDiedre = -sens*ConstanteDeForce*Math.pow(Math.pow(1-AngleX,-1)-AngleX+1,1);
+            }
+            if (FDiedre>10000){
+                System.out.println(33);
+            }
+        
+        
         } else {
             FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4.0*Math.pow(Math.PI,2) ) ),2));
         }
@@ -1402,14 +1423,58 @@ public class Atome{
     public static double Température(ArrayList<Atome> A){
         double v1 = 0.0;
         double Ek = 0.0;
+        double EkMoyen=0;
+        ArrayList<Double> EK1 = new ArrayList<>(
+        );
+        
+
         for (int i = 0; i < A.size(); i++) {
-            v1 += A.get(i).vélocité.longueur();
-            Ek += Math.pow(A.get(i).vélocité.longueur()*Math.pow(10,-0),2.0)*A.get(i).m*0.5;
+            /* v1 += A.get(i).vélocité.longueur();
+            Ek += Math.pow(A.get(i).vélocité.longueur(),2.0)*A.get(i).m*0.5; */
+            EK1.add(Math.pow(A.get(i).vélocitéMoyen.longueur(),2.0)*A.get(i).m*0.5);
+            
+        
         }
-        v1 = v1/(double)A.size();
+       
+        for (int i = 0; i < EK1.size(); i++) {
+        EkMoyen =+ EK1.get(i)/EK1.size(); 
+
+        }
+        /* for (int j=0; j < A.size()*0.5; j++){
+        for (int i = 0; i < EK1.size()-1; i++) {
+            if(EK1.get(i) < EK1.get((i+1))){
+                
+                
+                double a = EK1.get(i);
+                EK1.set( i, EK1.get(i+1));
+                EK1.set( i+1 , a );
+            
+            }
+        }
+        } */
+
+
+        //EK1.
+
+
+
+
+
+        //EK1.sort(1<3 <Atome> A.get(2) );
+        if (EK1.getLast()>100){
+           // System.out.println(3);
+        }
+        double Temperature=EkMoyen*2.0/(3.0*kB);
+        return (Temperature);
+
+        /* v1 = v1/(double)A.size();
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
-        return Ek*2.0/(3.0*kB);
+        return Ek*2.0/(3.0*kB); 
+ */
+        
+       
+
     }
 
     public static double TempératureEnVitesse(double T, double m){
@@ -1439,6 +1504,7 @@ public class Atome{
         }
         this.position = b.position.copier();
         this.vélocité = b.vélocité.copier();
+        this.vélocitéMoyen = b.vélocitéMoyen.copier();
         this.Force = b.Force.copier();
         this.positionDoublet = (ArrayList<Vecteur3D>) b.positionDoublet.clone();
         this.prevPosDoublet = (ArrayList<Vecteur3D>) b.prevPosDoublet.clone();
@@ -1486,8 +1552,11 @@ public class Atome{
     public static final double K = 8.987*Math.pow(10.0,39.0);    //Constante de Coulomb
     public static final double ep0 = 8.854*Math.pow(10.0,-42);     //Permittivité du vide
     public static final double h = 6.626*Math.pow(10.0,-14);       //Constante de Planck
-    public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman
+    public static final double kB = 1.380*Math.pow(10.0,-3);       //Constante de Boltzman en Jarmstrong
+    public static final double kBJ = 1.380*Math.pow(10.0,-23);       //Constante de Boltzman en J
     public static final double c = 2.99792458*Math.pow(10.0,18.0);//Vitesse de la lumière
+    public static final double Navodagro = 6.02214076*Math.pow(10,23); //nombre d'avogadro en Mol-1
+    public static final double R=Navodagro*kB;
 
     public static ArrayList<Atome> Environnement = new ArrayList<>(); //Référence à la liste des autres atomes de la simulation
 
