@@ -307,7 +307,7 @@ public class Atome{
                     
                     Ai.Force.addi(Force); //Appliquer force de torsion à IA
                     A.Force.addi(Force.opposé());
-                   // Aj.Force.addi(Force.opposé());
+                    //Aj.Force.addi(Force.opposé());
                     //A.forceDoublet.get(j).addi(Force.opposé()); //Appliquer force au doublet
                     
                 }

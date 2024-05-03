@@ -15,8 +15,8 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 35f;
-    public static int FOV = 250;     //Champ de vision de la caméra
+    public static float Zoom = 30f;
+    public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
@@ -100,7 +100,7 @@ public class App {
         
         //MoléculeRéf.intégrerÀSimulation(Hs, NaCl);
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =8;  //Nombre de molécules voulus
+        int NbMolécules =1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -110,34 +110,9 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 180) {
             essais++;
             MoléculeRéf mol = H2O;
-                if (Math.random() <0) {
-        
-                   /*  if (Math.random() <0.5) {
-                        mol = H2O; //Molécule à ajouter dans la simulation
-                    } else {
-                        if (Math.random() <0.5) {
-                            mol = H3Op; //Molécule à ajouter dans la simulation
-                        } else {
-                            mol = OHm;
-                        } 
-        
-                    }  */
-                    mol=NaOH;
-                } else {
-                     if (Math.random() < 0.8){
-                        //mol = H2O;
-                        mol = H2O;
-                    } else{
-                        if (Math.random() <0.5) {
-                            //mol = NaCl; //Molécule à ajouter dans la simulation
-                            mol=NaOH;
-                        } else {
-                            mol = HCl;
-                        } 
-                    } 
-                   // mol=HCl;
-                    
-                } 
+            if(totalMolécules < 2){
+                mol = MoléculeRéf.avoirNaCl();
+            }
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
