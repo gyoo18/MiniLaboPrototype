@@ -8,6 +8,37 @@ import java.util.ArrayList;
 
 public class Intégrateur {
 
+    private static class FilsDistributeur implements Runnable{
+
+        private ArrayList<Atome> ensemble;
+        private boolean terminé = false;
+
+        public FilsDistributeur(){}
+
+        public void changerEnsemble(ArrayList<Atome> sousEnsemble){
+            ensemble = sousEnsemble;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < ensemble.size(); i++) {
+                Atome.ÉvaluerForces(ensemble.get(i));
+            }
+            //System.out.println(Thread.currentThread().getName());
+            terminé = true;
+        }
+    }
+
+    private static Thread[] bouc = new Thread[5];
+    private static FilsDistributeur[] fils = new FilsDistributeur[bouc.length];
+
+    public static void initialisation(){
+        for (int i = 0; i < bouc.length; i++) {
+            fils[i] = new FilsDistributeur();
+            bouc[i] = new Thread(fils[i]);
+        }
+    }
+
     /**
      * Intègre selon la méthode d'Euler
      * @param O - la liste des Atomes à intégre
@@ -201,10 +232,79 @@ public class Intégrateur {
                     o.vélDoublet.get(i).addi(Vecteur3D.mult( o.forceDoublet.get(i), h/(4.0*Atome.mE)));
                 }
             }
-
-            
         }
         
+    }
+
+    public static void IterVerletVBF(ArrayList<Atome> O, double h){
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3D(0);
+            for (int j = 0; j < o.forceDoublet.size(); j++) {
+                o.forceDoublet.set(j,new Vecteur3D(0));
+            }
+        }
+
+        for (Atome o : O) {
+            o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.size(); i++) {
+                    o.vélDoublet.get(i).addi(Vecteur3D.mult(o.forceDoublet.get(i), h/(4.0*Atome.mE)));
+                }
+            }
+            o.ÉvaluerContraintes();
+        }
+
+        for (Atome o : O) {
+            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.m))));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.size(); i++) {
+                    o.positionDoublet.get(i).addi(Vecteur3D.addi(Vecteur3D.mult(o.vélDoublet.get(i),h), Vecteur3D.mult(o.forceDoublet.get(i), h*h/(4.0*Atome.mE))));
+                }
+            }
+            o.ÉvaluerContraintes();
+        }
+
+        ArrayList<ArrayList<Atome>> Op = new ArrayList<>();
+        for (int i = 0; i < bouc.length; i++) {
+            Op.add(new ArrayList<>());
+            int L = O.size()/bouc.length;
+            for (int j = L*i; j < L*(i+1); j++) {
+                Op.get(i).add(O.get(j));
+            }
+        }
+        for (int i = 0; i < bouc.length; i++) {
+            fils[i].changerEnsemble(Op.get(i));
+            bouc[i] = new Thread(fils[i]);
+            bouc[i].start();
+        }
+
+        boolean terminé = false;
+        while (!terminé) {
+            terminé = true;
+            for (int i = 0; i < bouc.length; i++) {
+                terminé = terminé && !bouc[i].isAlive();
+            }
+        }
+
+        for (int i = 0; i < O.size(); i++) {
+            if(O.get(i).Force.longueur() < 0.00000000001){
+                //System.out.println("null");
+                Atome.ÉvaluerForces(O.get(i));
+            }
+        }
+
+        for (Atome o : O) {
+            o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.m)));
+
+            if(o.forceDoublet != null){
+                for (int i = 0; i < o.forceDoublet.size(); i++) {
+                    o.vélDoublet.get(i).addi(Vecteur3D.mult( o.forceDoublet.get(i), h/(4.0*Atome.mE)));
+                }
+            }
+        }
     }
 
     public static void IterVerletVBCD(ArrayList<Atome> O, double h){

@@ -34,6 +34,8 @@ public class App {
         frame.add(image);                           //Ajouter l'objet Image à l'écran
         frame.setVisible(true);                   //Afficher la fenêtre
 
+        Intégrateur.initialisation();
+
         try{
             //Thread.sleep(3000);
         }catch(Exception e){
@@ -91,7 +93,7 @@ public class App {
         
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =1000;  //Nombre de molécules voulus
+        int NbMolécules = 1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -102,7 +104,7 @@ public class App {
             essais++;
             MoléculeRéf mol = H2O;
             if(totalMolécules < 2){
-                mol = MoléculeRéf.avoirNaCl();
+                //mol = MoléculeRéf.avoirNaCl();
             }
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
@@ -168,7 +170,7 @@ public class App {
         long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt =0.25*0.0625*Math.pow(10.0,-18);     //Delta temps de la simulation
+        double dt =1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -182,24 +184,11 @@ public class App {
             for (int N = 0; N < 20; N++) {
                 
                 for (int i = 0; i < Hs.size(); i++) {
-                   /*  if (mailmanresonant > 1000){
-                        for (int j=0; j < Hs.get(i).liaisonIndexe.size(); j++){
-
-                            if (Hs.get(i).liaisonIndexe.get(j) != -1 && Hs.get(i).liaisonIndexe.get(i) != Hs.get(i).liaisonIndexe.get(j)){
-                            
-                           
-                            Hs.get(i).briserLien(j);  
-                           
-                            }
-                        
-                        }
-                        mailmanresonant=0;
-                    } */
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                     //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
-                Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerletVBF(Hs, dt); //Mise à jour de la position.
                 temps += dt;
                // T += Atome.Température(Hs);
                 /* mailmanresonant++; */

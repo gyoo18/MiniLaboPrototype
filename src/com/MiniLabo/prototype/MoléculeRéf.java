@@ -794,7 +794,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         NaCl.évaluerSystèmesConjugués(); //Détecte la résonance
-        NaCl.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        //NaCl.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);

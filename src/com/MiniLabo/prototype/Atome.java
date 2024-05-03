@@ -1448,7 +1448,6 @@ public class Atome{
 
     public static double TempératureEnVitesse(double T, double m){
         return Math.sqrt(3.0*kB*T/m);
-        return Math.sqrt(3.0*kB*T/m);
     }
 
     /**
