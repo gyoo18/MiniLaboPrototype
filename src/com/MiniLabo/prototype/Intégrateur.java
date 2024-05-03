@@ -69,15 +69,15 @@ public class Intégrateur {
             
             Vecteur3D pPos = o.position.copier();
 
-            /*if(Math.abs(o.position.y) > (double)App.TailleY/(2.0*App.Zoom)){
-                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(0,2*(o.position.y-o.prevPosition.y),0) );
+            /* if(Math.abs(o.position.y) > (double)App.TailleY/(2.0*App.Zoom)){
+                o.prevPosition= Vecteur3D.addi(o.prevPosition, new Vecteur3D(0,2*(o.position.y-o.prevPosition.y),0) );
             }
             if(Math.abs(o.position.x) > (double)App.TailleX/(2.0*App.Zoom)){
-                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(2*(o.position.x-o.prevPosition.x),0,0) );
+                o.prevPosition= Vecteur3D.addi(o.prevPosition, new Vecteur3D(2*(o.position.x-o.prevPosition.x),0,0) );
             }
             if(Math.abs(o.position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
-                o.prevPosition= Vecteur3f.add(o.prevPosition, new Vecteur3f(0,0,2*(o.position.z-o.prevPosition.z)) );
-            }*/
+                o.prevPosition= Vecteur3D.addi(o.prevPosition, new Vecteur3D(0,0,2*(o.position.z-o.prevPosition.z)) );
+            } */
             o.position = (Vecteur3D.addi(Vecteur3D.mult(o.position, 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosition, -1.0), Vecteur3D.mult(o.Force, h*h/o.m))));
             o.prevPosition = pPos.copier();
 
@@ -89,16 +89,17 @@ public class Intégrateur {
                     o.positionDoublet.set(i,(Vecteur3D.addi(Vecteur3D.mult(o.positionDoublet.get(i), 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosDoublet.get(i), -1.0), Vecteur3D.mult(o.forceDoublet.get(i), h*h/Atome.mE)))));
                     o.prevPosDoublet.set(i,pPos);
 
+                    
                     o.vélDoublet.set(i,Vecteur3D.mult(Vecteur3D.sous(o.positionDoublet.get(i), pPos),1.0/(2.0*h)));
                 }
-               /*  for (int i = 0; i < o.forceDoublet.length; i++) {
-                    o.positionDoublet.get(i) = Vecteur3f.scale(Vecteur3f.normalize(o.positionDoublet.get(i)), o.rayonCovalent);
-                    o.prevPosDoublet[i] = Vecteur3f.scale(Vecteur3f.normalize(o.prevPosDoublet[i]), o.rayonCovalent);
-                    if(o.vélDoublet.get(i).length() > 0){
-                        o.vélDoublet.get(i) = Vecteur3f.sub(o.vélDoublet.get(i), Vecteur3f.scale( o.positionDoublet.get(i), Vecteur3f.scal(o.vélDoublet.get(i), o.positionDoublet.get(i))/(o.positionDoublet.get(i).longueur()*o.positionDoublet.get(i).longueur()) ) );
-                        o.vélDoublet.get(i) = Vecteur3f.scale(Vecteur3f.norm(o.vélDoublet.get(i)), Math.min(o.vélDoublet.get(i).length(), 10000000000000.0));
+               /*  for (int i = 0; i < o.forceDoublet.size(); i++) {
+                    o.positionDoublet.get(i) = Vecteur3D.scale(Vecteur3D.normalize(o.positionDoublet.get(i)), o.rayonCovalent);
+                    o.prevPosDoublet[i] = Vecteur3D.scale(Vecteur3D.normalize(o.prevPosDoublet[i]), o.rayonCovalent);
+                    if(o.vélDoublet.get(i).longueur() > 0){
+                        o.vélDoublet.get(i) = new Vecteur3D.sub(o.vélDoublet.get(i), Vecteur3D.scale( o.positionDoublet.get(i), Vecteur3D.scal(o.vélDoublet.get(i), o.positionDoublet.get(i))/(o.positionDoublet.get(i).longueur()*o.positionDoublet.get(i).longueur()) ) );
+                        o.vélDoublet.get(i) = new Vecteur3D.mult(Vecteur3D.norm(o.vélDoublet.get(i)), Math.min(o.vélDoublet.get(i).length(), 10000000000000.0));
                     }
-                }*/
+                } */
                 
             }
 

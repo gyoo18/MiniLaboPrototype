@@ -58,11 +58,23 @@ public class App {
         MoléculeRéf HCl = MoléculeRéf.avoirHCl();
         MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
         MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
+        MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
-       /* Atome H = new Atome(1);
+        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
-        Hs.add(H);*/
+        Hs.add(H);
+        Atome H1 = new Atome(1);
+        H1.position= new V3(4,1,0);
+       
+        Hs.add(H1);
+        
+
+        Atome Cl = new Atome(17);
+        Cl.position= new V3(1,5,0);
+        Cl.retirerÉlectron();
+        Cl.évaluerValence();
+        Hs.add(Cl); */
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -77,15 +89,16 @@ public class App {
             }
         }*/
         
+        
         //Initialiser les atomes selon l'algorithme de poisson
         int NbMolécules =1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.1;  //Zone tampon entre les atomes
+        double tampon = 0.50025;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
-        while (totalMolécules < NbMolécules && essais < 40) {
+        while (totalMolécules < NbMolécules && essais < 180) {
             essais++;
             MoléculeRéf mol = H2O;
             if(totalMolécules < 2){
@@ -138,9 +151,12 @@ public class App {
         }
 
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
-            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
-            //Hs.get(i).vélocité = new Vecteur3D(module,0.0,0.0);
+            //double module = Atome.TempératureE6Vitesse(250.0+273.15, Hs.get(i).m);
+            double module=Math.pow(10, 15);
+            double Angle1=Math.random()*2*Math.PI;
+            double Angle2=Math.random()*2*Math.PI;
+           // Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -152,9 +168,9 @@ public class App {
         long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt = 1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
+        double dt =0.25*0.0625*Math.pow(10.0,-18);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 50));   //Couleur de l'arrière-plan
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
 
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
@@ -361,7 +377,7 @@ public class App {
         //Dessiner l'atome
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
        
-       /*  g.setColor(new Color(0,0,0,200));
+       /*\  g.setColor(new Color(0,0,0,200));
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
         g.fillOval((int)(((A.position.x)*multPersZ - 0*PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
         g.drawLine((int) ((A.position.x)*multPersZ - PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)), (int)((A.position.x)*multPersZ - 0*PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)));
