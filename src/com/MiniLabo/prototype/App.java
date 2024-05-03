@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 30f;
+    public static float Zoom = 10f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -232,7 +232,7 @@ public class App {
             }
 
             if (System.currentTimeMillis()-mailman > 1000){
-                System.out.println("8-------------------------------------D");
+                System.out.println("I-+-+-+-I-+-+-+-I-+-+-+-I-+-+-+-I");
 
                 mailman = System.currentTimeMillis();
                 System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");
