@@ -385,7 +385,7 @@ public class Atome{
 
         //Force non conventionelle
         double ModuleFriction = -0.00000000000001;
-        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,0,-9.8*Math.pow(10,10)*A.m)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
@@ -675,15 +675,17 @@ public class Atome{
             } else{
 
                 //FDiedre = -sens*ConstanteDeForce*Math.pow((AngleO-Angle),-1);
-                FDiedre = -sens*ConstanteDeForce*Math.pow(Math.pow(1-AngleX,-1)-AngleX+1,1);
+                //FDiedre = -0.00125*sens*ConstanteDeForce*   Math.pow(   (   Math.pow(1-AngleX,-1)-AngleX+1 ) ,3)  ;
+                FDiedre=-10.0*sens*ConstanteDeForce*Math.pow(-1.0*Math.pow((1-AngleX),2)+1.0,    1);
             }
-            if (FDiedre>10000){
+            /* if (FDiedre>10000){
                 System.out.println(33);
-            }
+            } */
         
         
         } else {
             FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4.0*Math.pow(Math.PI,2) ) ),2));
+       
         }
 
 
