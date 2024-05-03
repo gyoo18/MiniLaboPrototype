@@ -773,7 +773,7 @@ public class MoléculeRéf extends Molécule{
         Atome Cl = new Atome(17);    
         Cl.position = new Vecteur3D(0,0,0);
         Atome Na = new Atome(11);    
-        Na.position = new Vecteur3D(1,0,0);
+        Na.position = new Vecteur3D(3.03,0,0);
 
         //Ajouter chaque atome à la molécule
         NaCl.ajouterAtome(Cl);

@@ -16,7 +16,7 @@ public class App {
     public static int TailleY = 512;
     public static int TailleZ = 512;
     public static float Zoom = 35f;
-    public static int FOV = 100;     //Champ de vision de la caméra
+    public static int FOV = 250;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
@@ -60,21 +60,30 @@ public class App {
         MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
         MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
-        /* Atome H = new Atome(1);
+         /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
         Hs.add(H);
         Atome H1 = new Atome(1);
-        H1.position= new V3(4,1,0);
+        H1.position= new V3(4,1,0); */
        
-        Hs.add(H1);
+        //Hs.add(H1);
         
 
-        Atome Cl = new Atome(17);
-        Cl.position= new V3(1,5,0);
-        Cl.retirerÉlectron();
+        /* Atome Cl = new Atome(17);
+        Cl.position= new V3(2,3,3);
+         Cl.ajouterÉlectron();
         Cl.évaluerValence();
-        Hs.add(Cl); */
+        Cl.indexe=0;
+        Hs.add(Cl);
+
+        Atome Na = new Atome(11);
+        Na.position= new V3(-1,0,0);
+        Na.retirerÉlectron();
+        Na.évaluerValence();
+        Na.indexe=1;
+        Hs.add(Na); */
+
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -89,13 +98,13 @@ public class App {
             }
         }*/
         
-        
+        //MoléculeRéf.intégrerÀSimulation(Hs, NaCl);
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =100;  //Nombre de molécules voulus
+        int NbMolécules =8;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.50025;  //Zone tampon entre les atomes
+        double tampon = 0.850025;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 180) {
@@ -115,7 +124,7 @@ public class App {
                     }  */
                     mol=NaOH;
                 } else {
-                     if (Math.random() < 0.9){
+                     if (Math.random() < 0.8){
                         //mol = H2O;
                         mol = H2O;
                     } else{
@@ -161,9 +170,11 @@ public class App {
             }
         }
 
+
+        //Déplacement
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
-        for (int i = 0; i < 10; i++) {
+         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < Hs.size(); j++) {
                 Atome.ÉvaluerForces(Hs.get(j));
             }
@@ -173,15 +184,15 @@ public class App {
             for (int j = 0; j < Hs.size(); j++) {
                 Hs.get(j).ÉvaluerContraintes();
             }
-        }
-
+        } 
+        //Vitesse initial
         for (int i = 0; i < Hs.size(); i++) {
             //double module = Atome.TempératureE6Vitesse(250.0+273.15, Hs.get(i).m);
-            double module=Math.pow(10, 15);
+            double module=Math.pow(10, 10);
             double Angle1=Math.random()*2*Math.PI;
             double Angle2=Math.random()*2*Math.PI;
-           // Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
-            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+            //Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -193,7 +204,7 @@ public class App {
         long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt =0.25*0.0625*Math.pow(10.0,-18);     //Delta temps de la simulation
+        double dt =2*0.625*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
             g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
             g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
@@ -246,7 +257,8 @@ public class App {
             }
 
             if (System.currentTimeMillis()-mailman > 1000){
-                
+                System.out.println("8-------------------------------------D");
+
                 mailman = System.currentTimeMillis();
                 System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");
 
@@ -389,13 +401,13 @@ public class App {
         //Rouge = charge+, Blanc = neutre, Bleu = charge-
         if(charge > 0.0){
             //Rouge
-            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(charge/2.0,1.0)), 200));
+            g.setColor(new Color((int)(col*255f), (int)mix(0.0,col*255f,1.0-Math.min(charge/2.0,1.0)), (int)mix(0.0, col*255f, 1.0-Math.min(charge/2.0,1.0)), 220));
         }else if(charge == 0.0){
             //Blanc
-            g.setColor(new Color((int)(255*col),(int)(255*col),(int)(255*col),200));
+            g.setColor(new Color((int)(255*col),(int)(255*col),(int)(255*col),220));
         }else if(charge < 0.0){
             //Bleu
-            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-charge/2.0,1.0)), (int)(col*255f), 200));
+            g.setColor(new Color((int)mix(0f,col*255f,1.0-Math.min(-charge/2.0,1.0)), (int)mix(0f, col*255f, 1.0-Math.min(-charge/2.0,1.0)), (int)(col*255f), 220));
         }
 
         double PR = A.rayonCovalent*multPersZ;  //Rayon 2D de l'atome
@@ -437,11 +449,17 @@ public class App {
             }
         }
         //Dessiner force resultante
-        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocitéMoyen),0.01*Math.log(Zoom*A.vélocitéMoyen.longueur()+1)),A.position);
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.01*Math.log(Zoom*A.Force.longueur()+1)),A.position);
         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
         g.setStroke(new BasicStroke());
-        g.setColor(Color.WHITE);       //Couleur de la force
+        g.setColor(Color.RED);       //Couleur de la force
         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+        //Vecteur vitesse
+        Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.01*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
+        double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));
+        g.setStroke(new BasicStroke());
+        g.setColor(Color.WHITE);       //Couleur de la force
+        g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZV) , (TailleY/2) - (int)((directionF.y)*multPersZV));
     }
 
     /**
