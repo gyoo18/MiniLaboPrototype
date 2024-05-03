@@ -153,7 +153,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if( true ){ //true){ // dist <2.0*(A.rayonCovalent+APrime.rayonCovalent)
+            if( true ){ // dist <2.0*(A.rayonCovalent+APrime.rayonCovalent)
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -382,7 +382,6 @@ public class Atome{
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
-            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Appliquer les forces des doublets sur l'atome.
@@ -1360,12 +1359,10 @@ public class Atome{
     }
 
     public static double Température(ArrayList<Atome> A){
-
-
         double v1 = 0.0;
         double Ek = 0.0;
 
-        double Kstruges=1.0 + 4.3*Math.log10(A.size());
+        double Kstruges=1.0 + (10.0/3.0)*Math.log10(A.size());
         //double Yule = 
         double KsA= Math.ceil(Kstruges);
         double Delta =0.0 ;
@@ -1381,13 +1378,9 @@ public class Atome{
         for (int i = 0; i < A.size(); i++) {
             for (int j = 0; j<KsA; j++){
                 if (MinEk+j*Delta<= Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
-                EkMod[j]++;          
+                    EkMod[j]++;          
                 }
-
-
             }
-            
-        
         }
             /** Donne la popularite de la/les cases les plus remplis*/
         double Population=0.0;
@@ -1406,10 +1399,6 @@ public class Atome{
         }
         //EkMode=EkMode/n;
 
-
-
-
-
          /* for (int i = 0; i < A.size(); i++) {
             v1 += A.get(i).vélocitéMoyenne.longueur();
             Ek += Math.pow(VitesseMode,2)*A.get(i).m*0.5;
@@ -1424,8 +1413,10 @@ public class Atome{
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s"); Ek*2.0/(3.0*kB)
         if (Double.isNaN(EkMode*2.0/(3.0*kB))){
             System.out.println("EnenergiCinetiqueNAN");
+            return 30.0;
+        }else{
+            return ((EkMode*2.0/(3.0*kB)));
         }
-        return ((EkMode*2.0/(3.0*kB)));
 
         /* for (int j=0; j < A.size()*0.5; j++){
         for (int i = 0; i < EK1.size()-1; i++) {

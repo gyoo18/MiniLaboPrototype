@@ -104,7 +104,7 @@ public class App {
             essais++;
             MoléculeRéf mol = H2O;
             if(totalMolécules < 2){
-                //mol = MoléculeRéf.avoirNaCl();
+                mol = MoléculeRéf.avoirNaCl();
             }
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
@@ -138,9 +138,9 @@ public class App {
             }
         }
 
-        Atome.MettreÀJourEnvironnement(Hs);
+        /*Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             for (int j = 0; j < Hs.size(); j++) {
                 Atome.ÉvaluerForces(Hs.get(j));
             }
@@ -150,14 +150,14 @@ public class App {
             for (int j = 0; j < Hs.size(); j++) {
                 Hs.get(j).ÉvaluerContraintes();
             }
-        }
+        }*/
 
         for (int i = 0; i < Hs.size(); i++) {
-            //double module = Atome.TempératureE6Vitesse(250.0+273.15, Hs.get(i).m);
-            double module=Math.pow(10, 15);
+            double module = Atome.TempératureEnVitesse(250.0+273.15, Hs.get(i).m);
+            //double module=Math.pow(10, 15);
             double Angle1=Math.random()*2*Math.PI;
             double Angle2=Math.random()*2*Math.PI;
-           // Hs.get(i).vélocité = new Vecteur3D(5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module,5.0*(Math.random()-0.5)*module);
+            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
@@ -188,13 +188,10 @@ public class App {
                     //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
-                Intégrateur.IterVerletVBF(Hs, dt); //Mise à jour de la position.
+                Intégrateur.IterVerletVBF(Hs, dt, N==0); //Mise à jour de la position.
                 temps += dt;
                // T += Atome.Température(Hs);
                 /* mailmanresonant++; */
-                
-                    
-                
             }
             
             //Affichage de la simulation
@@ -209,7 +206,7 @@ public class App {
                 }
             }
 
-            if (System.currentTimeMillis()-mailman > 1000){
+            if (System.currentTimeMillis()-mailman > 5000){
                 
                 mailman = System.currentTimeMillis();
                 System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");

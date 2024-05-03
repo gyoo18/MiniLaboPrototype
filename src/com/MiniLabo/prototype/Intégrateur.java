@@ -236,7 +236,7 @@ public class Intégrateur {
         
     }
 
-    public static void IterVerletVBF(ArrayList<Atome> O, double h){
+    public static void IterVerletVBF(ArrayList<Atome> O, double h, boolean distribuer){
 
         for (Atome o : O) {
             o.Force = new Vecteur3D(0);
@@ -266,17 +266,27 @@ public class Intégrateur {
             }
             o.ÉvaluerContraintes();
         }
-
+        
         ArrayList<ArrayList<Atome>> Op = new ArrayList<>();
-        for (int i = 0; i < bouc.length; i++) {
-            Op.add(new ArrayList<>());
+        if(distribuer){
             int L = O.size()/bouc.length;
-            for (int j = L*i; j < L*(i+1); j++) {
-                Op.get(i).add(O.get(j));
+            for (int i = 0; i < bouc.length; i++) {
+                Op.add(new ArrayList<>());
+                if(L*(i+2) < O.size()){
+                    for (int j = L*i; j < L*(i+1); j++) {
+                        Op.get(i).add(O.get(j));
+                    }
+                }else{
+                    for (int j = L*i; j < O.size(); j++) {
+                        Op.get(i).add(O.get(j));
+                    }
+                }
             }
         }
         for (int i = 0; i < bouc.length; i++) {
-            fils[i].changerEnsemble(Op.get(i));
+            if(distribuer){
+                fils[i].changerEnsemble(Op.get(i));
+            }
             bouc[i] = new Thread(fils[i]);
             bouc[i].start();
         }
@@ -290,8 +300,8 @@ public class Intégrateur {
         }
 
         for (int i = 0; i < O.size(); i++) {
-            if(O.get(i).Force.longueur() < 0.00000000001){
-                //System.out.println("null");
+            if(O.get(i).Force.longueur() == 0.0){
+                System.out.println("null");
                 Atome.ÉvaluerForces(O.get(i));
             }
         }
