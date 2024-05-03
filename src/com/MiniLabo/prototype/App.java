@@ -91,7 +91,7 @@ public class App {
         
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules =10;  //Nombre de molécules voulus
+        int NbMolécules =100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -161,6 +161,20 @@ public class App {
             }
         }
 
+        Atome.MettreÀJourEnvironnement(Hs);
+        Molécule.MiseÀJourEnvironnement(Hs);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < Hs.size(); j++) {
+                Atome.ÉvaluerForces(Hs.get(j));
+            }
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).déplacerVersÉquilibre();
+            }
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).ÉvaluerContraintes();
+            }
+        }
+
         for (int i = 0; i < Hs.size(); i++) {
             //double module = Atome.TempératureE6Vitesse(250.0+273.15, Hs.get(i).m);
             double module=Math.pow(10, 15);
@@ -174,9 +188,9 @@ public class App {
         for (int i = 0; i < Hs.size(); i++) {
             indexe.add(i);
         }
-        
+
         //Simulation
-        double mailman=0; //utiliser pour projeter dans terminal
+        long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt =0.25*0.0625*Math.pow(10.0,-18);     //Delta temps de la simulation
@@ -206,10 +220,8 @@ public class App {
                         }
                         mailmanresonant=0;
                     } */
-                    
-
-                    
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                    //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
                 Intégrateur.IterVerletVB(Hs, dt); //Mise à jour de la position.
@@ -233,21 +245,15 @@ public class App {
                 }
             }
 
-            
-            mailman++;
-            if (mailman ==100){
+            if (System.currentTimeMillis()-mailman > 1000){
                 
-                mailman =0;
-                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C, temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-
+                mailman = System.currentTimeMillis();
+                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");
 
               //Statistiques sur la vitesse de la simulation
-             // System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-            
-
-
+                System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
+    
                 énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
-            
             }
 
             //Dessiner les atomes dans l'ordre
@@ -431,15 +437,11 @@ public class App {
             }
         }
         //Dessiner force resultante
-       /*  Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(Zoom*A.Force.longueur()+1)),A.position);
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocitéMoyen),0.01*Math.log(Zoom*A.vélocitéMoyen.longueur()+1)),A.position);
         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
         g.setStroke(new BasicStroke());
         g.setColor(Color.WHITE);       //Couleur de la force
         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
- */
-
-
-
     }
 
     /**

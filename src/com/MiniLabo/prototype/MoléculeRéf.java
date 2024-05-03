@@ -101,7 +101,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         mol.évaluerSystèmesConjugués(); //Détecte la résonance
-        mol.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        mol.initialiserPositions();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);
@@ -139,7 +139,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(2, 1, 0, 1, false);
 
         H2O.évaluerSystèmesConjugués();
-        H2O.initialiserDoublets();
+        H2O.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -175,7 +175,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(1, 0, 0, 1, false);
        
         OHm.évaluerSystèmesConjugués();
-        OHm.initialiserDoublets();
+        OHm.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -218,7 +218,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(3, 2, 0, 1, false);
 
         H3Op.évaluerSystèmesConjugués();
-        H3Op.initialiserDoublets();
+        H3Op.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -257,7 +257,7 @@ public class MoléculeRéf extends Molécule{
         O.créerLien(2, 1, 0, 1, false);
 
         NaOH.évaluerSystèmesConjugués();
-        NaOH.initialiserDoublets();
+        NaOH.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -291,7 +291,7 @@ public class MoléculeRéf extends Molécule{
         Na.créerLien(1, 0, 0, 1, false);
 
         NaCl.évaluerSystèmesConjugués();
-        NaCl.initialiserDoublets();
+        NaCl.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -326,7 +326,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(2, 1, 0, 1, false);
 
         CH2.évaluerSystèmesConjugués();
-        CH2.initialiserDoublets();
+        CH2.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -369,7 +369,7 @@ public class MoléculeRéf extends Molécule{
         C.créerLien(4, 3, 0, 1, false);
 
         CH4.évaluerSystèmesConjugués();
-        CH4.initialiserDoublets();
+        CH4.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -435,7 +435,7 @@ public class MoléculeRéf extends Molécule{
         C4.créerLien(9, 3, 0, 1, false); //Liaison avec H6
 
         C4H6.évaluerSystèmesConjugués();
-        C4H6.initialiserDoublets();
+        C4H6.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -492,7 +492,7 @@ public class MoléculeRéf extends Molécule{
         C2.créerLien( H3.indexe, 3, 0, 1, false);
 
         C2H3O2.évaluerSystèmesConjugués();
-        C2H3O2.initialiserDoublets();
+        C2H3O2.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -569,7 +569,7 @@ public class MoléculeRéf extends Molécule{
         C2.créerLien(H6.indexe, 3, 0, 1, false);
 
         C2H6.évaluerSystèmesConjugués();
-        C2H6.initialiserDoublets();
+        C2H6.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -632,7 +632,7 @@ public class MoléculeRéf extends Molécule{
         //C2.créerLien(H4.indexe, 3, 0, 1, false);
 
         C2H4.évaluerSystèmesConjugués();
-        C2H4.initialiserDoublets();
+        C2H4.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);
@@ -671,7 +671,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         mol.évaluerSystèmesConjugués(); //Détecte la résonance
-        mol.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        mol.initialiserPositions();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);
@@ -712,7 +712,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         HCl.évaluerSystèmesConjugués(); //Détecte la résonance
-        HCl.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        HCl.initialiserPositions();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);
@@ -753,7 +753,7 @@ public class MoléculeRéf extends Molécule{
 
         //Ne pas changer
         Cl2.évaluerSystèmesConjugués(); //Détecte la résonance
-        Cl2.initialiserDoublets();      //Initialise la position des doublets à l'équilibre
+        Cl2.initialiserPositions();      //Initialise la position des doublets à l'équilibre
         //Ne pas changer
         Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
         MiseÀJourEnvironnement(Environnement);
@@ -888,7 +888,7 @@ public class MoléculeRéf extends Molécule{
         C2.créerLien(H6.indexe, 3, 0, 1, false); */
 
         C6H6.évaluerSystèmesConjugués();
-        C6H6.initialiserDoublets();
+        C6H6.initialiserPositions();
 
         Atome.MettreÀJourEnvironnement(Environnement);
         MiseÀJourEnvironnement(Environnement);

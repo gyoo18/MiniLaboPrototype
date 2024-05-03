@@ -452,12 +452,8 @@ public class Molécule {
         }
     }
 
-    public void initialiserDoublets(){
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < Atomes.size(); j++) {
-                Atomes.get(j).déplacerDoublet();
-            }
-        }
+    public void initialiserPositions(){
+        
     }
 
     /**

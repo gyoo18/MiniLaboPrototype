@@ -20,7 +20,7 @@ public class Atome{
     public double charge = 0;           //Charge de l'atome
     public float électronégativité = 0; //Électronégativité de l'atome peut varier avec le nombre d'électrons
 
-    public int indexe = -1; //Indexe de cet atome dans la liste de la simulation
+    public int indexe = -1; //Indexe de cet atome  dans la liste de la simulation
 
     //État des doublets
     public ArrayList<Vecteur3D> positionDoublet = new ArrayList<>(); //Position des doublets relatif au noyau
@@ -78,7 +78,7 @@ public class Atome{
      * Paulie, Vanderwal, Electrique, Morse, Torsion, Diedre
      */
     public static boolean[] ListForce = {
-       true, //Force Paulie
+        true, //Force Paulie
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
@@ -378,10 +378,10 @@ public class Atome{
         }
 
         double ModuleFriction = -0.00000000000001;
-        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+            A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
@@ -401,8 +401,6 @@ public class Atome{
             A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
 
-
-
         //Mettre à jour la vélocité moyenne
         if(A.vélocitéMoyenne.longueur()!=0.0){
             A.vélocitéMoyenne = Vecteur3D.addi(Vecteur3D.mult(A.vélocité,(1.0-A.facteurMixVélMoyen)), Vecteur3D.mult(A.vélocitéMoyenne, A.facteurMixVélMoyen));
@@ -411,6 +409,7 @@ public class Atome{
         }
         
     }
+
     /**
      * Renvoie un vecteur qui représente la force électrique entre deux particules
      * @param q1 - Charge de la première particule en nombre de charges élémentaires. Sera multiplié par la charge élémentaire e.
@@ -546,7 +545,20 @@ public class Atome{
         return ( Vecteur3D.mult(dir,module) );
     }
     
-    private static Vecteur3D ForceTorsion(Vecteur3D IAxe, Vecteur3D JAxe, double mA, double mB, int NBLiens, int NBDoublets, int X, int Y, int Z){
+    /**
+     * Renvoie la force de torsion à appliquer sur I dans le système I-K-J, où K est l'atome central.
+     * @param IAxe - Vecteur directeur de K vers I
+     * @param JAxe - Vecteur directeur de K vers J
+     * @param mI - Masse de I
+     * @param mJ - Masse de J
+     * @param NBLiens - Nombre de liens que K forme
+     * @param NBDoublets - Nombre de doublets que K possède
+     * @param K - Nombre de protons de K
+     * @param I - Nombre de protons de I. Mettre -1 si c'est un doublet.
+     * @param J - Nombre de protons de J. Mettre -1 si c'est un doublet.
+     * @return - Vecteur de force en newtons angstromiens
+     */
+    private static Vecteur3D ForceTorsion(Vecteur3D IAxe, Vecteur3D JAxe, double mI, double mJ, int NBLiens, int NBDoublets, int K, int I, int J){
         //Compter le nombre de liens formés par A
         Vecteur3D PlanAjAi= new Vecteur3D( V3.croix(JAxe,IAxe));
         
@@ -571,251 +583,41 @@ public class Atome{
                 break;
         }
         double Kij;
-        if(Y == -1 || Z == -1){
-            Kij = 2000.0;
+        if(I == -1 || J == -1){
+            Kij = 10000.0;
         }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
+            double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
                 nbOndeFondamental = 0.0;
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = (mA*mB)/(mA+mB);
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
+            double masse = 1.0/((1.0/mI)+(1.0/mJ));
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
         //TODO doublet angle different doublet doublet, doublet atome
-       return ( Vecteur3D.mult(potdirection, -D0*Kij ));
+        return ( Vecteur3D.mult(potdirection, -D0*Kij ));
     }
     
     private static Vecteur3D ForceTorsion(Atome Ai, Atome A, Atome Aj){
-        double mA=Ai.m;
-        double mB=Aj.m;
-        int X=A.NP;
-        int Y=Ai.NP;
-        int Z=Aj.NP;
-        //Compter le nombre de liens formés par A
-        int NBLiens = 0;
-        boolean[] traité = new boolean[A.liaisonIndexe.size()];
-        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
-                //Si la liaison existe,
-                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                NBLiens++;
-                traité[j] = true;
-            }
-        }
-        Vecteur3D PlanAjAi= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
-        
-        Vecteur3D potdirection = new Vecteur3D(  V3.norm(       V3.croix(V3.sous(Ai.position,A.position),PlanAjAi)      )     );
-
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(Ai.position,A.position)), V3.norm(V3.sous(Aj.position ,A.position))),-1.0),1.0));
-        double angle0; //Angle à l'équilibre entre I et J
-        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
-        switch(NBLiens+A.doublets){
-            case 2:
-                angle0 = Math.PI;
-                break;
-            case 3:
-                angle0 = 2.0*Math.PI/3.0;
-                break;
-            case 4:
-                angle0 = 73.0*Math.PI/120.0;
-                break;
-            default:
-                angle0 = angle;
-            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                break;
-        }
-        double Kij;
-        if(Y == -1 || Z == -1){
-            Kij = 2000.0;
-        }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
-            if(nbOndeFondamental == 0.0){
-                nbOndeFondamental = 0.0;
-            }
-            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = (mA*mB)/(mA+mB);
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
-        }
-
-        double D0 = angle0-angle; //Delta theta      
-        
-       return ( Vecteur3D.mult(potdirection, -D0*Kij ));
+        Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
+        Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
+        return ForceTorsion(IAxe, JAxe, Ai.m, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, Aj.NP);
     }
    
     private static Vecteur3D ForceTorsion(Atome Ai, Atome A,  int Doubletj){
-        double mA=Ai.m;
-        double mB=2.0*mE; //doublet
-        int X=A.NP;
-        int Y=Ai.NP; 
-        int Z=-1; //doublet
-        //Compter le nombre de liens formés par A
-        int NBLiens = 0;
-        boolean[] traité = new boolean[A.liaisonIndexe.size()];
-        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
-                //Si la liaison existe,
-                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                NBLiens++;
-                traité[j] = true;
-            }
-        }
-        
-        Vecteur3D PlanAiAdj= new Vecteur3D( V3.croix(V3.sous(A.positionDoublet.get(Doubletj),A.position), V3.sous(Ai.position,A.position)));
-        
-        Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(V3.sous(Ai.position,A.position),PlanAiAdj)));
-
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(Ai.position,A.position)), V3.norm(V3.sous(A.positionDoublet.get(Doubletj),A.position))),-1),1));
-        double angle0; //Angle à l'équilibre entre I et J
-        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
-        switch(NBLiens+A.doublets){
-            case 2:
-                angle0 = Math.PI;
-                break;
-            case 3:
-                angle0 = 2.0*Math.PI/3.0;
-                break;
-            case 4:
-                angle0 = 73.0*Math.PI/120.0;
-                break;
-            default:
-                angle0 = angle;
-            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                break;
-        }
-        double Kij;
-        if(Y == -1 || Z == -1){
-            Kij = 2000.0;
-        }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
-            if(nbOndeFondamental == 0.0){
-                nbOndeFondamental = 0.0;
-            }
-            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse =(mA*mB)/(mA+mB);
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
-        }
-
-        double D0 = angle0*1.05-angle; //Delta theta      
-        
-       return ( Vecteur3D.mult(potdirection, -D0*Kij ));
+       Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
+       return ForceTorsion(IAxe, A.positionDoublet.get(Doubletj), Ai.m, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, -1);
     }
-   
-    private static Vecteur3D ForceTorsion(int Doubleti, Atome A, Atome Aj){
-        double mA=2.0*mE; //doublet
-        double mB=Aj.m;
-        int X=A.NP;
-        int Y=-1; //doublet; 
-        int Z=Aj.NP; 
-        //Compter le nombre de liens formés par A
-        int NBLiens = 0;
-        boolean[] traité = new boolean[A.liaisonIndexe.size()];
-        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
-                //Si la liaison existe,
-                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                NBLiens++;
-                traité[j] = true;
-            }
-        }
-        
-        Vecteur3D PlanAiAdj= new Vecteur3D( V3.croix(V3.sous(Aj.position,A.position), V3.sous(A.positionDoublet.get(Doubleti),A.position)));
-        
-        Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(V3.sous(A.positionDoublet.get(Doubleti),A.position),PlanAiAdj)));
 
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(A.positionDoublet.get(Doubleti),A.position)), V3.norm(V3.sous(Aj.position,A.position))),-1),1));
-        double angle0; //Angle à l'équilibre entre I et J
-        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
-        switch(NBLiens+A.doublets){
-            case 2:
-                angle0 = Math.PI;
-                break;
-            case 3:
-                angle0 = 2.0*Math.PI/3.0;
-                break;
-            case 4:
-                angle0 = 73.0*Math.PI/120.0;
-                break;
-            default:
-                angle0 = angle;
-            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                break;
-        }
-        double Kij;
-        if(Y == -1 || Z == -1){
-            Kij = 2000.0;
-        }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
-            if(nbOndeFondamental == 0.0){
-                nbOndeFondamental = 0.0;
-            }
-            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = (mA*mB)/(mA+mB);
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
-        }
-
-        double D0 = angle0*1.05-angle; //Delta theta      
-        
-       return ( Vecteur3D.mult(potdirection, -D0*Kij ));
-    }
+    private static Vecteur3D ForceTorsion(int Doubleti, Atome A,  Atome Aj){
+        Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
+        return ForceTorsion(A.positionDoublet.get(Doubleti), JAxe, 2.0*mE, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, -1, Aj.NP);
+     }
    
     private static Vecteur3D ForceTorsion(int Doubleti, Atome A,  int Doubletj){
-        double mA=2.0*mE; //doublet
-        double mB=2.0*mE; //doublet
-        int X=A.NP;
-        int Y=-1; //doublet
-        int Z=-1; //doublet
-        //Compter le nombre de liens formés par A
-        int NBLiens = 0;
-        boolean[] traité = new boolean[A.liaisonIndexe.size()];
-        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
-            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
-                //Si la liaison existe,
-                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
-                NBLiens++;
-                traité[j] = true;
-            }
-        }
-        Vecteur3D PlanAdiAdj= new Vecteur3D( V3.croix(V3.sous(A.positionDoublet.get(Doubletj),A.position), V3.sous(A.positionDoublet.get(Doubleti),A.position)));
-        
-        Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(V3.sous(A.positionDoublet.get(Doubleti),A.position),PlanAdiAdj)));
-
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(V3.sous(A.positionDoublet.get(Doubleti),A.position)), V3.norm(V3.sous(A.positionDoublet.get(Doubletj),A.position))),-1),1));
-        double angle0; //Angle à l'équilibre entre I et J
-        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
-        switch(NBLiens+A.doublets){
-            case 2:
-                angle0 = Math.PI;
-                break;
-            case 3:
-                angle0 = 2.0*Math.PI/3.0;
-                break;
-            case 4:
-                angle0 = 73.0*Math.PI/120.0;
-                break;
-            default:
-                angle0 = angle;
-            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
-                break;
-        }
-        double Kij;
-        if(Y == -1 || Z == -1){
-            Kij = 2000.0;
-        }else{
-            double nbOndeFondamental = fréquenceTorsion[X-1][Y-1][Z-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
-            if(nbOndeFondamental == 0.0){
-                nbOndeFondamental = 0.0;
-            }
-            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
-            double masse = (mA*mB)/(mA+mB);
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*400.0; //Force du ressort angulaire
-        }
-
-        double D0 = angle0*1.1-angle; //Delta theta      
-        
-       return ( Vecteur3D.mult(potdirection, -D0*Kij ));
+       return ForceTorsion(A.positionDoublet.get(Doubleti), A.positionDoublet.get(Doubletj), 2.0*mE, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, -1, -1);
     }
   
 
@@ -1126,15 +928,16 @@ public class Atome{
     }
     
     /**Déplace les doublets de l'atome dans la direction de leur force appliquée. À utiliser pour initialiser leur position à l'équilibre */
-    public void déplacerDoublet(){
+    public void déplacerVersÉquilibre(){
         for (int i = 0; i < 1; i++) {
-            ÉvaluerForces(this);
             for (int j = 0; j < doublets; j++) {
                 forceDoublet.get(j).norm();
-                forceDoublet.get(j).mult(1);
+                forceDoublet.get(j).mult(0.03);
                 positionDoublet.get(j).addi(forceDoublet.get(j));
             }
-            ÉvaluerContraintes();
+            Force.norm();
+            Force.mult(0.03);
+            position.addi(Force);
         }
     }
 
@@ -1644,6 +1447,7 @@ public class Atome{
     }
 
     public static double TempératureEnVitesse(double T, double m){
+        return Math.sqrt(3.0*kB*T/m);
         return Math.sqrt(3.0*kB*T/m);
     }
 
