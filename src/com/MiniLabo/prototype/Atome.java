@@ -385,7 +385,7 @@ public class Atome{
 
         //Force non conventionelle
         double ModuleFriction = -0.00000000000001;
-        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,0,-9.8*Math.pow(10,10)*A.m)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
@@ -472,7 +472,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),1);   //Température du système en °K    //paire
+        double T = Math.max(Température(paire),10);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("TempératurenNan");
         }
