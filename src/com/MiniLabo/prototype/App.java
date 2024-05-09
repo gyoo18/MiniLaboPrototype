@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 1412; //Taille de simulation 
     public static int TailleY = 812;
     public static int TailleZ = 512;
-    public static float Zoom = 35f;
+    public static float Zoom = 45f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -93,7 +93,7 @@ public class App {
         
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 20;  //Nombre de molécules voulus
+        int NbMolécules = 90;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -157,11 +157,11 @@ public class App {
 
         for (int i = 0; i < Hs.size(); i++) {
             //double module = Atome.TempératureEnVitesse(250.0+273.15, Hs.get(i).m);
-            double module=12.0*Math.pow(10, 14);
+            double module=Math.pow(10, 11);
             double Angle1=Math.random()*2*Math.PI;
             double Angle2=Math.random()*2*Math.PI;
             //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
-            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         //Ajouter les atomes dans l'ordre de dessin
@@ -400,13 +400,19 @@ public class App {
                 g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             }
         }
-        //Dessiner force resultante
-        //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(Zoom*A.Force.longueur()+1)),A.position);
-        //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-        //g.setStroke(new BasicStroke());
-        //g.setColor(Color.WHITE);       //Couleur de la force
-        //g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-    }
+         //Dessiner force resultante
+         Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(Zoom*A.Force.longueur()+1)),A.position);
+         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+         g.setStroke(new BasicStroke());
+         g.setColor(Color.RED);       //Couleur de la force
+         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         //Vecteur vitesse
+         Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.1*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
+         double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));
+         g.setStroke(new BasicStroke());
+         g.setColor(Color.WHITE);       //Couleur de la force
+         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZV) , (TailleY/2) - (int)((directionF.y)*multPersZV));
+   }
 
     /**
      * Fonction d'interpolation linéaire ente a et b.

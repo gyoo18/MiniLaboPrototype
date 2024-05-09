@@ -10,7 +10,7 @@ public class Atome{
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
-    private Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
+    public Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
     private double facteurMixVélMoyen = 0.5;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
 
@@ -404,7 +404,7 @@ public class Atome{
                 Sin0 = 0.0;
                 aT = new Vecteur3D(0);
             }
-            A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+             A.Force.addi/*(A.forceDoublet.get(i).opposé());*/ (V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
             A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
 
@@ -472,7 +472,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),10);   //Température du système en °K    //paire
+        double T = Math.max(Température(Environnement),10);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("TempératurenNan");
         }
@@ -1389,7 +1389,10 @@ public class Atome{
         if (Double.isNaN(A.get(i).vélocité.longueur())){
             System.out.println("VélocitéNan");
         }
+        
         }
+        
+
         Delta=(MaxEk-MinEk)/KsA;
         for (int i = 0; i < A.size(); i++) {
             for (int j = 0; j<KsA; j++){
@@ -1438,7 +1441,17 @@ public class Atome{
         if (Double.isNaN(EkMode*2.0/(3.0*kB))){
             System.out.println("EnenergiCinetiqueNAN");
         }
-        return ((EkMode*2.0/(3.0*kB)));
+
+        double fidm=0;
+        double masemo=0;
+        for (int i=0; i< A.size(); i++){
+          fidm=+ A.get(i).vélocité.longueur();
+          masemo=+ A.get(i).m;
+        }
+        masemo=masemo/A.size();
+        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo));
+        //System.out.println(Tmp);
+        return (Tmp);//(EkMode*2.0/(3.0*kB)));
 
         /* for (int j=0; j < A.size()*0.5; j++){
         for (int i = 0; i < EK1.size()-1; i++) {
