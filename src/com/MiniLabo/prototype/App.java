@@ -94,7 +94,7 @@ public class App {
         
         //Initialiser les atomes selon l'algorithme de poisson
 
-        int NbMolécules = 90;  //Nombre de molécules voulus
+        int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
