@@ -1437,12 +1437,12 @@ public class Atome{
  
 
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s"); Ek*2.0/(3.0*kB)
-        /*if (Double.isNaN(EkMode*2.0/(3.0*kB))){
+        if (Double.isNaN(EkMode*2.0/(3.0*kB))){
             System.out.println("EnenergiCinetiqueNAN");
             return 30.0;
         }else{
             return ((EkMode*2.0/(3.0*kB)));
-        }*/
+        }
 
         double fidm=0;
         double masemo=0;

@@ -349,7 +349,6 @@ public class Intégrateur {
     public static void IterRK4(ArrayList<Atome> O, double h){
 
         //TODO Vincent intégrer les doublets dans RK4 
-        //TODO #35 Implémenter les fils d'exécutions dans RK4
         
         Vecteur3D[] K1v = new Vecteur3D[O.size()];
         Vecteur3D[] K1a = new Vecteur3D[O.size()];
