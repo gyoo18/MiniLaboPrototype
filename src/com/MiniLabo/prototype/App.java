@@ -12,10 +12,10 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 1412; //Taille de simulation 
-    public static int TailleY = 812;
+    public static int TailleX = 512; //Taille de simulation 
+    public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 45f;
+    public static float Zoom = 30f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -33,8 +33,6 @@ public class App {
         frame.setSize(TailleX + 100,TailleY + 100); //Taille de la fenêtre
         frame.add(image);                           //Ajouter l'objet Image à l'écran
         frame.setVisible(true);                   //Afficher la fenêtre
-
-        //Intégrateur.initialisation();
 
         try{
             //Thread.sleep(3000);
@@ -62,11 +60,11 @@ public class App {
         //MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
         //MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
-         Atome H = new Atome(1);
+        /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
         Hs.add(H);
-        /*Atome H1 = new Atome(1);
+        Atome H1 = new Atome(1);
         H1.position= new V3(4,1,0);
        
         Hs.add(H1);
@@ -93,24 +91,19 @@ public class App {
         
         
         //Initialiser les atomes selon l'algorithme de poisson
-
-        int NbMolécules = 90;  //Nombre de molécules voulus
+        int NbMolécules = 200;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 2.770025;  //Zone tampon entre les atomes
-
+        double tampon = 0.1;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 30) {
             essais++;
             MoléculeRéf mol = H2O;
-            if(totalMolécules < 3){
-                mol = MoléculeRéf.avoirH3Op();
-            }if(totalMolécules >= 3 && totalMolécules < 6){
-                mol = MoléculeRéf.avoirOHm();
+            if(totalMolécules < 4){
+                mol = MoléculeRéf.avoirNaCl();
             }
-
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
             boolean intersecte = false;
@@ -143,6 +136,13 @@ public class App {
             }
         }
 
+        //MoléculeRéf NaCl1 = MoléculeRéf.avoirNaCl();
+        //NaCl1.position = new Vecteur3D(-10,0,0);
+        //MoléculeRéf.intégrerÀSimulation(Hs, NaCl1);
+        //MoléculeRéf NaCl2 = MoléculeRéf.avoirNaCl();
+        //NaCl2.position = new Vecteur3D(10,0,0);
+        //MoléculeRéf.intégrerÀSimulation(Hs, NaCl2);
+
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
         Intégrateur.initialisation(Hs,10);
@@ -159,7 +159,7 @@ public class App {
         for (int i = 0; i < 30; i++) {
             
             Intégrateur.calculerForces(Hs);
-          
+
             for (int j = 0; j < Hs.size(); j++) {
                 Hs.get(j).déplacerVersÉquilibre();
             }
@@ -177,7 +177,9 @@ public class App {
         long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
         double temps = 0.0;                         //Temps de simulation écoulé
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt =0.625*Math.pow(10.0,-17);     //Delta temps de la simulation
+        double dt =1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
+        //int longueurTest = 0;
+        //String résultatTest = "";
         while (true) {
             
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
@@ -407,19 +409,13 @@ public class App {
                 g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             }
         }
-         //Dessiner force resultante
-         Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.1*Math.log(Zoom*A.Force.longueur()+1)),A.position);
-         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-         g.setStroke(new BasicStroke());
-         g.setColor(Color.RED);       //Couleur de la force
-         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         //Vecteur vitesse
-         Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.1*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
-         double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));
-         g.setStroke(new BasicStroke());
-         g.setColor(Color.WHITE);       //Couleur de la force
-         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZV) , (TailleY/2) - (int)((directionF.y)*multPersZV));
-   }
+        //Dessiner force resultante
+        Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.03*Math.log(Zoom*A.Force.longueur()+1)),A.position);
+        double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+        g.setStroke(new BasicStroke());
+        g.setColor(Color.WHITE);       //Couleur de la force
+        g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+    }
 
     /**
      * Fonction d'interpolation linéaire ente a et b.
