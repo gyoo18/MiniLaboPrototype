@@ -139,10 +139,6 @@ public class Atome{
     */
     public static void ÉvaluerForces(Atome A){
 
-
-
-
-
         //Forces découlant des interractions avec les atomes non-liés
         for (int i = 0; i < Environnement.size(); i++) {
             //Pour tout les atomes
@@ -155,7 +151,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-            if( true ){ //true){ // dist <2.0*(A.rayonCovalent+APrime.rayonCovalent) dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+            if( dist < 5.0*(A.rayonCovalent+APrime.rayonCovalent)){
                 //Si A' se situe à moins de N rayons covalents de A
                 if (ListeForce[0]){
                     A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -329,51 +325,50 @@ public class Atome{
 
         //Force Dièdre
         for(int i = 0; i < A.liaisonIndexe.size(); i++){
-           if (ListeForce[5]){
-              //Pour toutes les liaisons
+         if (ListeForce[5]){
+            //Pour toutes les liaisons
 
-              //S'il n'y a pas de liaison, sauter à la prochaine
-              if(A.liaisonIndexe.get(i) == -1){
-                  continue;
-              }
-              //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
-              if(A.liaisonType.get(i)){
-                  //System.out.println(1450491);
-              }
-              Atome Ai =Environnement.get(A.liaisonIndexe.get(i));  
+            //S'il n'y a pas de liaison, sauter à la prochaine
+            if(A.liaisonIndexe.get(i) == -1){
+                continue;
+            }
+            //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
+            if(A.liaisonType.get(i)){
+                //System.out.println(1450491);
+            }
+            Atome Ai =Environnement.get(A.liaisonIndexe.get(i));  
+            
+            //int liaisonOrdre = A.liaisonOrdre.get(i);  //Évaluer le nombre de liaison existantes entre A et A1, pas important pour Ai, mais pour Aj
 
-              //int liaisonOrdre = A.liaisonOrdre.get(i);  //Évaluer le nombre de liaison existantes entre A et A1, pas important pour Ai, mais pour Aj
+            for ( int j=0; j < A.liaisonIndexe.size(); j++ ){
+                
+                if(A.liaisonIndexe.get(j) == -1){
+                    continue;
+                }
+                if(A.liaisonIndexe.get(j) == A.liaisonIndexe.get(i)){
+                    continue;
+                }
+                Atome Aj =Environnement.get(A.liaisonIndexe.get(j));
+                for ( int k=0; k < Aj.liaisonIndexe.size(); k++){
+                    if(Aj.liaisonIndexe.get(k) == -1){
+                        continue;
+                    }
+                    if(Environnement.get(Aj.liaisonIndexe.get(k)) == A){
+                        continue;
+                    }
+                    Atome Ak =Environnement.get(Aj.liaisonIndexe.get(k));
 
-              for ( int j=0; j < A.liaisonIndexe.size(); j++ ){
-
-                  if(A.liaisonIndexe.get(j) == -1){
-                      continue;
-                  }
-                  if(A.liaisonIndexe.get(j) == A.liaisonIndexe.get(i)){
-                      continue;
-                  }
-                  Atome Aj =Environnement.get(A.liaisonIndexe.get(j));
-                  for ( int k=0; k < Aj.liaisonIndexe.size(); k++){
-                      if(Aj.liaisonIndexe.get(k) == -1){
-                          continue;
-                      }
-                      if(Environnement.get(Aj.liaisonIndexe.get(k)) == A){
-                          continue;
-                      }
-                      Atome Ak =Environnement.get(Aj.liaisonIndexe.get(k));
-
-                      Ai.Force.addi(ForceDiedre(Ai, A, Aj, Ak));
-                      A.Force.addi(ForceDiedre(Ai,A,Aj,Ak).opposé());
-                      //System.out.println(V3.distance(ForceDiedre(Ai, A, Aj, Ak),new V3(000)));
-                  }
-              }
-           }
+                    Ai.Force.addi(ForceDiedre(Ai, A, Aj, Ak));
+                    A.Force.addi(ForceDiedre(Ai,A,Aj,Ak).opposé());
+                    //System.out.println(V3.distance(ForceDiedre(Ai, A, Aj, Ak),new V3(000)));
+                }
+            }
+         }
         }
 
-        //Force non conventionelle
-        double ModuleFriction = -0.00000000000001;
+        double ModuleFriction = -0.000000000000001;
         //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        //A.Force.addi(new Vecteur3D(0,0,-9.8*Math.pow(10,10)*A.m)); //Appliquer une force de gravité
+        //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
@@ -390,7 +385,7 @@ public class Atome{
                 Sin0 = 0.0;
                 aT = new Vecteur3D(0);
             }
-             A.Force.addi/*(A.forceDoublet.get(i).opposé());*/ (V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
+            A.Force.addi(V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT.opposé(),A.forceDoublet.get(i).longueur()*Sin0)),(A.m-2.0*mE)/(A.m)));
             A.forceDoublet.set(i,V3.mult(V3.addi(A.forceDoublet.get(i), V3.mult(aT,((A.m-2.0*mE)*A.forceDoublet.get(i).longueur()*Sin0/(2.0*mE)))),(2.0*mE)/(A.m)));
         }
 
@@ -467,7 +462,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(Environnement),10);   //Température du système en °K    //paire
+        double T = Math.max(Température(paire),1);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("TempératurenNan");
         }
@@ -489,7 +484,7 @@ public class Atome{
     private Vecteur3D évaluerMomentDipolaire(){
         //TODO #27 réviser évaluerMomentDipolaire()
         double chargeTotale = charge;
-        chargeTotale = chargeTotale-2.0*doublets;
+        chargeTotale += -2.0*doublets;
         for (int i = 0; i < liaisonIndexe.size(); i++) {
             if(liaisonIndexe.get(i) == -1){
                 continue;
@@ -680,23 +675,21 @@ public class Atome{
             AngleO=0.5*Math.PI; //1/2 = 0.5 sa faisait bugger :()
             ConstanteDeForce=10*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
             double AngleP=1.0/AngleO;
-            double AngleX=Angle*(2.0/Math.PI);
+            double AngleX=Angle*(2/Math.PI);
             if (AngleO-Angle==0){
                FDiedre=0;
             } else{
 
                 //FDiedre = -sens*ConstanteDeForce*Math.pow((AngleO-Angle),-1);
-                //FDiedre = -0.00125*sens*ConstanteDeForce*   Math.pow(   (   Math.pow(1-AngleX,-1)-AngleX+1 ) ,3)  ;
-                FDiedre=-10.0*sens*ConstanteDeForce*Math.pow(-1.0*Math.pow((1-AngleX),2)+1.0,    1);
+                FDiedre = -sens*ConstanteDeForce*Math.pow(Math.pow(1-AngleX,-1)-AngleX+1,1);
             }
-            /* if (FDiedre>10000){
+            if (FDiedre>10000){
                 System.out.println(33);
-            } */
+            }
         
         
         } else {
             FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4.0*Math.pow(Math.PI,2) ) ),2));
-       
         }
 
         //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
@@ -880,14 +873,13 @@ public class Atome{
             liaisonOrdre.add(-1);
         }
         while (liaisonIndexe.size()>n) {
-            for (int n1 = 0; n1 < liaisonIndexe.size(); n1++) { //n-- "<"
+            for (int n1 = 0; n1 < liaisonIndexe.size(); n1++) {
                 if ( liaisonIndexe.get(n1) == -1){
                     liaisonIndexe.remove(n1);
                     liaisonType.remove(n1);
                     liaisonOrdre.remove(n1);
                     break;
                 }
-
             }
         }
 
@@ -952,11 +944,11 @@ public class Atome{
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < doublets; j++) {
                 forceDoublet.get(j).norm();
-                forceDoublet.get(j).mult(0.0000030);
+                forceDoublet.get(j).mult(0.03);
                 positionDoublet.get(j).addi(forceDoublet.get(j));
             }
             Force.norm();
-            Force.mult(0.0000030);
+            Force.mult(0.03);
             position.addi(Force);
         }
     }
@@ -1392,19 +1384,14 @@ public class Atome{
         double[] EkMod= new double[(int) KsA];
         double EkMode=0.0;
         for (int i = 0; i < A.size(); i++) {
-        MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
-        MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
-        if (Double.isNaN(A.get(i).vélocité.longueur())){
-            System.out.println("VélocitéNan");
+            MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
+            MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
         }
-     }
-        
-
         Delta=(MaxEk-MinEk)/KsA;
         for (int i = 0; i < A.size(); i++) {
             for (int j = 0; j<KsA; j++){
-                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
-                EkMod[j]++;
+                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
+                    EkMod[j]++;          
                 }
             }
         }
@@ -1443,17 +1430,6 @@ public class Atome{
         }else{
             return ((EkMode*2.0/(3.0*kB)));
         }
-
-        double fidm=0;
-        double masemo=0;
-        for (int i=0; i< A.size(); i++){
-          fidm=+ A.get(i).vélocité.longueur();
-          masemo=+ A.get(i).m;
-        }
-        masemo=masemo/A.size();
-        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo));
-        //System.out.println(Tmp);
-        return (Tmp);//(EkMode*2.0/(3.0*kB)));
 
         /* for (int j=0; j < A.size()*0.5; j++){
         for (int i = 0; i < EK1.size()-1; i++) {
