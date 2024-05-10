@@ -10,8 +10,9 @@ public class Intégrateur {
 
     private static class FilsDistributeur implements Runnable{
 
-        private ArrayList<Atome> ensemble;
-        private boolean terminé = false;
+        private volatile ArrayList<Atome> ensemble;
+        private volatile boolean terminé = false;
+        private volatile boolean actif = true;
 
         public FilsDistributeur(){}
 
@@ -19,23 +20,59 @@ public class Intégrateur {
             ensemble = sousEnsemble;
         }
 
+        public ArrayList<Atome> avoirRésultat(){
+            return ensemble;
+        }
+
         @Override
         public void run() {
-            for (int i = 0; i < ensemble.size(); i++) {
-                Atome.ÉvaluerForces(ensemble.get(i));
+            System.out.println("Hello");
+            while (actif) {
+                terminé = false;
+                for (int i = 0; i < ensemble.size(); i++) {
+                    Atome.ÉvaluerForces(ensemble.get(i));
+                }
+                //System.out.println(Thread.currentThread().getName());
+                terminé = true;
+                synchronized (this){
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            //System.out.println(Thread.currentThread().getName());
-            terminé = true;
         }
     }
 
     private static Thread[] bouc = new Thread[5];
     private static FilsDistributeur[] fils = new FilsDistributeur[bouc.length];
 
-    public static void initialisation(){
+    public static void initialisation(ArrayList<Atome> O){
+        for (int i = 0; i < bouc.length; i++) {
+            if(bouc[i] != null){
+                bouc[i].interrupt();
+            }
+        }
+        ArrayList<ArrayList<Atome>> Op = new ArrayList<>();
+        int L = O.size()/bouc.length;
+        for (int i = 0; i < bouc.length; i++) {
+            Op.add(new ArrayList<>());
+            if(L*(i+2) < O.size()){
+                for (int j = L*i; j < L*(i+1); j++) {
+                    Op.get(i).add(O.get(j));
+                }
+            }else{
+                for (int j = L*i; j < O.size(); j++) {
+                    Op.get(i).add(O.get(j));
+                }
+            }
+        }
         for (int i = 0; i < bouc.length; i++) {
             fils[i] = new FilsDistributeur();
+            fils[i].changerEnsemble(Op.get(i));
             bouc[i] = new Thread(fils[i]);
+            bouc[i].start();
         }
     }
 
@@ -195,13 +232,6 @@ public class Intégrateur {
     public static void IterVerletVB(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
-            o.Force = new Vecteur3D(0);
-            for (int j = 0; j < o.forceDoublet.size(); j++) {
-                o.forceDoublet.set(j,new Vecteur3D(0));
-            }
-        }
-
-        for (Atome o : O) {
             o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
 
             if(o.forceDoublet != null){
@@ -221,6 +251,13 @@ public class Intégrateur {
                 }
             }
             o.ÉvaluerContraintes();
+        }
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3D(0);
+            for (int j = 0; j < o.forceDoublet.size(); j++) {
+                o.forceDoublet.set(j,new Vecteur3D(0));
+            }
         }
 
         for (Atome o : O) {
@@ -236,14 +273,8 @@ public class Intégrateur {
         
     }
 
-    public static void IterVerletVBF(ArrayList<Atome> O, double h, boolean distribuer){
-
-        for (Atome o : O) {
-            o.Force = new Vecteur3D(0);
-            for (int j = 0; j < o.forceDoublet.size(); j++) {
-                o.forceDoublet.set(j,new Vecteur3D(0));
-            }
-        }
+    public static void IterVerletVBF(ArrayList<Atome> O, double h){
+        //TODO #34 Améliorer la stabilité de IterVerletVBF
 
         for (Atome o : O) {
             o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
@@ -266,47 +297,51 @@ public class Intégrateur {
             }
             o.ÉvaluerContraintes();
         }
-        
-        ArrayList<ArrayList<Atome>> Op = new ArrayList<>();
-        if(distribuer){
-            int L = O.size()/bouc.length;
-            for (int i = 0; i < bouc.length; i++) {
-                Op.add(new ArrayList<>());
-                if(L*(i+2) < O.size()){
-                    for (int j = L*i; j < L*(i+1); j++) {
-                        Op.get(i).add(O.get(j));
-                    }
-                }else{
-                    for (int j = L*i; j < O.size(); j++) {
-                        Op.get(i).add(O.get(j));
-                    }
-                }
+
+        for (Atome o : O) {
+            o.Force = new Vecteur3D(0);
+            for (int j = 0; j < o.forceDoublet.size(); j++) {
+                o.forceDoublet.set(j,new Vecteur3D(0));
             }
         }
+        
+        //synchronized (fils[0]){
+        //    fils[0].changerEnsemble(O);
+        //}
+
         for (int i = 0; i < bouc.length; i++) {
-            if(distribuer){
-                fils[i].changerEnsemble(Op.get(i));
+            synchronized (fils[i]){
+                fils[i].notify();
+                fils[i].terminé = false;
             }
-            bouc[i] = new Thread(fils[i]);
-            bouc[i].start();
         }
 
         boolean terminé = false;
         while (!terminé) {
             terminé = true;
             for (int i = 0; i < bouc.length; i++) {
-                terminé = terminé && !bouc[i].isAlive();
+                synchronized (fils[i]){
+                    terminé = terminé && fils[i].terminé;
+                }
             }
         }
 
-        for (int i = 0; i < O.size(); i++) {
+        /*for (int i = 0; i < O.size(); i++) {
             if(O.get(i).Force.longueur() == 0.0){
-                System.out.println("null");
+                //System.out.println("null");
                 Atome.ÉvaluerForces(O.get(i));
             }
-        }
+        }*/
+
+        //synchronized (fils[0]){
+        //    ArrayList<Atome> résultat = fils[0].avoirRésultat();
+        //    for (int i = 0; i < bouc.length; i++) {
+        //        O.set(i,résultat.get(i));
+        //    }
+        //}
 
         for (Atome o : O) {
+            //Atome.ÉvaluerForces(o);
             o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.m)));
 
             if(o.forceDoublet != null){

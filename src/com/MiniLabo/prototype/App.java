@@ -12,9 +12,9 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 512; //Taille de simulation 
-    public static int TailleY = 512;
-    public static int TailleZ = 512;
+    public static int TailleX = 1340; //Taille de simulation 
+    public static int TailleY = 620;
+    public static int TailleZ = 720;
     public static float Zoom = 30f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
@@ -34,8 +34,6 @@ public class App {
         frame.add(image);                           //Ajouter l'objet Image à l'écran
         frame.setVisible(true);                   //Afficher la fenêtre
 
-        Intégrateur.initialisation();
-
         try{
             //Thread.sleep(3000);
         }catch(Exception e){
@@ -53,14 +51,14 @@ public class App {
          //Molécule de base
     
         MoléculeRéf H2O = MoléculeRéf.avoirH2O();
-        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
-        MoléculeRéf OHm = MoléculeRéf.avoirOHm();
-        MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
-        MoléculeRéf NaOH = MoléculeRéf.avoirNaOH();
-        MoléculeRéf HCl = MoléculeRéf.avoirHCl();
-        MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
-        MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
-        MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
+        //MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
+        //MoléculeRéf OHm = MoléculeRéf.avoirOHm();
+        //MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
+        //MoléculeRéf NaOH = MoléculeRéf.avoirNaOH();
+        //MoléculeRéf HCl = MoléculeRéf.avoirHCl();
+        //MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
+        //MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
+        //MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
         /* Atome H = new Atome(1);
         H.retirerÉlectron();
@@ -97,13 +95,13 @@ public class App {
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.50025;  //Zone tampon entre les atomes
+        double tampon = 0.1;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
-        while (totalMolécules < NbMolécules && essais < 180) {
+        while (totalMolécules < NbMolécules && essais < 30) {
             essais++;
             MoléculeRéf mol = H2O;
-            if(totalMolécules < 2){
+            if(totalMolécules < 4){
                 mol = MoléculeRéf.avoirNaCl();
             }
             //position aléatoire dans le domaine.
@@ -138,9 +136,17 @@ public class App {
             }
         }
 
-        /*Atome.MettreÀJourEnvironnement(Hs);
+        //MoléculeRéf NaCl1 = MoléculeRéf.avoirNaCl();
+        //NaCl1.position = new Vecteur3D(-10,0,0);
+        //MoléculeRéf.intégrerÀSimulation(Hs, NaCl1);
+        //MoléculeRéf NaCl2 = MoléculeRéf.avoirNaCl();
+        //NaCl2.position = new Vecteur3D(10,0,0);
+        //MoléculeRéf.intégrerÀSimulation(Hs, NaCl2);
+
+        Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
-        for (int i = 0; i < 30; i++) {
+        Intégrateur.initialisation(Hs);
+        /*for (int i = 0; i < 30; i++) {
             for (int j = 0; j < Hs.size(); j++) {
                 Atome.ÉvaluerForces(Hs.get(j));
             }
@@ -153,7 +159,7 @@ public class App {
         }*/
 
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(250.0+273.15, Hs.get(i).m);
+            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
             //double module=Math.pow(10, 15);
             double Angle1=Math.random()*2*Math.PI;
             double Angle2=Math.random()*2*Math.PI;
@@ -172,9 +178,7 @@ public class App {
         long chorono = System.currentTimeMillis();  //Temps au début de la simulation
         double dt =1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
         while (true) {
-            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-            g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
-
+            
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
@@ -188,11 +192,14 @@ public class App {
                     //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
-                Intégrateur.IterVerletVBF(Hs, dt, N==0); //Mise à jour de la position.
+                Intégrateur.IterVerletVBF(Hs, dt);
                 temps += dt;
-               // T += Atome.Température(Hs);
+                //T += Atome.Température(Hs);
                 /* mailmanresonant++; */
             }
+
+            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
+            g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
             
             //Affichage de la simulation
             DessinerBoite();  //Dessiner le domaine
@@ -209,7 +216,7 @@ public class App {
             if (System.currentTimeMillis()-mailman > 5000){
                 
                 mailman = System.currentTimeMillis();
-                System.out.println(String.format("%.0f",(/*T/20.0*/ Atome.Température(Hs))-273.15) + "°C");
+                System.out.println(String.format("%.0f",( Atome.Température(Hs))-273.15) + "°C");
 
               //Statistiques sur la vitesse de la simulation
                 System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
