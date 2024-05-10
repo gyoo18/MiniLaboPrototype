@@ -21,21 +21,44 @@ public class App {
     private static int FOVBoite = FOV;
     private static int FOVetBoite = FOV;
 
+    public static ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
+    public static ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
+
+    /**Temps réel de départ de la simulation en ms */
+    public static long départ = System.currentTimeMillis();
+    /**Temps réel écoulé depuis le début de la simulation en ms*/
+    public static long chrono = 0; 
+    /**Temps de simlation écoulé depuis le début de la simulation en fs */
+    public static double temps = 0;
+    /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
+    public static double dt = 0;
+    /**Delta temps en temps réel entre chaque mise à jour de la simulation en ms */
+    public static long DeltaT = 0;
+    /**Nombre de sous-étapes entre chaque appel à dessin */
+    public static int sousÉtapes = 60;
+
+    private static JFrame frame;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello World!");
+        System.out.println("Bienvenue dans MiniLabo!");
+
+        Initialisation();
+        simulation();
+        //Analyse se fait à partir de simulation();
+        
+    }
+
+    public static void Initialisation(){
+        System.out.println("Initialisation");
 
         BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
         g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
 
         JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
-        JFrame frame = new JFrame();                //Initialiser l'écran
+        frame = new JFrame();                //Initialiser l'écran
         frame.setSize(TailleX + 100,TailleY + 100); //Taille de la fenêtre
         frame.add(image);                           //Ajouter l'objet Image à l'écran
         frame.setVisible(true);                   //Afficher la fenêtre
-
-        ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
-        ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
         //Molécule de base
     
@@ -54,15 +77,15 @@ public class App {
             }
         }*/
         
-        
         //Initialiser les atomes selon l'algorithme de poisson
-
-        int NbMolécules = 1000;  //Nombre de molécules voulus
+        int NbMolécules = 100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
         double tampon = 0.5;  //Zone tampon entre les atomes
 
+        System.out.println("Placement des "+NbMolécules+" molécules.");
+        long timer = System.currentTimeMillis();
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 30) {
@@ -102,12 +125,22 @@ public class App {
                 essais = 0;
                 totalMolécules++;
             }
+
+            if(System.currentTimeMillis()-timer > 1000){
+                timer = System.currentTimeMillis();
+                System.out.println("Placement des molécules " + (double)totalMolécules/(double)NbMolécules + "%");
+            }
         }
+
+        System.out.println("Molécules placées. " + totalMolécules + " molécules sont rentrées dans la zone de simulation.");
+        System.out.println("Total Atomes : " + Hs.size());
+        System.out.println("Initialisation des systèmes.");
 
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
         Intégrateur.initialisation(Hs,10);
 
+        System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
             //double module=Math.pow(10, 15);
@@ -117,7 +150,11 @@ public class App {
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
-        for (int i = 0; i < 30; i++) {
+        System.out.println("Initialisation des positions d'équilibre.");
+        timer = System.currentTimeMillis();
+
+        int itérations = 30;
+        for (int i = 0; i < itérations; i++) {
             
             Intégrateur.calculerForces(Hs);
           
@@ -127,18 +164,27 @@ public class App {
             for (int j = 0; j < Hs.size(); j++) {
                 Hs.get(j).ÉvaluerContraintes();
             }
+
+            if(System.currentTimeMillis() - timer > 1000){
+                System.out.println("Initialisation des positions d'équilibre. " + (double)i/(double)itérations);
+            }
         }
 
+        System.out.println("Initialisation de l'ordre de dessin.");
         //Ajouter les atomes dans l'ordre de dessin
         for (int i = 0; i < Hs.size(); i++) {
             indexe.add(i);
         }
 
-        //Simulation
-        long mailman = System.currentTimeMillis(); //utiliser pour projeter dans terminal
-        double temps = 0.0;                         //Temps de simulation écoulé
-        long chorono = System.currentTimeMillis();  //Temps au début de la simulation
-        double dt =1.0*Math.pow(10.0,-17);     //Delta temps de la simulation
+        System.out.println("Initialisation complète.");
+    }
+
+    public static void simulation(){
+        System.out.println("Début de la simulation.");
+
+        long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
+        départ = System.currentTimeMillis();
+        dt =1.0*Math.pow(10.0,-17);              //Delta temps de la simulation
         while (true) {
             
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
@@ -147,7 +193,7 @@ public class App {
             double T = 0.0; //Température moyenne
             //Sous-étapes. Répète N fois/image
             /* double mailmanresonant =0; */
-            for (int N = 0; N < 60; N++) {
+            for (int N = 0; N < sousÉtapes; N++) {
                 
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
@@ -175,22 +221,14 @@ public class App {
                 }
             }
 
-            if (System.currentTimeMillis()-mailman > 5000){
-                
-                mailman = System.currentTimeMillis();
-                System.out.println(String.format("%.0f",( Atome.Température(Hs))-273.15) + "°C");
-
-                //Statistiques sur la vitesse de la simulation
-                System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + " fs/s");
-                //résultatTest += String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + ";";
-                //longueurTest ++;
-    
-                énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
-            }
-
             //Dessiner les atomes dans l'ordre
             for (int i = 0; i < indexe.size(); i++) {
                 DessinerAtome(Hs.get(indexe.get(i)), Hs);
+            }
+
+            if (System.currentTimeMillis()-mailman > 5000){
+                mailman = System.currentTimeMillis();
+                analyse();
             }
             
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
@@ -198,6 +236,42 @@ public class App {
         }
     }
 
+    public static void analyse(){
+        System.out.println("");
+        System.out.println("====== Analyse ======");
+        DeltaT = (System.currentTimeMillis()-départ-chrono)/sousÉtapes;
+        chrono += System.currentTimeMillis()-départ-chrono;
+        temps += dt;
+        System.out.println("chrono: " + chrono/1000 + "s");
+        System.out.println("MPS: " + String.format("%.03f",1/((double)DeltaT/1000.0)));
+
+        //Statistiques sur la vitesse de la simulation
+        System.out.println("temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (dt*Math.pow(10.0,15.0))/((double)DeltaT/1000.0)) + " fs/s");
+        //résultatTest += String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + ";";
+        //longueurTest ++;
+
+        double température = Atome.Température(Hs);
+        System.out.println("Température: " + String.format("%.0f",( température-273.15)) + "°C");
+
+        Vecteur3D max = new Vecteur3D(-Double.MAX_VALUE);
+        Vecteur3D min = new Vecteur3D(Double.MAX_VALUE);
+        for (int i = 0; i < Hs.size(); i++) {
+            max.x = Math.max(Hs.get(i).position.x + Hs.get(i).rayonCovalent, max.x);
+            max.y = Math.max(Hs.get(i).position.y + Hs.get(i).rayonCovalent, max.y);
+            max.z = Math.max(Hs.get(i).position.z + Hs.get(i).rayonCovalent, max.z);
+
+            min.x = Math.min(Hs.get(i).position.x + Hs.get(i).rayonCovalent, min.x);
+            min.y = Math.min(Hs.get(i).position.y + Hs.get(i).rayonCovalent, min.y);
+            min.z = Math.min(Hs.get(i).position.z + Hs.get(i).rayonCovalent, min.z);
+        }
+
+        double volume = (max.x-min.x)*(max.y-min.y)*(max.z-min.z);
+        System.out.println("Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3");
+        double pression = Hs.size()*Atome.R*température/volume;
+        System.out.println("Pression: " + String.format("%.03E",pression) + "kPa");
+
+        énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
+    }
     /**Dessine une boite représentant le domaine de simulation à  l'écran */
     public static void DessinerBoite(){
         double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
