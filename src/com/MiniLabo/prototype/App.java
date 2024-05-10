@@ -12,10 +12,10 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 1412; //Taille de simulation 
-    public static int TailleY = 812;
+    public static int TailleX = 512; //Taille de simulation 
+    public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 45f;
+    public static float Zoom = 65.0f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -62,10 +62,10 @@ public class App {
         MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
         MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
 
-         Atome H = new Atome(1);
+         /* Atome H = new Atome(1);
         H.retirerÉlectron();
         H.évaluerValence();
-        Hs.add(H);
+        Hs.add(H); */
         /*Atome H1 = new Atome(1);
         H1.position= new V3(4,1,0);
        
@@ -93,21 +93,21 @@ public class App {
         
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 90;  //Nombre de molécules voulus
+        int NbMolécules = 30;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
-        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 2.770025;  //Zone tampon entre les atomes
+        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon = 0.00770025;  //Zone tampon entre les atomes
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < 180) {
             essais++;
             MoléculeRéf mol = H2O;
-            if(totalMolécules < 3){
+           /*  if(totalMolécules < 3){
                 mol = MoléculeRéf.avoirH3Op();
             }if(totalMolécules >= 3 && totalMolécules < 6){
                 mol = MoléculeRéf.avoirOHm();
-            }
+            } */
 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
