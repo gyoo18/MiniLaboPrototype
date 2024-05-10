@@ -112,17 +112,24 @@ public class Intégrateur {
             for (int i = 0; i < bouc.length; i++) {
                 synchronized (fils[i]){
                     fils[i].notify();
-                    fils[i].terminé = false;
+                    if(fils[i].terminé){
+                        fils[i].terminé = false;
+                    }
                 }
             }
 
             boolean terminé = false;
+            long timer = System.currentTimeMillis();
             while (!terminé) {
                 terminé = true;
                 for (int i = 0; i < bouc.length; i++) {
                     synchronized (fils[i]){
                         terminé = terminé && fils[i].terminé;
                     }
+                }
+                if(!terminé && System.currentTimeMillis()-timer > 100*O.size()/bouc.length){
+                    terminé = true;
+                    System.err.println("Les fils d'exécutions ont pris trop de temps. Sortie de l'attente.");
                 }
             }
         }else{
