@@ -199,8 +199,8 @@ public class Vecteur3D {
      * @param a
      * @param b
      * @return a^b
-     *
-    * |i  j  k |
+     */
+    /* |i  j  k |
      * |ax ay az|    |ay az|    |ax az|    |ax ay|
      * |bx by bz| = i|by bz| - j|bx bz| + k|bx by| = i(ay*bz-az*by) - j(ax*bz-az*bx) + k(ax*by-ay*bx)
      * */
@@ -213,10 +213,10 @@ public class Vecteur3D {
      * @param b
      * @param c
      * @return a•(b^c)
-     *
-    * |ax ay az|
+     */
+    /* |ax ay az|
      * |bx by bz|     |by bz|     |bx bz|     |bx by|
-     * |cx cy cz| = ax|cy cz| + ay|cx cz| + az|cx cy| = ax(by*cz-bz*cy) - ay(bx*cz-bz*cx) + az(bx*cy-by*cx)
+     * |cx cy cz| = ax|cy cz| + ay|cx cz| + az|cx cy| = ax(by*cz-bz*cy) + ay(bx*cz-bz*cx) + az(bx*cy-by*cx)
      * */
     public static double mixte(Vecteur3D a, Vecteur3D b, Vecteur3D c){
         return  a.x*(b.y*c.z-b.z*c.y) + a.y*(b.z*c.x-b.x*c.z) + a.z*(b.x*c.y-b.y*c.x);
