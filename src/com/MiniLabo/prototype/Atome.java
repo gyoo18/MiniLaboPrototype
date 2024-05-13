@@ -13,6 +13,7 @@ public class Atome{
     public Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
     private double facteurMixVélMoyen = 0.5;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
+    public double potentiel = 0;
 
     public int NP;                      //Nombre de protons. Définis le type d'atomes.
     public int NE;                      //Nombre d'électrons.
@@ -82,8 +83,8 @@ public class Atome{
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
-        true, //Force de Torsion
-        true, //Force Diedre
+        false, //Force de Torsion
+        false, //Force Diedre
     };
 
     /**
@@ -227,6 +228,7 @@ public class Atome{
                         }
                     }
                 }
+            
             }
         }
 
@@ -366,9 +368,9 @@ public class Atome{
          }
         }
 
-        double ModuleFriction = -0.000000000000001;
+        double ModuleFriction = -0.0000000000001;
         //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        //A.Force.addi(new Vecteur3D(0,-1,0.0)); //Appliquer une force de gravité
+        //A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
             //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
@@ -426,11 +428,11 @@ public class Atome{
      * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
      * @return Vecteur de force en Newtons Angströmiens
      * @see <h3>Sources :</h3> 
-     *      <p>•<a href="https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/Pauli_exclusive_principle.html"><i>W. Pauli</i> (1924) Pauli Exclusion Principle</a>;</p>
-     *      <p>•<a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
+     *      <p>• <a href="https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/Pauli_exclusive_principle.html"><i>W. Pauli</i> (1924) Pauli Exclusion Principle</a>;</p>
+     *      <p>• <a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        Vecteur3D force = ( V3.mult(dir, (2.0*Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+        Vecteur3D force = ( V3.mult(dir, (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
         if (Double.isNaN(force.longueur())){
             System.err.println("Force Paulie renvoie NaN");
         }
@@ -447,9 +449,7 @@ public class Atome{
      * @see <a href="https://staff.ulsu.ru/moliver/ref/corr/lond36.pdf">Source : <i>F. London</i> (1937) The General Theory of Molecular Forces</a>
      */
     private static Vecteur3D ForceVanDerWall(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
-        //TODO #11 Implémenter moments dipolaires
-        //TODO #12 Implémenter fréquence d'ionisation
-        //TODO #26 Décider quelle température prendre pour Van der Walls
+        //TODO #27 réviser calculerMomentDipolaire()
         double mu1 = Environnement.get(indexeA).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 1
         double mu2 = Environnement.get(indexeB).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 2
         double m = Environnement.get(indexeA).m*Environnement.get(indexeB).m/(Environnement.get(indexeA).m+Environnement.get(indexeB).m);
@@ -466,9 +466,9 @@ public class Atome{
         if (Double.isNaN(T)){
             System.out.println("TempératurenNan");
         }
-        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/*kB*T);             //Forces de Keesom
-        double Debye = (a1*mu2*mu2 + a2*mu1*mu1)/*Math.pow(4.0*Math.PI*ep0*ep0,2.0)*/;                   //Forces de Debye
-        double London = ((3.0*h)/2.0)*((a1*a2))/*Math.pow(4.0*Math.PI*ep0*ep0,2.0))*/*((nu1*nu2)/(nu1+nu2));//Forces de London
+        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*kB*T);             //Forces de Keesom
+        double Debye = (a1*mu2*mu2 + a2*mu1*mu1);                   //Forces de Debye
+        double London = ((3.0*h)/2.0)*((a1*a2))*((nu1*nu2)/(nu1+nu2));//Forces de London
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         Vecteur3D force = ( V3.mult(dir, 6.0*module/Math.pow(dist,7.0)));
         if (Double.isNaN(force.longueur())){
@@ -635,6 +635,7 @@ public class Atome{
   
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
+        //TODO #39 Implémenter Force Dièdre
         double ConstanteDeForce=1000*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
         double sens = 1.0;
         Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
@@ -746,6 +747,500 @@ public class Atome{
             }
         }
     }
+
+    public static void évaluerÉnergiePotentielle(Atome A){
+        //Forces découlant des interractions avec les atomes non-liés
+        for (int i = 0; i < Environnement.size(); i++) {
+            //Pour tout les atomes
+            if(Environnement.get(i) == A){
+                //Si l'autre atome (A') est cet atome (A), sauter au prochain atome
+                continue;
+            }
+
+            Atome APrime = Environnement.get(i);
+            Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
+            double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
+
+            if( dist < 5.0*(A.rayonCovalent+APrime.rayonCovalent)){
+                //Si A' se situe à moins de N rayons covalents de A
+                if (ListeForce[0]){
+                    A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent, dist, dir); //Appliquer la force de Pauli   
+                }
+                if (ListeForce[1]){
+                    A.potentiel += potentielVanDerWalls(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir); //Appliquer les forces de Van der Walls
+                }
+                if (ListeForce[2]){
+                    A.potentiel += potentielÉlectrique(A.charge, APrime.charge,dist,dir); //Appliquer la force électrique
+                }
+
+                //Forces des doublets d'A' sur A
+                for (int j = 0; j < APrime.forceDoublet.size(); j++) {
+                    dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                    dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
+                    if (ListeForce[0]){
+                        A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
+                    }
+                    
+                    if (ListeForce[2]){
+                        boolean voisin=false;
+                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                            if(A.liaisonIndexe.get(i1)==-1){
+                                continue;
+                            }
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                                voisin=true;   
+                            }
+                        }
+                        if (!voisin){
+                            A.potentiel += potentielÉlectrique(A.charge, -2.0,dist,dir); //Appliquer la force électrique
+                        }
+                    }
+                }
+
+                //Forces de A' sur les doublets
+                for (int j = 0; j < A.forceDoublet.size(); j++) {
+
+                    Vecteur3D eDir = V3.norm(V3.sous(V3.addi(A.positionDoublet.get(j), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
+                    double eDist = V3.distance(V3.addi(A.position,A.positionDoublet.get(j)), APrime.position); //Distance entre le doublet et A'
+                    if (ListeForce[0]){
+                        A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir); //Appliquer la force de Pauli 
+                    }
+                    
+                    if (ListeForce[2]){
+                        boolean voisin=false;
+                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                            if(A.liaisonIndexe.get(i1)==-1){
+                                continue;
+                            }
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                                voisin=true;
+                            }
+                        } 
+                        if (!voisin){
+                            A.potentiel += potentielÉlectrique(-2.0, APrime.charge,eDist,eDir); //Appliquer la force électrique
+                        }
+                    }
+
+                    //Forces des doublets de A' sur les doublets de A
+                    for (int k = 0; k < APrime.forceDoublet.size(); k++) {
+                        eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                        eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
+                        if (ListeForce[0]){
+                            A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
+                        }
+                        if (ListeForce[2]){
+                            A.potentiel += potentielÉlectrique(-2, -2,eDist,eDir); //Appliquer la force électrique
+                        }
+                    }
+                }
+            
+            }
+        }
+
+        for (int j = 0; j < A.forceDoublet.size(); j++) {
+            for (int k = 0; k < A.forceDoublet.size(); k++) {
+                //Si On regarde le même doublet, passer au prochain
+                if(k==j){continue;}
+
+                Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre doublet
+                double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et lautre doublet
+                if (ListeForce[2]){
+                    A.potentiel += potentielÉlectrique(-2, -2, eDist, eDir); //Appliquer la force électrique entre les deux doublet   
+                }
+                
+            }
+        }
+
+        //Compter le nombre de liens formés par A
+        int nLiens = 0;
+        boolean[] traité = new boolean[A.liaisonIndexe.size()];
+        for (int j = 0; j < A.liaisonIndexe.size(); j++) {
+            if(A.liaisonIndexe.get(j) != -1 && !traité[j] && !A.liaisonType.get(j)){
+                //Si la liaison existe,
+                //On ne prend que la liaison sigma pour éviter de la compter plus d'une fois.
+                nLiens++;
+                traité[j] = true;
+            }
+        }
+
+        //Forces de liaisons
+        for(int i = 0; i < A.liaisonIndexe.size(); i++){
+            //Pour toutes les liaisons
+
+            //S'il n'y a pas de liaison, sauter à la prochaine
+            if(A.liaisonIndexe.get(i) == -1){
+                continue;
+            }
+            //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
+            if(A.liaisonType.get(i)){
+                continue;
+            }
+            
+            //Évaluer le nombre de liaison existantes entre A et A'
+            int liaisonOrdre = A.liaisonOrdre.get(i);
+            Atome Ai=Environnement.get(A.liaisonIndexe.get(i));
+
+            Vecteur3D dir = V3.norm( V3.sous(A.position, Ai.position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
+            double dist = V3.distance(Ai.position, A.position); //Distance entre A et A'
+            if (ListeForce[3]){
+                A.potentiel += potentielMorse(dist, dir, liaisonOrdre, A.NP, Ai.NP); //Appliquer la force de Morse
+            }
+            
+            //si force torsion
+            if (ListeForce[4]){
+                //Appliquer la force de torsion avec tout les autres liens
+                for(int j = 0; j < A.liaisonIndexe.size(); j++){
+                    //Pour toutes les liaisons de A
+                    //Si la liaison n'existe pas, qu'elle est cette liaison ou qu'elle est pi (pour éviter de la compter plus d'une fois), passer à la prochaine
+                    if(A.liaisonIndexe.get(j) == -1 || A.liaisonIndexe.get(i) == A.liaisonIndexe.get(j) || A.liaisonType.get(j)){
+                        //Si la liaison n'existe pas ou qu'elle est celle que nous évaluons en ce moment, passer à la prochaine
+                        continue;
+                    }
+                    Atome Aj=Environnement.get(A.liaisonIndexe.get(j));
+
+                    double potentiel = potentielTorsion(Ai, A, Aj);
+                    
+                    Ai.potentiel += potentiel; //Appliquer force de torsion à IA
+                    A.potentiel += potentiel;
+                }
+
+                //Torsion Atome-Doublet
+                for(int j = 0; j < A.positionDoublet.size(); j++){
+                    double force = potentielTorsion(Ai,A,j); //Calculer force de torsion appliquer sur Ai
+                    double forceDoublet = potentielTorsion(j,A,Ai); //Calculer force de torsion appliquer sur le doublet
+                    Ai.potentiel += force; //Appliquer force de torsion à A'
+                    A.potentiel += force;
+                    A.potentiel += forceDoublet; //Appliquer force au doublet
+                    A.potentiel += forceDoublet;
+                }
+            }
+        }
+        
+        if (ListeForce[4]){
+            //Force de torsion entre les doublets
+            for (int i = 0; i < A.positionDoublet.size(); i++) {
+                for(int j = 0; j < A.positionDoublet.size(); j++){
+                    //Si on regarde le même doublet, passer au prochain
+                    if(i==j){continue;} 
+                    double forceDoublet = potentielTorsion(i,A,j);               
+                    //A.forceDoublet.get(i).addi(forceDoublet); //Appliquer force au doublet i
+                    //A.Force.addi(forceDoublet.opposé());
+                }
+            }
+
+        }
+
+        //Force Dièdre
+        for(int i = 0; i < A.liaisonIndexe.size(); i++){
+            if (ListeForce[5]){
+                //Pour toutes les liaisons
+
+                //S'il n'y a pas de liaison, sauter à la prochaine
+                if(A.liaisonIndexe.get(i) == -1){
+                    continue;
+                }
+                //Si le type de liaison est pi, passer à la prochaine. Cela assure que les liaisons multiples ne sont traités qu'une fois.
+                if(A.liaisonType.get(i)){
+                    //System.out.println(1450491);
+                }
+                Atome Ai =Environnement.get(A.liaisonIndexe.get(i));  
+                
+                //int liaisonOrdre = A.liaisonOrdre.get(i);  //Évaluer le nombre de liaison existantes entre A et A1, pas important pour Ai, mais pour Aj
+
+                for ( int j=0; j < A.liaisonIndexe.size(); j++ ){
+                    
+                    if(A.liaisonIndexe.get(j) == -1){
+                        continue;
+                    }
+                    if(A.liaisonIndexe.get(j) == A.liaisonIndexe.get(i)){
+                        continue;
+                    }
+                    Atome Aj =Environnement.get(A.liaisonIndexe.get(j));
+                    for ( int k=0; k < Aj.liaisonIndexe.size(); k++){
+                        if(Aj.liaisonIndexe.get(k) == -1){
+                            continue;
+                        }
+                        if(Environnement.get(Aj.liaisonIndexe.get(k)) == A){
+                            continue;
+                        }
+                        Atome Ak =Environnement.get(Aj.liaisonIndexe.get(k));
+
+                        Ai.potentiel += potentielDiedre(Ai, A, Aj, Ak);
+                        A.potentiel += potentielDiedre(Ai, A, Aj, Ak);
+                        //System.out.println(V3.distance(ForceDiedre(Ai, A, Aj, Ak),new V3(000)));
+                    }
+                }
+            }
+        }
+        
+        //A.potentiel += A.m*9.8*Math.pow(10.0,-10.0)*A.position.y;
+    }
+
+    /**
+     * Renvoie un vecteur qui représente la force électrique entre deux particules
+     * @param q1 - Charge de la première particule en nombre de charges élémentaires. Sera multiplié par la charge élémentaire e.
+     * @param q2 - Charge de la deuxième particule.
+     * @param r - Distance entre les deux particule en Angströms
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième charge vers la première.
+     * @return - Vecteur de force en Newtons Angströmiens
+     * @see <a href = "https://www.erpi.com/fr/bundle-physique-1-m-can-ens-e-man-6m-d5-9782761354998.html">Source : <i>H. Benson, M. Lachance</i> (2015) Physique I, Mécanique, 5e Édition</a>
+     */
+    private static double potentielÉlectrique(double q1, double q2, double r, Vecteur3D dir){
+        double potentiel = K*q1*e*q2*e/r;
+        if (Double.isNaN(potentiel)){
+            System.err.println("Potentiel électrique renvoie NaN");
+        }
+        return potentiel;
+    }
+    
+    /**
+     * L'interaction de répulsion de Pauli est un phénomène quantique qui n'a pas d'équivalent physique. 
+     * Cette force ne représente pas une conversion directe,seulement une approximation raisonnable.
+     * Ainsi, cette fonction renvoie une force qui immite la répulsion de Pauli avec un terme de Lennard-Jones 6-12.
+     * @param RayonCovalent1 - Rayon Covalent de la première particule. Utilisé pour calculer la longueur d'une liaison potentielle entre les deux particule. Cette force devrait équilibrer les forces de Van der Walls et la force électrique autour de 2 fois la longueur de liaison.
+     * @param RayonCovalent2 - Rayon Covlaent de la deuxième particule.
+     * @param dist - Distance entre les deux particules en Angströms.
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
+     * @return Vecteur de force en Newtons Angströmiens
+     * @see <h3>Sources :</h3> 
+     *      <p>•<a href="https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/Pauli_exclusive_principle.html"><i>W. Pauli</i> (1924) Pauli Exclusion Principle</a>;</p>
+     *      <p>•<a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
+     */
+    private static double potentielPauli(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
+        double potentiel = (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
+        if (Double.isNaN(potentiel)){
+            System.err.println("Potentiel Paulie renvoie NaN");
+        }
+        return potentiel;
+    }
+    
+    /**
+     * Renvoie une approximation des forces de Van der Walls.
+     * @param NP - Nombre de protons du premier atome.
+     * @param NPA - Nombres de protons du deuxième atome.
+     * @param dist - Distance entre les deux particules en Angströms.
+     * @param dir - Vecteur unitaire de direction qui pointe de la deuxième particule vers la première.
+     * @return Vecteur de force en Newtons Angströmiens
+     * @see <a href="https://staff.ulsu.ru/moliver/ref/corr/lond36.pdf">Source : <i>F. London</i> (1937) The General Theory of Molecular Forces</a>
+     */
+    private static double potentielVanDerWalls(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
+        //TODO #27 réviser évaluerMomentDipolaire()
+        double mu1 = Environnement.get(indexeA).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 1
+        double mu2 = Environnement.get(indexeB).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 2
+        double m = Environnement.get(indexeA).m*Environnement.get(indexeB).m/(Environnement.get(indexeA).m+Environnement.get(indexeB).m);
+        double a1 = Polarisabilité[NP-1]*convPolar;  //Polarisabilité électronique de la particule 1
+        double a2 = Polarisabilité[NPA-1]*convPolar;  //Polarisabilité électronique de la particule 2
+        double nu1 = e/Math.sqrt(m*a1); //Fréquence d'ionisation de la particule 1
+        double nu2 = e/Math.sqrt(m*a2);; //Fréquence d'ionisation de la particule 2
+
+        ArrayList<Atome> paire = new ArrayList<>();
+        paire.add(Environnement.get(indexeA));
+        paire.add(Environnement.get(indexeB));
+
+        double T = Math.max(Température(paire),1);   //Température du système en °K    //paire
+        if (Double.isNaN(T)){
+            System.out.println("Température Nan");
+        }
+        double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*kB*T);             //Forces de Keesom
+        double Debye = (a1*mu2*mu2 + a2*mu1*mu1);                   //Forces de Debye
+        double London = ((3.0*h)/2.0)*((a1*a2))*((nu1*nu2)/(nu1+nu2));//Forces de London
+        double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
+        double potentiel = 6.0*module/(7.0*Math.pow(dist,6.0));
+        if (Double.isNaN(potentiel)){
+            System.err.println("Potentiel Paulie renvoie NaN");
+        }
+        return potentiel;
+    }
+
+    /**
+     * Le mécanisme de liaison de deux atome est très complexe, mais nous pouvons l'approximer avec un potentiel oscillatoire.
+     * Cette fonction renvoie une force qui imite le comportement d'une particule dans un lien en utilisant le potentiel de Morse.
+     * @param dist - Distance entre les deux atomes
+     * @param dir - Vecteur unitaire de direction qui pointe du deuxième atome vers le premier
+     * @param nLiaisons - Nombre de liaison présentes entre les deux atomes. (Liaison simple, double ou triple).
+     * @param NP - Nombre de protons du premier atome.
+     * @param NPA - Nombre de protons du deuxième atome.
+     * @return Vecteur de force en Newtons Angströmiens.
+     * @see <a href="https://journals.aps.org/pr/abstract/10.1103/PhysRev.34.57">Source : <i>P. M. Morse</i> (1929) Diatomic Molecules According to the Wave Mechanics. II. Vibrational Levels</a> Repéré sur <a href="https://en.wikipedia.org/wiki/Morse_potential">Wikipedia (2024)</a>
+     *
+     */
+    private static double potentielMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
+        double l = 0; //Longueur de liaison
+        if(nLiaisons == 1){
+            l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/); //Longueur d'ordre 1
+        }else if(nLiaisons == 2){
+            l = (rayonsCovalents2[NP-1] + rayonsCovalents2[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/); //Longueur d'ordre 2
+        }else if(nLiaisons == 3){
+            l = (rayonsCovalents3[NP-1] + rayonsCovalents3[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/);  //Longueur d'ordre 3;
+        }
+
+
+        l = l/100.0;    //La longueur est en pm et on travaille en Å.
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
+        double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
+        //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
+        // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
+        // quasiment identique à s'il n'était pas lié.
+        double a = Math.sqrt(p/(2.0*D));
+        double module = D*Math.pow(1-Math.exp(-a*(dist-l)),2.0); //Appliquer la force de morse
+
+        double potentiel = module;
+        if (Double.isNaN(potentiel)){
+            System.err.println("Potentiel de Morse renvoie NaN");
+        }
+        return potentiel;
+    }
+    
+    /**
+     * Renvoie la force de torsion à appliquer sur I dans le système I-K-J, où K est l'atome central.
+     * @param IAxe - Vecteur directeur de K vers I
+     * @param JAxe - Vecteur directeur de K vers J
+     * @param mI - Masse de I
+     * @param mJ - Masse de J
+     * @param NBLiens - Nombre de liens que K forme
+     * @param NBDoublets - Nombre de doublets que K possède
+     * @param K - Nombre de protons de K
+     * @param I - Nombre de protons de I. Mettre -1 si c'est un doublet.
+     * @param J - Nombre de protons de J. Mettre -1 si c'est un doublet.
+     * @return - Vecteur de force en newtons angstromiens
+     */
+    private static double potentielTorsion(Vecteur3D IAxe, Vecteur3D JAxe, double mI, double mJ, int NBLiens, int NBDoublets, int K, int I, int J){
+        //Compter le nombre de liens formés par A
+        Vecteur3D PlanAjAi= new Vecteur3D( V3.croix(JAxe,IAxe));
+        
+        Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(IAxe,PlanAjAi)));
+
+        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(IAxe), V3.norm(JAxe)),-1),1));
+        double angle0; //Angle à l'équilibre entre I et J
+        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
+        switch(NBLiens+NBDoublets){
+            case 2:
+                angle0 = Math.PI;
+                break;
+            case 3:
+                angle0 = 2.0*Math.PI/3.0;
+                break;
+            case 4:
+                angle0 = 73.0*Math.PI/120.0;
+                break;
+            default:
+                angle0 = angle;
+            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                break;
+        }
+        double Kij;
+        if(I == -1 || J == -1){
+            Kij = 10000.0;
+        }else{
+            double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
+            if(nbOndeFondamental == 0.0){
+                nbOndeFondamental = 0.0;
+            }
+            double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
+            double masse = 1.0/((1.0/mI)+(1.0/mJ));
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+        }
+
+        double D0 = angle0-angle; //Delta theta      
+        //TODO doublet angle different doublet doublet, doublet atome
+        double force = 0.5*Kij*D0*D0;
+        if (Double.isNaN(force)){
+            System.err.println("Force Torsion renvoie NaN");
+        }
+        return force;
+    }
+    
+    private static double potentielTorsion(Atome Ai, Atome A, Atome Aj){
+        Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
+        Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
+        return potentielTorsion(IAxe, JAxe, Ai.m, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, Aj.NP);
+    }
+   
+    private static double potentielTorsion(Atome Ai, Atome A,  int Doubletj){
+       Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
+       return potentielTorsion(IAxe, A.positionDoublet.get(Doubletj), Ai.m, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, -1);
+    }
+
+    private static double potentielTorsion(int Doubleti, Atome A,  Atome Aj){
+        Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
+        return potentielTorsion(A.positionDoublet.get(Doubleti), JAxe, 2.0*mE, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, -1, Aj.NP);
+     }
+   
+    private static double potentielTorsion(int Doubleti, Atome A,  int Doubletj){
+       return potentielTorsion(A.positionDoublet.get(Doubleti), A.positionDoublet.get(Doubletj), 2.0*mE, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, -1, -1);
+    }
+  
+    private static double potentielDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
+        //TODO #38 Implémenter Potentiel Dièdre
+        double ConstanteDeForce=1000*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10 ,-23 );
+        double sens = 1.0;
+        Vecteur3D PlaniAj= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position), V3.sous(Ai.position,A.position)));
+        Vecteur3D PlanAjk= new Vecteur3D( V3.croix(V3.sous(Aj.position ,A.position ), V3.sous(Ak.position ,Aj.position)));
+        if(Vecteur3D.mixte(PlaniAj, V3.sous(Aj.position ,A.position ), PlanAjk)>0 ){
+            sens=1.0;
+        }
+        if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)<0 ){
+            sens=-1.0;
+           
+        }
+        if(Vecteur3D.mixte(PlaniAj, Vecteur3D.sous(Aj.position ,A.position ), PlanAjk)==0 ){
+            sens=0.0;
+        }
+        
+        double AngleO=1.0*Math.PI;
+        Vecteur3D direction = new Vecteur3D(Vecteur3D.norm(PlaniAj));
+        double iAjxAjk = V3.scal(V3.norm(PlaniAj),V3.norm(PlanAjk));
+        double Angle= Math.acos(Math.min(Math.max(iAjxAjk,-1.0),1.0));
+        double FDiedre=0.0;
+        Boolean Liasondouble = false;
+        for (int j=0; j < A.liaisonIndexe.size();j++){
+            if (A.liaisonIndexe.get(j)!=-1){
+                if (Environnement.get(A.liaisonIndexe.get(j))==Aj){
+                    if (A.liaisonOrdre.get(j)==2){
+                      Liasondouble=true;
+                        if (Angle>0.5*Math.PI){
+                            //A.briserLien(j);
+                           // System.out.println(33);
+                           
+                        }
+                    } 
+                }
+            }
+           
+        }
+        if (Liasondouble){
+            AngleO = 0.5*Math.PI;
+            ConstanteDeForce=10*Math.pow(10,20)*Math.pow(6.022,-1)*Math.pow(10.0 ,-23.0 );
+            double AngleP=1.0/AngleO;
+            double AngleX=Angle*(2/Math.PI);
+            if (AngleO-Angle==0){
+               FDiedre=0;
+            } else{
+                FDiedre = -sens*ConstanteDeForce*Math.pow(Math.pow(1.0-AngleX,-1.0)-AngleX+1.0,1.0);
+            }
+            if (FDiedre>10000){
+                System.out.println(33);
+            }
+        
+        
+        } else {
+            FDiedre = sens*ConstanteDeForce*(Math.pow((( Math.pow(AngleO,2) -  Math.pow(Angle,2) ) / ( 4.0*Math.pow(Math.PI,2) ) ),2));
+        }
+
+        //double FDiedre = sens*ConstanteDeForce*(Math.pow((1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) ),-2));
+        //double FDiedre = sens*ConstanteDeForce*((Math.PI-Angle));
+       // double FDiedre = sens*ConstanteDeForce*2*((Angle)) / ( 4*Math.pow(Math.PI,2) )*(1- ( Math.pow(Angle,2) ) / ( 4*Math.pow(Math.PI,2) ) );
+        /* if (Double.isNaN(FDiedre)){
+            FDiedre=0;
+        } */
+       
+        Vecteur3D force = ( Vecteur3D.mult(direction, FDiedre ));
+        if (Double.isNaN(force.longueur())){
+            System.err.println("Force Dièdre renvoie NaN");
+        }
+        return -1;
+    }
+
 
     /**Ajouter un électron aux cases quantiques (en mode hybridé)*/
     public void ajouterÉlectron(){
