@@ -202,7 +202,7 @@ public class App {
                 MiseÀJours++;
                 
                 for (int i = 0; i < Hs.size(); i++) {
-                    //Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                     //Hs.get(i).déplacerVersÉquilibre();
                 }
                 
