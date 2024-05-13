@@ -12,10 +12,10 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 512; //Taille de simulation 
-    public static int TailleY = 512;
-    public static int TailleZ = 512;
-    public static float Zoom = 20f;
+    public static int TailleX = 1420; //Taille de simulation 
+    public static int TailleY = 720;
+    public static int TailleZ = 720;
+    public static float Zoom = 30f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -65,7 +65,7 @@ public class App {
 
         //Molécule de base
     
-        MoléculeRéf H2O = MoléculeRéf.avoirH2();
+        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -84,7 +84,7 @@ public class App {
         int NbMolécules = 1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
-        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
         double tampon = 0.5;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
@@ -95,7 +95,7 @@ public class App {
             essais++;
             MoléculeRéf mol = H2O;
             if(totalMolécules < 3){
-                //mol = MoléculeRéf.avoirNaCl();
+                mol = MoléculeRéf.avoirNaCl();
             }
 
             //position aléatoire dans le domaine.
@@ -150,14 +150,14 @@ public class App {
             //double module=Math.pow(10, 15);
             double Angle1=Math.random()*2*Math.PI;
             double Angle2=Math.random()*2*Math.PI;
-            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        int itérations = 0;
+        int itérations = 5;
         for (int i = 0; i < itérations; i++) {
             
             Intégrateur.calculerForces(Hs);
@@ -232,7 +232,7 @@ public class App {
                 DessinerAtome(Hs.get(indexe.get(i)), Hs);
             }
 
-            if (System.currentTimeMillis()-mailman > 5000 || chrono == 0){
+            if (System.currentTimeMillis()-mailman > 5000){
                 mailman = System.currentTimeMillis();
                 analyse(MiseÀJours);
                 MiseÀJours = 0;
@@ -299,8 +299,7 @@ public class App {
             Ep += Hs.get(i).potentiel;
         }
         double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
-        //Ep = (2.0/dist);
-        Ek *= 2.0; //(2.0/0.64)-Ep;
+        Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
         AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.3E",Ep) + " JÅ";
         AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.3E",Ek) + " JÅ";

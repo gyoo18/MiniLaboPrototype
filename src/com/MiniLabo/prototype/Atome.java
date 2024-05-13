@@ -139,7 +139,7 @@ public class Atome{
      * @param a - Atome sur lequel appliquer les forces 
     */
     public static void ÉvaluerForces(Atome A){
-
+        
         //Forces découlant des interractions avec les atomes non-liés
         for (int i = 0; i < Environnement.size(); i++) {
             //Pour tout les atomes
@@ -369,10 +369,10 @@ public class Atome{
         }
 
         double ModuleFriction = -0.0000000000001;
-        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        //A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
+        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+            A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Appliquer les forces des doublets sur l'atome.
@@ -749,6 +749,8 @@ public class Atome{
     }
 
     public static void évaluerÉnergiePotentielle(Atome A){
+        //TODO #41 implémenter le potentiel des forces de Torsions
+        //TODO #42 implémenter le potentiel des forces Dièdres
         //Forces découlant des interractions avec les atomes non-liés
         for (int i = 0; i < Environnement.size(); i++) {
             //Pour tout les atomes
@@ -973,7 +975,7 @@ public class Atome{
             }
         }
         
-        //A.potentiel += A.m*9.8*Math.pow(10.0,-10.0)*A.position.y;
+        A.potentiel += A.m*9.8*Math.pow(10.0,-10.0)*A.position.y;
     }
 
     /**
@@ -1147,7 +1149,7 @@ public class Atome{
         if (Double.isNaN(force)){
             System.err.println("Force Torsion renvoie NaN");
         }
-        return force;
+        return 0;
     }
     
     private static double potentielTorsion(Atome Ai, Atome A, Atome Aj){
