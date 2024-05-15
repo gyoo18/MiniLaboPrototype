@@ -109,8 +109,8 @@ public class App {
         int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
-        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.5;  //Zone tampon entre les atomes
+        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon = 0.7;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
         long timer = System.currentTimeMillis();
