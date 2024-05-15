@@ -176,151 +176,174 @@ public class Atome{
                             APrime=Environnement.get(i);
                             PBoite= new V3 (0.0,0.0,0.0);
 
-                           
+                        
+                        ListeForce[3]=true;
+                        ListeForce[4]=true;
+                        ListeForce[5]=true;
+
+                    } else {
+                        
+                        ListeForce[3]=false;
+                        ListeForce[4]=false;
+                        ListeForce[5]=false;
+                        if(Environnement.get(i) == A ){
+                            
+                            APrime=Environnement.get(i).copier(false);
+                            
                         } else {
-                            ListeForce[3]=false;
-                            ListeForce[4]=false;
-                            ListeForce[5]=false;
-                            ListeForce[3]=false;
-                            ListeForce[4]=false;
-                            ListeForce[5]=false;
-                            if(Environnement.get(i) == A ){
-                                
-                                APrime=Environnement.get(i).copier(false);
-                                
-                            } else {
-                                APrime=Environnement.get(i);
+                            APrime=Environnement.get(i);
+                        }
+                        
+                        
+                        PBoite= new V3 ( (double) iBoite*App.TailleX/App.Zoom, (double) jBoite*App.TailleY/App.Zoom, (double) kBoite*App.TailleZ/App.Zoom);
+                        /* APrime = Environnement.get(i).copier(false); */
+                        
+                        APrime = new Atome(Environnement.get(i).NP);
+                        APrime.indexe=Environnement.get(i).indexe;
+                        APrime.charge=Environnement.get(i).charge;
+                        APrime.NE=Environnement.get(i).NE;
+                        APrime.doublets=Environnement.get(i).doublets;
+                        APrime.électronégativité=Environnement.get(i).électronégativité;
+                        APrime.molécule=Environnement.get(i).molécule;
+                        
+
+
+                        
+                         for (int j = 0; j < Environnement.get(i).positionDoublet.size(); j++) {
+
+
+                            if (APrime.positionDoublet.size()< Environnement.get(i).positionDoublet.size()) {
+                                APrime.positionDoublet.add(new V3(0,0,0));//V3.addi( Environnement.get(i).positionDoublet.get(j) , PBoite )); //  entre deux repasser position de liaison
+                                APrime.prevPosDoublet.add( new V3(0,0,0));//APrime.positionDoublet.get(APrime.positionDoublet.size()-1));
+                                APrime.vélDoublet.add( new Vecteur3D(0, 0, 0));
+                                APrime.forceDoublet.add( new Vecteur3D(   0, 0, 0));
+
+                            }
+                            if (APrime.positionDoublet.size()> Environnement.get(i).positionDoublet.size()) {
+                                APrime.positionDoublet.remove(0);
+                                APrime.prevPosDoublet.remove(0);
+                                APrime.vélDoublet.remove(0);
+                                APrime.forceDoublet.remove(0);
                             }
 
-                            PBoite= new V3 ( (double) iBoite*App.TailleX/App.Zoom, (double) jBoite*App.TailleY/App.Zoom, (double) kBoite*App.TailleZ/App.Zoom);
-                            /* APrime = Environnement.get(i).copier(false); */
-                            
-                            APrime = new Atome(Environnement.get(i).NP);
-                            APrime.indexe=Environnement.get(i).indexe;
-                            APrime.charge=Environnement.get(i).charge;
-                            APrime.NE=Environnement.get(i).NE;
-                            APrime.doublets=Environnement.get(i).doublets;
-                            APrime.électronégativité=Environnement.get(i).électronégativité;
-                            APrime.molécule=Environnement.get(i).molécule;
-                            for (int j = 0; j < Environnement.get(i).positionDoublet.size(); j++) {
-                                if (APrime.positionDoublet.size()< Environnement.get(i).positionDoublet.size()) {
-                                    APrime.positionDoublet.add(new V3(0,0,0));//V3.addi( Environnement.get(i).positionDoublet.get(j) , PBoite )); //  entre deux repasser position de liaison
-                                    APrime.prevPosDoublet.add( new V3(0,0,0));//APrime.positionDoublet.get(APrime.positionDoublet.size()-1));
-                                    APrime.vélDoublet.add( new Vecteur3D(0, 0, 0));
-                                    APrime.forceDoublet.add( new Vecteur3D(   0, 0, 0));
+                        }
+                        if (Double.isNaN(APrime.position.x) && Environnement.get(i) == A ){
+                            System.out.println("AprimePosNan");
+                        }
+                        if (Double.isNaN(APrime.position.x) && Environnement.get(i) != A ){
+                            System.out.println("AprimePosNan");
+                        }
+                         APrime.position=V3.addi(APrime.position, PBoite);
+                        
+                    }
+                    
 
-                                }
-                                if (APrime.positionDoublet.size()> Environnement.get(i).positionDoublet.size()) {
-                                    APrime.positionDoublet.remove(0);
-                                    APrime.prevPosDoublet.remove(0);
-                                    APrime.vélDoublet.remove(0);
-                                    APrime.forceDoublet.remove(0);
-                                }
+
+                  
+                    Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
+                    double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
+                    if (0.0000001>(dist)){
+                        System.out.println("distance0");
+                    }
+                    if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+                        //Si A' se situe à moins de N rayons covalents de A
+                        if (ListeForce[0]){
+                            A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
+                        }
+                        if (ListeForce[1]){
+                            A.Force.addi( ForceVanDerWall(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
+                        }
+                        if (ListeForce[2]){
+                            if (Double.isNaN(dist)){
+                                System.out.println("distanceNan");
                             }
-                            if (Double.isNaN(APrime.position.x) && Environnement.get(i) == A ){
-                                System.out.println("AprimePosNan");
-                            }
-                            if (Double.isNaN(APrime.position.x) && Environnement.get(i) != A ){
-                                System.out.println("AprimePosNan");
-                            }
-                            APrime.position=V3.addi(APrime.position, PBoite);
-                            
+                            A.Force.addi( ForceÉlectrique(A.charge, APrime.charge,dist,dir)); //Appliquer la force électrique
                         }
 
-                        Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
-                        double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
-                        if (0.0000001>(dist)){
-                            System.out.println("distance0");
-                        }
-                        if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)){// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
-                            //Si A' se situe à moins de N rayons covalents de A
+                        //Forces des doublets d'A' sur A
+                        for (int j = 0; j < APrime.forceDoublet.size(); j++) {
+                            dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                            dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
+                            if (0.0000000000000001>(dist)){
+                                System.out.println("distance0");
+                            }
                             if (ListeForce[0]){
-                                A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
+                                A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
                             }
-                            if (ListeForce[1]){
-                                A.Force.addi( ForceVanDerWall(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
-                            }
+                            
                             if (ListeForce[2]){
-                                if (Double.isNaN(dist)){
-                                    System.out.println("distanceNan");
-                                }
-                                A.Force.addi( ForceÉlectrique(A.charge, APrime.charge,dist,dir)); //Appliquer la force électrique
-                            }
-
-                            //Forces des doublets d'A' sur A
-                            for (int j = 0; j < APrime.forceDoublet.size(); j++) {
-                                dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
-                                dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
-                                if (0.0000000000000001>(dist)){
-                                    System.out.println("distance0");
-                                }
-                                if (ListeForce[0]){
-                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
-                                }
-                                if (ListeForce[2]){
-                                    boolean voisin=false;
-                                    for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                        if(A.liaisonIndexe.get(i1)==-1){
-                                            continue;
-                                        }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1))  && BoitePrincipale){
-                                            voisin=true;
-                                        }
+                                boolean voisin=false;
+                                for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                    if(A.liaisonIndexe.get(i1)==-1){
+                                        continue;
                                     }
-                                    if (!voisin){
-                                        if (Double.isNaN(dist)){
-                                            System.out.println("distanceNan");
-                                        }
-                                        A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
-                                    }
-                                }
-                            }
-                            //Forces de A' sur les doublets
-                            for (int j = 0; j < A.forceDoublet.size(); j++) {
-
-                                Vecteur3D eDir = V3.norm(V3.sous(V3.addi(A.positionDoublet.get(j), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
-                                double eDist = V3.distance(V3.addi(A.position,A.positionDoublet.get(j)), APrime.position); //Distance entre le doublet et A'
-                                if (0.0000000000000001>(eDist)){
-                                    System.out.println("distance0");
-                                }
-                                if (ListeForce[0]){
-                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
-                                }
-                                if (ListeForce[2]){
-                                    boolean voisin=false;
-                                    for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                        if(A.liaisonIndexe.get(i1)==-1){
-                                            continue;
-                                        }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
-                                            voisin=true;
-                                        }
-                                    } 
-                                    if (!voisin){
-                                        if (Double.isNaN(eDist)){
-                                            System.out.println("distanceNan");
-                                        }
-                                        A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
-                                    }
-                                }
-
-                                //Forces des doublets de A' sur les doublets de A
-                                for (int k = 0; k < APrime.forceDoublet.size(); k++) {
-                                    eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
-                                    eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
-                                    if (ListeForce[0]){
-                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
-                                    }
-                                    if (ListeForce[2]){
-                                        if (Double.isNaN(eDist)){
-                                            System.out.println("distanceNan");
-                                        }
-                                        A.forceDoublet.get(j).addi(  ForceÉlectrique(-2.0, -2.0,eDist,eDir) ); //Appliquer la force électrique
+                                    if (APrime == Environnement.get(A.liaisonIndexe.get(i1))  && BoitePrincipale){
+                                    voisin=true;   
                                         
                                     }
                                 }
+                                if (!voisin){
+                                    if (Double.isNaN(dist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    
+                                    A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                }
+                            }
+                            //Forces de A' sur les doublets
+                            for (int j1 = 0; j1 < A.forceDoublet.size(); j1++) {
+
+                            Vecteur3D eDir = V3.norm(V3.sous(V3.addi(A.positionDoublet.get(j1), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
+                            double eDist = V3.distance(V3.addi(A.position,A.positionDoublet.get(j1)), APrime.position); //Distance entre le doublet et A'
+                            if (0.0000000000000001>(eDist)){
+                                System.out.println("distance0");
+                            }
+                            if (ListeForce[0]){
+                                A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
+                            }
+                            
+                            if (ListeForce[2]){
+                                boolean voisin=false;
+                                for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                    if(A.liaisonIndexe.get(i1)==-1){
+                                        continue;
+                                    }
+                                    if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
+                                    voisin=true;   
+                                    
+                                    }
+                                } 
+                                if (!voisin){
+                                    if (Double.isNaN(eDist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    
+                                    A.forceDoublet.get(j1).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                                }
+                            }
+                            
+                            
+                            //Forces des doublets de A' sur les doublets de A
+                            for (int k = 0; k < APrime.forceDoublet.size(); k++) {
+                                eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                                eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
+                                if (ListeForce[0]){
+                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                }
+                            
+                                if (ListeForce[2]){
+                                    if (Double.isNaN(eDist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    A.forceDoublet.get(j).addi(  ForceÉlectrique(-2.0, -2.0,eDist,eDir) ); //Appliquer la force électrique
+                                    
+                                }
+                                
                             }
                         }
+                        
+                    }
+                    //APrime.position=V3.addi(APrime.position,V3.mult(PBoite,-1.0));
                     }  
                 }
             }
@@ -465,7 +488,7 @@ public class Atome{
             }
          }
         }
-
+    }
         double ModuleFriction = -0.0000000000001;
         A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
@@ -476,9 +499,11 @@ public class Atome{
         //Mettre à jour la vélocité moyenne
         if(A.vélocitéMoyenne.longueur()!=0.0){
             A.vélocitéMoyenne = Vecteur3D.addi(Vecteur3D.mult(A.vélocité,(1.0-A.facteurMixVélMoyen)), Vecteur3D.mult(A.vélocitéMoyenne, A.facteurMixVélMoyen));
-        }else{
+        }else {
             A.vélocitéMoyenne = A.vélocité.copier();
         }
+    
+    
         
         //System.out.println("Évalué forces sur " + A.toString());
     }
