@@ -185,22 +185,22 @@ public class App {
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        int itérations = 5;
-        for (int i = 0; i < itérations; i++) {
-            
-            Intégrateur.calculerForces(Hs);
-          
-            for (int j = 0; j < Hs.size(); j++) {
-                Hs.get(j).déplacerVersÉquilibre();
-            }
-            for (int j = 0; j < Hs.size(); j++) {
-                Hs.get(j).ÉvaluerContraintes();
-            }
-
-            if(System.currentTimeMillis() - timer > 1000){
-                System.out.println("Initialisation des positions d'équilibre. " + String.format("%.0f",100.0*(double)i/(double)itérations) + "%");
-            }
-        }
+        //int itérations = 0;
+        //for (int i = 0; i < itérations; i++) {
+        //    
+        //    Intégrateur.calculerForces(Hs);
+        //  
+        //    for (int j = 0; j < Hs.size(); j++) {
+        //        Hs.get(j).déplacerVersÉquilibre();
+        //    }
+        //    for (int j = 0; j < Hs.size(); j++) {
+        //        Hs.get(j).ÉvaluerContraintes();
+        //    }
+//
+        //    if(System.currentTimeMillis() - timer > 1000){
+        //        System.out.println("Initialisation des positions d'équilibre. " + String.format("%.0f",100.0*(double)i/(double)itérations) + "%");
+        //    }
+        //}
 
         System.out.println("Initialisation de l'ordre de dessin.");
         //Ajouter les atomes dans l'ordre de dessin
