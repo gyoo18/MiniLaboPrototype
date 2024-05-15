@@ -159,7 +159,7 @@ public class Atome{
                         if (Double.isNaN(A.position.x)){
                             System.out.println("Atome postition Nan");
                         }
-                        if(Environnement.get(i) == A /*&& BoitePrincipale*/){
+                        if(Environnement.get(i) == A && BoitePrincipale){
                             //Si l'autre atome (A') est cet atome (A), sauter au prochain atome
                             continue;
                         }
@@ -170,9 +170,6 @@ public class Atome{
                                 continue;
                             }
                             APrime=Environnement.get(i);
-                            if(APrime == A){
-                                continue;
-                            }
                             PBoite= new V3 (0.0,0.0,0.0);
                         } else {
                             if(Environnement.get(i) == A ){
@@ -252,7 +249,7 @@ public class Atome{
                                         if(A.liaisonIndexe.get(i1)==-1){
                                             continue;
                                         }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1))  /*&& BoitePrincipale*/){
+                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
                                             voisin=true;
                                         }
                                     }
@@ -281,7 +278,7 @@ public class Atome{
                                         if(A.liaisonIndexe.get(i1)==-1){
                                             continue;
                                         }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) /*&& BoitePrincipale*/){
+                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
                                             voisin=true;
                                         }
                                     } 
@@ -314,9 +311,6 @@ public class Atome{
             }
         }
 //Il faut figurer ce qui se passe avec ListeForce
-        //ListeForce[3]=true;
-        //ListeForce[4]=true;
-        //ListeForce[5]=true;
         for (int j = 0; j < A.forceDoublet.size(); j++) {
             for (int k = 0; k < A.forceDoublet.size(); k++) {
                 //Si On regarde le même doublet, passer au prochain
