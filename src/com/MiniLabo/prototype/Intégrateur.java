@@ -94,7 +94,6 @@ public class Intégrateur {
             bouc[i].start();
         }
     }
- 
 
     /**
      * Calcule les forces sur la liste d'atome donnée. Chaque atome conservera une référence à 
@@ -113,12 +112,15 @@ public class Intégrateur {
 
             for (int i = 0; i < bouc.length; i++) {
                 synchronized (fils[i]){
+                    fils[i].terminé = false;
+                    fils[i].notify();
+                }
+               /*  synchronized (fils[i]){
+                    fils[i].notify();
                     if(fils[i].terminé){
                         fils[i].terminé = false;
                     }
-                    fils[i].notify();
-                    
-                }
+                } */
             }
 
             boolean terminé = false;
@@ -135,14 +137,28 @@ public class Intégrateur {
                     System.err.println("Les fils d'exécutions ont pris trop de temps. Sortie de l'attente.");
                 }
             }
+            for (Atome o : O) {
+                Atome.ÉquilibrerDoublets(o);
+            }
         }else{
             for (Atome o : O) {
                 o.Force = new Vecteur3D(0);
                 for (int j = 0; j < o.forceDoublet.size(); j++) {
                     o.forceDoublet.set(j,new Vecteur3D(0));
                 }
+            }
+            for (Atome o : O) {
                 Atome.ÉvaluerForces(o);
             }
+            for (Atome o : O) {
+                Atome.ÉquilibrerDoublets(o);
+            }
+            //for (Atome o : O) {
+            //    App.ForceSytème.addi(o.Force);
+            //    for (int i = 0; i < o.forceDoublet.size(); i++) {
+            //        App.ForceSytème.addi(o.forceDoublet.get(i));
+            //    }
+            //}
         }
     }
 

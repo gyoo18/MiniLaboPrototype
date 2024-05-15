@@ -12,10 +12,10 @@ import javax.swing.SwingUtilities;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 1420; //Taille de simulation 
-    public static int TailleY = 720;
-    public static int TailleZ = 720;
-    public static float Zoom = 30f;
+    public static int TailleX = 512; //Taille de simulation 
+    public static int TailleY = 512;
+    public static int TailleZ = 512;
+    public static float Zoom = 40f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -39,6 +39,7 @@ public class App {
 
     private static String[] AnalyseTexte = new String[12];
     private static String Valeurs = "";
+    public static Vecteur3D ForceSytème = new Vecteur3D(0);
 
     private static JFrame frame;
 
@@ -118,14 +119,15 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 30) {
             essais++;
             MoléculeRéf mol = H2O;
-            /* if(totalMolécules < 3){
-                mol = MoléculeRéf.avoirH3Op();
+            if(totalMolécules < 3){
+                //mol = MoléculeRéf.avoirH3Op();
             }if(totalMolécules >= 3 && totalMolécules < 6){
-                mol = MoléculeRéf.avoirOHm();
-            } */
+                //mol = MoléculeRéf.avoirOHm();
+            }
 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
+            //position = new Vecteur3D(0);
             boolean intersecte = false;
             for (int i = 0; i < Hs.size(); i++) {
                 //Réessayer si cet emplacement intersecte un atome dans la simulation
@@ -168,7 +170,7 @@ public class App {
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
         Intégrateur.initialisation(Hs,10);
-        Intégrateur.FilsExécution = true;
+        Intégrateur.FilsExécution = false;
 
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
@@ -183,7 +185,7 @@ public class App {
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        int itérations = 5;
+        int itérations = 10;
         for (int i = 0; i < itérations; i++) {
             
             Intégrateur.calculerForces(Hs);
@@ -227,6 +229,7 @@ public class App {
             for (int N = 0; N < sousÉtapes; N++) {
                 MiseÀJours++;
                 
+                ForceSytème = new Vecteur3D(0);
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                     //Hs.get(i).déplacerVersÉquilibre();
@@ -258,7 +261,7 @@ public class App {
                 DessinerAtome(Hs.get(indexe.get(i)), Hs);
             }
 
-            if (System.currentTimeMillis()-mailman > 5000){
+            if (System.currentTimeMillis()-mailman > 1000){
                 mailman = System.currentTimeMillis();
                 analyse(MiseÀJours);
                 MiseÀJours = 0;
@@ -273,17 +276,23 @@ public class App {
                 }
             }
 
-            g.setColor(new Color(50,50,50,200));
+           /*  g.setColor(new Color(50,50,50,200));
             g.fillRect(TailleX/2, TailleY/2, 220, AnalyseTexte.length*15+10);
             g.setColor(Color.WHITE);
             for (int i = 0; i < AnalyseTexte.length; i++) {
                 if(AnalyseTexte[i] != null){
                     g.drawString(AnalyseTexte[i], 5, (i+1)*15);
                 }
-            }
+            } */
+
+            Vecteur3D posI = new Vecteur3D(0);
+            Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);
+            double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+            g.setColor(Color.RED);       //Couleur de la force
+            g.drawLine((TailleX/2) + (int)((posI.x)*multPersZF), (TailleY/2) - (int)((posI.y)*multPersZF), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
             
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
-            //try {Thread.sleep(300);} catch (Exception e) {}
+            //try {Thread.sleep(100);} catch (Exception e) {}
         }
     }
 
@@ -485,7 +494,7 @@ public class App {
         //Dessiner l'atome
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)),(int)((PR))*2,(int)(PR)*2);
        
-       /*\  g.setColor(new Color(0,0,0,200));
+       /*  g.setColor(new Color(0,0,0,200));
         g.fillOval((int)(((A.position.x)*multPersZ - PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
         g.fillOval((int)(((A.position.x)*multPersZ - 0*PR) + (TailleX/2)), (int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR/2)),(int)((PR))*3/4,(int)(PR)*3/4);
         g.drawLine((int) ((A.position.x)*multPersZ - PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)), (int)((A.position.x)*multPersZ - 0*PR) + (TailleX/2),(int)((TailleY/2) - (int)((A.position.y)*multPersZ + PR)));
@@ -519,18 +528,23 @@ public class App {
                 g.drawLine(  (TailleX/2) + (int)((A.position.x + 0.3f)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ) , (TailleX/2) + (int)((B.get(A.liaisonIndexe.get(i)).position.x+0.3f)*multPersZB) , (TailleY/2) - (int)((B.get(A.liaisonIndexe.get(i)).position.y)*multPersZB));
             }
         }
-         //Dessiner force resultante
-         //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.03*Math.log(Zoom*A.Force.longueur()+1)),A.position);
-         //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-         //g.setStroke(new BasicStroke());
-         //g.setColor(Color.RED);       //Couleur de la force
-         //g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         //Vecteur vitesse
+         ////Dessiner force resultante
+         Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.05*Math.max(Math.log(Zoom*A.Force.longueur()+1.0),0.0)),A.position);
+         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+         g.setColor(Color.RED);       //Couleur de la force
+         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         for (int i = 0; i < A.forceDoublet.size(); i++) {
+            Vecteur3D posI = Vecteur3D.addi(A.position, A.positionDoublet.get(i));
+            directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.forceDoublet.get(i)),0.03*Math.max(Math.log(Zoom*A.forceDoublet.get(i).longueur()+1.0),0.0)),posI);
+            multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+            g.setColor(Color.RED);       //Couleur de la force
+            g.drawLine((TailleX/2) + (int)((posI.x)*multPersZ), (TailleY/2) - (int)((posI.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         }
+         ////Vecteur vitesse
          //Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.03*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
          //double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));
-         //g.setStroke(new BasicStroke());
-         //g.setColor(Color.RED);       //Couleur de la force
-         //g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZV) , (TailleY/2) - (int)((directionF.y)*multPersZV));
+         //g.setColor(Color.WHITE);       //Couleur de la force
+         ////g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZV) , (TailleY/2) - (int)((directionF.y)*multPersZV));
    }
 
     /**

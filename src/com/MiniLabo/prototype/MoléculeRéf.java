@@ -118,10 +118,11 @@ public class MoléculeRéf extends Molécule{
 
         Atome O = new Atome(8);
         O.position = new Vecteur3D(0);
+        O.ajouterÉlectron();O.ajouterÉlectron();
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(1.77,0,0);
+        H1.position = new Vecteur3D(1.0,0,0);
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(1.77*Math.cos(109.5*2.0*Math.PI/360.0),1.77*Math.sin(109.5*2.0*Math.PI/360.0),0);
+        H2.position = new Vecteur3D(1.0*Math.cos(109.5*2.0*Math.PI/360.0),1.0*Math.sin(109.5*2.0*Math.PI/360.0),0);
        
 
         H2O.ajouterAtome(O);
@@ -348,7 +349,7 @@ public class MoléculeRéf extends Molécule{
         Atome H3 = new Atome(1);
         H3.position = new Vecteur3D(0,-1,0);
         Atome H4 = new Atome(1);
-        H4.position = new Vecteur3D(0,1,0);
+        H4.position = new Vecteur3D(0,0,1);
 
         CH4.ajouterAtome(C);
         CH4.ajouterAtome(H1);
