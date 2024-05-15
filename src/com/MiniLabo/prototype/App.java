@@ -216,7 +216,7 @@ public class App {
 
         long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
         départ = System.currentTimeMillis();
-        dt =1.0*Math.pow(10.0,-17.0);              //Delta temps de la simulation
+        dt =0.625*Math.pow(10.0,-17);              //Delta temps de la simulation
         int MiseÀJours = 0;
         while (true) {
             
@@ -275,6 +275,15 @@ public class App {
                     g.drawString(AnalyseTexte[i], 5, (i+1)*15);
                 }
             }
+
+           /*  g.setColor(new Color(50,50,50,200));
+            g.fillRect(TailleX/2, TailleY/2, 220, AnalyseTexte.length*15+10);
+            g.setColor(Color.WHITE);
+            for (int i = 0; i < AnalyseTexte.length; i++) {
+                if(AnalyseTexte[i] != null){
+                    g.drawString(AnalyseTexte[i], 5, (i+1)*15);
+                }
+            } */
 
             Vecteur3D posI = new Vecteur3D(0);
             Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);

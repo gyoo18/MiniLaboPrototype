@@ -113,6 +113,12 @@ public class Intégrateur {
                     fils[i].terminé = false;
                     fils[i].notify();
                 }
+               /*  synchronized (fils[i]){
+                    fils[i].notify();
+                    if(fils[i].terminé){
+                        fils[i].terminé = false;
+                    }
+                } */
             }
 
             boolean terminé = false;
@@ -124,7 +130,7 @@ public class Intégrateur {
                         terminé = terminé && fils[i].terminé;
                     }
                 }
-                if(!terminé && System.currentTimeMillis()-timer > 100*O.size()/bouc.length){
+                if(!terminé && System.currentTimeMillis()-timer > 1000*O.size()/bouc.length){
                     terminé = true;
                     System.err.println("Les fils d'exécutions ont pris trop de temps. Sortie de l'attente.");
                 }
