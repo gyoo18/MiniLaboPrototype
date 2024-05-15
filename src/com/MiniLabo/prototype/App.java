@@ -105,7 +105,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 1000;  //Nombre de molécules voulus
+        int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -118,11 +118,11 @@ public class App {
         while (totalMolécules < NbMolécules && essais < 30) {
             essais++;
             MoléculeRéf mol = H2O;
-            if(totalMolécules < 3){
+            /* if(totalMolécules < 3){
                 mol = MoléculeRéf.avoirH3Op();
             }if(totalMolécules >= 3 && totalMolécules < 6){
                 mol = MoléculeRéf.avoirOHm();
-            }
+            } */
 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (TailleX/(2.0*Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (TailleY/(2.0*Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (TailleZ/(2.0*Zoom) - mol.BEAA.z));
@@ -214,7 +214,7 @@ public class App {
 
         long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
         départ = System.currentTimeMillis();
-        dt =1.0*Math.pow(10.0,-17);              //Delta temps de la simulation
+        dt =0.625*Math.pow(10.0,-17);              //Delta temps de la simulation
         int MiseÀJours = 0;
         while (true) {
             
@@ -266,6 +266,15 @@ public class App {
 
             g.setColor(new Color(50,50,50,200));
             g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
+            g.setColor(Color.WHITE);
+            for (int i = 0; i < AnalyseTexte.length; i++) {
+                if(AnalyseTexte[i] != null){
+                    g.drawString(AnalyseTexte[i], 5, (i+1)*15);
+                }
+            }
+
+            g.setColor(new Color(50,50,50,200));
+            g.fillRect(TailleX/2, TailleY/2, 220, AnalyseTexte.length*15+10);
             g.setColor(Color.WHITE);
             for (int i = 0; i < AnalyseTexte.length; i++) {
                 if(AnalyseTexte[i] != null){

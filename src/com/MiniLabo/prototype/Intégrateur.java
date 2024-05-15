@@ -33,6 +33,8 @@ public class Intégrateur {
                 terminé = false;
                 for (int i = 0; i < ensemble.size(); i++) {
                     Atome.ÉvaluerForces(ensemble.get(i));
+
+                    
                 }
                 terminé = true;
                 synchronized (this){
@@ -111,10 +113,11 @@ public class Intégrateur {
 
             for (int i = 0; i < bouc.length; i++) {
                 synchronized (fils[i]){
-                    fils[i].notify();
                     if(fils[i].terminé){
                         fils[i].terminé = false;
                     }
+                    fils[i].notify();
+                    
                 }
             }
 
@@ -127,7 +130,7 @@ public class Intégrateur {
                         terminé = terminé && fils[i].terminé;
                     }
                 }
-                if(!terminé && System.currentTimeMillis()-timer > 100*O.size()/bouc.length){
+                if(!terminé && System.currentTimeMillis()-timer > 1000*O.size()/bouc.length){
                     terminé = true;
                     System.err.println("Les fils d'exécutions ont pris trop de temps. Sortie de l'attente.");
                 }
