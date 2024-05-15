@@ -15,7 +15,7 @@ public class App {
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 40f;
+    public static float Zoom = 30f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -106,7 +106,7 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 2;  //Nombre de molécules voulus
+        int NbMolécules = 100;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
         boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
@@ -170,7 +170,7 @@ public class App {
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
         Intégrateur.initialisation(Hs,10);
-        Intégrateur.FilsExécution = false;
+        Intégrateur.FilsExécution = true;
 
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
@@ -185,7 +185,7 @@ public class App {
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        int itérations = 10;
+        int itérations = 5;
         for (int i = 0; i < itérations; i++) {
             
             Intégrateur.calculerForces(Hs);
@@ -520,17 +520,17 @@ public class App {
             }
         }
          ////Dessiner force resultante
-         Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.05*Math.max(Math.log(Zoom*A.Force.longueur()+1.0),0.0)),A.position);
-         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-         g.setColor(Color.RED);       //Couleur de la force
-         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         for (int i = 0; i < A.forceDoublet.size(); i++) {
-            Vecteur3D posI = Vecteur3D.addi(A.position, A.positionDoublet.get(i));
-            directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.forceDoublet.get(i)),0.03*Math.max(Math.log(Zoom*A.forceDoublet.get(i).longueur()+1.0),0.0)),posI);
-            multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-            g.setColor(Color.RED);       //Couleur de la force
-            g.drawLine((TailleX/2) + (int)((posI.x)*multPersZ), (TailleY/2) - (int)((posI.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         }
+         //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.05*Math.max(Math.log(Zoom*A.Force.longueur()+1.0),0.0)),A.position);
+         //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+         //g.setColor(Color.RED);       //Couleur de la force
+         //g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         //for (int i = 0; i < A.forceDoublet.size(); i++) {
+         //   Vecteur3D posI = Vecteur3D.addi(A.position, A.positionDoublet.get(i));
+         //   directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.forceDoublet.get(i)),0.03*Math.max(Math.log(Zoom*A.forceDoublet.get(i).longueur()+1.0),0.0)),posI);
+         //   multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+         //   g.setColor(Color.RED);       //Couleur de la force
+         //   g.drawLine((TailleX/2) + (int)((posI.x)*multPersZ), (TailleY/2) - (int)((posI.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         //}
          ////Vecteur vitesse
          //Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.03*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
          //double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));

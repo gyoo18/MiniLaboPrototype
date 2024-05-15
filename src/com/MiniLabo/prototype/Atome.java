@@ -203,7 +203,7 @@ public class Atome{
                         Vecteur3D dir = V3.norm( V3.sous(A.position,APrime.position) ); //Vecteur direction vers l'autre atome (A')
                         double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
-                        if( true ) { //dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)){// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+                        if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)){// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
                             //Si A' se situe à moins de N rayons covalents de A
                             if (ListeForce[0]){
                                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -312,8 +312,6 @@ public class Atome{
                 traité[j] = true;
             }
         }
-
-        
 
         //Forces de liaisons
         for(int i = 0; i < A.liaisonIndexe.size(); i++){
@@ -1634,77 +1632,77 @@ public class Atome{
                 Atome APrime = Atome.Environnement.get(j); //Référence à A' , A est l'atome ayant le doublets, A' n'importe qu'elle atome
                 double dist = Vecteur3D.distance(position, APrime.position); //Calculer la distance entre A et A'
                 if(dist < min_dist && dist < 2.0*(rayonCovalent + APrime.rayonCovalent)){
-                        int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
-                        int Ql = 0;         //Nombre quantique azimutal l.
-                        int Qm = 0;         //Nombre quantique magnétique m.
-                        int CaseVide = 0; //Trouver le nombre de caseVide
-                        boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
-                        int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
-                        for (int i1 = 0; i1 < MAX_N; i1++) {
-                            //Traverser n de MAX_N à 1
-                            Ql = Qn-1;
-                            for (int j1 = 0; j1 < Qn; j1++) {
-                                //Traverser l de n-1 à 0
-                                Qm = Ql;
-                                for(int j2 = 0; j2 < 2*Ql+1; j2++){
-                                    //Traverser m de l à -l
-                                    if(APrime.cases[casesIndexe] != 0){
-                                        //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
-                                        trouvéNiveau = true;
-                                    }
-                                    if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
-                                        //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
-                                    }
-                                    if (APrime.cases[casesIndexe] != 0){
-                                        int CasePotVide=0;
-                                        if (casesIndexe <= 0){
-                                            CasePotVide = 1;
-                                        }
-                                        if (0 <casesIndexe && casesIndexe <= 1){
-                                            CasePotVide = 2;
-                                        }
-                                        if (1 <casesIndexe && casesIndexe <= 4){
-                                            CasePotVide = 5;
-                                        }
-                                        if (4 < casesIndexe &&casesIndexe <= 5){
-                                            CasePotVide = 6;
-                                        }
-
-                                        if (5 < casesIndexe &&casesIndexe <= 8){
-                                            CasePotVide = 9;
-                                        }
-                                        if (8 < casesIndexe &&casesIndexe <= 9){
-                                            CasePotVide = 10;
-                                        }
-                                        if (9 <casesIndexe &&casesIndexe <= 13){
-                                            CasePotVide = 14;
-                                        }
-                                        CaseVide = CasePotVide-casesIndexe-1;
-                                        break; //Cation, charge positive...
-                                    }
-                                    casesIndexe--; //Prochaine case
-                                    Qm--;          //Prochain m
+                    int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
+                    int Ql = 0;         //Nombre quantique azimutal l.
+                    int Qm = 0;         //Nombre quantique magnétique m.
+                    int CaseVide = 0; //Trouver le nombre de caseVide
+                    boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
+                    int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
+                    for (int i1 = 0; i1 < MAX_N; i1++) {
+                        //Traverser n de MAX_N à 1
+                        Ql = Qn-1;
+                        for (int j1 = 0; j1 < Qn; j1++) {
+                            //Traverser l de n-1 à 0
+                            Qm = Ql;
+                            for(int j2 = 0; j2 < 2*Ql+1; j2++){
+                                //Traverser m de l à -l
+                                if(APrime.cases[casesIndexe] != 0){
+                                    //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
+                                    trouvéNiveau = true;
                                 }
-                                Ql--; //Prochain l
-                            }
-                            
-                            if(trouvéNiveau){
-                                //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
-                                i1 = 4;
-                                break;
-                            }
-                            //Sinon,
-                            Qn--; //Prochain n
+                                if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
+                                    //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
+                                }
+                                if (APrime.cases[casesIndexe] != 0){
+                                    int CasePotVide=0;
+                                    if (casesIndexe <= 0){
+                                        CasePotVide = 1;
+                                    }
+                                    if (0 <casesIndexe && casesIndexe <= 1){
+                                        CasePotVide = 2;
+                                    }
+                                    if (1 <casesIndexe && casesIndexe <= 4){
+                                        CasePotVide = 5;
+                                    }
+                                    if (4 < casesIndexe &&casesIndexe <= 5){
+                                        CasePotVide = 6;
+                                    }
 
-                            if (Qn==0 && !trouvéNiveau){
-                                CaseVide++;
-                                 //Si aucun électron, CaseVide = 0 , 1S0
+                                    if (5 < casesIndexe &&casesIndexe <= 8){
+                                        CasePotVide = 9;
+                                    }
+                                    if (8 < casesIndexe &&casesIndexe <= 9){
+                                        CasePotVide = 10;
+                                    }
+                                    if (9 <casesIndexe &&casesIndexe <= 13){
+                                        CasePotVide = 14;
+                                    }
+                                    CaseVide = CasePotVide-casesIndexe-1;
+                                    break; //Cation, charge positive...
+                                }
+                                casesIndexe--; //Prochaine case
+                                Qm--;          //Prochain m
                             }
+                            Ql--; //Prochain l
                         }
+                        
+                        if(trouvéNiveau){
+                            //On a traversé toute la couche et si elle était la couche de valence, on sort de la boucle
+                            i1 = 4;
+                            break;
+                        }
+                        //Sinon,
+                        Qn--; //Prochain n
 
-                     
+                        if (Qn==0 && !trouvéNiveau){
+                            CaseVide++;
+                                //Si aucun électron, CaseVide = 0 , 1S0
+                        }
+                    }
 
-                        if ( positionDoublet.size() > 0 && CaseVide > 0){
+                    
+
+                    if ( positionDoublet.size() > 0 && CaseVide > 0){
 
                         APrime.ajouterÉlectron(); 
                         retirerÉlectron();   //Doublet se transforme en 2 electron , qui
@@ -1712,8 +1710,8 @@ public class Atome{
                         APrime.évaluerValence();    //ÉvaluerValence pour reprend / perde ses doubletts
                         //System.out.println(APrime.NP);
                         ForceSimoideDoublets += 0;
-                        
-                        }
+                    
+                    }
                     
                 }
         

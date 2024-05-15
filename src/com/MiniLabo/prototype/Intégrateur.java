@@ -30,11 +30,6 @@ public class Intégrateur {
         public void run() {
             System.out.println(Thread.currentThread().getName() + " est activé pour le calcul des forces.");
             while (true) {
-                terminé = false;
-                for (int i = 0; i < ensemble.size(); i++) {
-                    Atome.ÉvaluerForces(ensemble.get(i));
-                }
-                terminé = true;
                 synchronized (this){
                     try {
                         wait();
@@ -42,6 +37,11 @@ public class Intégrateur {
                         e.printStackTrace();
                     }
                 }
+                terminé = false;
+                for (int i = 0; i < ensemble.size(); i++) {
+                    Atome.ÉvaluerForces(ensemble.get(i));
+                }
+                terminé = true;
             }
         }
     }
@@ -145,12 +145,6 @@ public class Intégrateur {
             for (Atome o : O) {
                 Atome.ÉquilibrerDoublets(o);
             }
-            //for (Atome o : O) {
-            //    App.ForceSytème.addi(o.Force);
-            //    for (int i = 0; i < o.forceDoublet.size(); i++) {
-            //        App.ForceSytème.addi(o.forceDoublet.get(i));
-            //    }
-            //}
         }
     }
 
