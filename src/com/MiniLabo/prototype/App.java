@@ -56,7 +56,7 @@ public class App {
         System.out.println("Initialisation");
 
         Thread thread = new Thread(boucleDessin);
-        boucleDessin.mode = com.MiniLabo.prototype.App.BoucleDessin.MODE.INIT;
+        Paramètres.mode = Paramètres.Mode.INIT;
         thread.start();
         //Molécule de base
 
@@ -191,7 +191,7 @@ public class App {
 
     public static void simulation(){
         System.out.println("Début de la simulation.");
-        boucleDessin.mode = com.MiniLabo.prototype.App.BoucleDessin.MODE.SIM;
+        Paramètres.mode = Paramètres.Mode.SIM;
 
         départ = System.currentTimeMillis();
         while (true) {
@@ -310,10 +310,6 @@ public class App {
         private static Graphics2D g;
         private static JFrame frame;
 
-        public static enum MODE{INIT,SIM}
-
-        public volatile MODE mode = MODE.INIT;
-
         public volatile int MisesÀJours = 0;
         public volatile double progressionPlacement = 0.0;
 
@@ -361,7 +357,7 @@ public class App {
                     DessinerAtome(g,Hs.get(indexe.get(i)), Hs);
                 }
 
-                if (System.currentTimeMillis()-mailman > Paramètres.tempsAttenteAnalyse && mode == MODE.SIM){
+                if (System.currentTimeMillis()-mailman > Paramètres.tempsAttenteAnalyse && Paramètres.mode == Paramètres.Mode.SIM){
                     mailman = System.currentTimeMillis();
                     analyse(MisesÀJours);
                     MisesÀJours = 0;
@@ -370,13 +366,13 @@ public class App {
                 g.setColor(new Color(50,50,50,200));
                 g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
                 g.setColor(Color.WHITE);
-                if(mode == MODE.SIM){
+                if(Paramètres.mode == Paramètres.Mode.SIM){
                     for (int i = 0; i < AnalyseTexte.length; i++) {
                         if(AnalyseTexte[i] != null){
                             g.drawString(AnalyseTexte[i], 5, (i+1)*15);
                         }
                     }
-                }else if(mode == MODE.INIT){
+                }else if(Paramètres.mode == Paramètres.Mode.INIT){
                     
                     g.setColor(new Color(50,50,50,200));
                     g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
