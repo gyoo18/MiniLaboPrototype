@@ -284,8 +284,11 @@ public class MoléculeRéf extends Molécule{
         double module=2.36;
 
         Atome Na = new Atome(11);
+       /*  Na.retirerÉlectron();
+        Na.évaluerValence(); */
         Atome Cl = new Atome(17);
-
+       /*  Cl.ajouterÉlectron();
+        Cl.évaluerValence(); */
         Na.position = new Vecteur3D(0);
         Cl.position = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
 

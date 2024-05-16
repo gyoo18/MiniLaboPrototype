@@ -87,7 +87,7 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < NBessais) {
             essais++;
-            MoléculeRéf mol = Paramètres.PlacementMolécule(NbMolécules);
+            MoléculeRéf mol = Paramètres.PlacementMolécule(totalMolécules);
 
             //position aléatoire dans le domaine.
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (Paramètres.TailleX/(2.0*Paramètres.Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (Paramètres.TailleY/(2.0*Paramètres.Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (Paramètres.TailleZ/(2.0*Paramètres.Zoom) - mol.BEAA.z));
@@ -364,7 +364,7 @@ public class App {
                 if (System.currentTimeMillis()-mailman > Paramètres.tempsAttenteAnalyse && mode == MODE.SIM){
                     mailman = System.currentTimeMillis();
                     analyse(MisesÀJours);
-                    MisesÀJours = 1;
+                    MisesÀJours = 0;
                 }
 
                 g.setColor(new Color(50,50,50,200));
