@@ -281,7 +281,7 @@ public class MoléculeRéf extends Molécule{
 
         double Angle1=Math.random()*2*Math.PI;
         double Angle2=Math.random()*2*Math.PI;
-        double module=2.54;
+        double module=2.36;
 
         Atome Na = new Atome(11);
         Atome Cl = new Atome(17);

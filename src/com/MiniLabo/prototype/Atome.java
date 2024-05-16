@@ -1725,7 +1725,7 @@ public class Atome{
                                     if (0 <casesIndexe && casesIndexe <= 1-diff){
                                         CasePotVide = 2;
                                     }
-                                    if (1 <casesIndexe && casesIndexe <= 4-diff){
+                                    if (1-diff <casesIndexe && casesIndexe <= 4-diff){
                                         CasePotVide = 5;
                                     }
                                     if (4-diff < casesIndexe &&casesIndexe <= 5-diff){
