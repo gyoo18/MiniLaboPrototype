@@ -1,6 +1,8 @@
 package com.MiniLabo.prototype;
 
 public class Paramètres {
+    public static String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math/";
+
     public static int TailleX = 1000; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
