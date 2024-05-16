@@ -32,6 +32,7 @@ public class Intégrateur {
             while (true) {
                 synchronized (this){
                     try {
+                        terminé = true;
                         wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -41,7 +42,6 @@ public class Intégrateur {
                 for (int i = 0; i < ensemble.size(); i++) {
                     Atome.ÉvaluerForces(ensemble.get(i));
                 }
-                terminé = true;
             }
         }
     }
@@ -113,12 +113,6 @@ public class Intégrateur {
                     fils[i].terminé = false;
                     fils[i].notify();
                 }
-               /*  synchronized (fils[i]){
-                    fils[i].notify();
-                    if(fils[i].terminé){
-                        fils[i].terminé = false;
-                    }
-                } */
             }
 
             boolean terminé = false;

@@ -10,8 +10,8 @@ public class Atome{
     public Vecteur3D prevPosition = null;                       //Position de l'atome à temps t-1
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
-    public Vecteur3D vélocitéMoyenne = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
-    private double facteurMixVélMoyen = 0.5;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
+    public Vecteur3D vélocitéMoyenne;// = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
+    private double facteurMixVélMoyen = 0.99;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
     public double potentiel = 0;
 
@@ -38,9 +38,6 @@ public class Atome{
     public ArrayList<Integer> liaisonOrdre = new ArrayList<>();   // Ordres de liaisons. 1 = liaison simple, 2 = liaison double, 3 = liaison triple
     public int doublets;            // Nombre de doublets électroniques
     public double rayonCovalent;    // Rayon covalent d'ordre 1 sur cet atome.
-
-
-
 
     /**Liste des systèmes conjugués dont l'atome fait partis.
      * <p>Ordonnés comme suit : </p>
@@ -80,7 +77,7 @@ public class Atome{
      */
     public static boolean[] ListeForce = {
         true, //Force Paulie
-        true, //Force Vanderwal
+        false, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
         true, //Force de Torsion
@@ -218,7 +215,7 @@ public class Atome{
                         if (0.0000001>(dist)){
                             System.out.println("distance0");
                         }
-                        if( true){//dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+                        if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
                             //Si A' se situe à moins de N rayons covalents de A
                             if (ListeForce[0]){
                                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -453,7 +450,7 @@ public class Atome{
         }
 
         //Mettre à jour la vélocité moyenne
-        if(A.vélocitéMoyenne.longueur()!=0.0){
+        if(A.vélocitéMoyenne != null){
             A.vélocitéMoyenne = Vecteur3D.addi(Vecteur3D.mult(A.vélocité,(1.0-A.facteurMixVélMoyen)), Vecteur3D.mult(A.vélocitéMoyenne, A.facteurMixVélMoyen));
         }else {
             A.vélocitéMoyenne = A.vélocité.copier();
@@ -719,7 +716,6 @@ public class Atome{
     private static Vecteur3D ForceTorsion(int Doubleti, Atome A,  int Doubletj){
        return ForceTorsion(A.positionDoublet.get(Doubleti), A.positionDoublet.get(Doubletj), 2.0*mE, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, -1, -1);
     }
-  
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
         //TODO #39 Implémenter Force Dièdre
@@ -1334,7 +1330,6 @@ public class Atome{
         }
         return -1;
     }
-
 
     /**Ajouter un électron aux cases quantiques (en mode hybridé)*/
     public void ajouterÉlectron(){
