@@ -84,8 +84,8 @@ public class Atome{
         true, //Force électrique
         true, //Force de Morse
         true, //Force de Torsion
-        true, //Force Diedre
-        true, //Boite Magique
+        false, //Force Diedre
+        false, //Boite Magique
     };
 
     /**
@@ -218,7 +218,7 @@ public class Atome{
                         if (0.0000001>(dist)){
                             System.out.println("distance0");
                         }
-                        if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+                        if( true){//dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
                             //Si A' se situe à moins de N rayons covalents de A
                             if (ListeForce[0]){
                                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -446,10 +446,10 @@ public class Atome{
         }
 
         double ModuleFriction = -0.0000000000001;
-        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
         //A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Mettre à jour la vélocité moyenne
@@ -631,13 +631,10 @@ public class Atome{
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
         double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
-        //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
-        // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
-        // quasiment identique à s'il n'était pas lié.
         double a = Math.sqrt(p/(2.0*D));
-        double module = -D*(-2.0*a*Math.exp(-2.0*a*(dist-l)) + 2.0*a*Math.exp(-a*(dist-l))); //Appliquer la force de morse
+        double module = -2.0*a*D*( Math.exp(-a*(dist-l)) - Math.exp(-2.0*a*(dist-l))); //Appliquer la force de morse
 
-        Vecteur3D force = ( Vecteur3D.mult(dir,module) );
+        Vecteur3D force = ( Vecteur3D.mult(dir, module) );
         if (Double.isNaN(force.longueur())){
             System.err.println("Force de Morse renvoie NaN");
         }
@@ -665,7 +662,7 @@ public class Atome{
 
         double angle = Math.acos(Math.min(Math.max(V3.scal(IAxe, JAxe)/(IAxe.longueur()*JAxe.longueur()),-2.0),2.0));
         double angle0; //Angle à l'équilibre entre I et J
-        //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
+        //Chercher l'angler à l'équilibre entre I et J //cela prend-il en compte les doublets?
         switch(NBLiens+NBDoublets){
             case 2:
                 angle0 = Math.PI;
@@ -694,7 +691,7 @@ public class Atome{
             Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
         }
 
-        double D0 = (109.5*Math.PI/180.0)-angle; //Delta theta      
+        double D0 = angle0-angle; //Delta theta      
         //TODO doublet angle different doublet doublet, doublet atome
         Vecteur3D force = ( Vecteur3D.mult(potdirection, -D0*Kij ));
         if (Double.isNaN(force.longueur())){
@@ -825,9 +822,14 @@ public class Atome{
                 //prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(0,0,2*(position.z-prevPosition.z)) ); //Inverser la vitesse de Verlet
             }
         }
-        if(indexe == 0){
-            //position = new Vecteur3D(0);
-        }
+        //if(indexe == 0){
+        //    position = new Vecteur3D(0);
+        //}else{
+        //    position = V3.mult(V3.norm(position),1.07);
+        //    if(vélocité.longueur() > 0){
+        //        vélocité = V3.sous(vélocité,V3.mult(position,V3.scal(position, vélocité)/(position.longueur()*vélocité.longueur())));
+        //    }
+        //}
 
         //Conserver la même distance entre les doublets et l'atome
         for (int i = 0; i < forceDoublet.size(); i++) {
@@ -841,7 +843,7 @@ public class Atome{
         }
     }
 
-    public static void évaluerÉnergiePotentielle(Atome A){
+    public static void évaluerÉnergiePotentielle(Atome A,boolean morseDécalé){
         //TODO #41 implémenter le potentiel des forces de Torsions
         //TODO #42 implémenter le potentiel des forces Dièdres
         //Forces découlant des interractions avec les atomes non-liés
@@ -978,7 +980,7 @@ public class Atome{
             Vecteur3D dir = V3.norm( V3.sous(A.position, Ai.position) ); //Vecteur de direction qui pointe vers l'autre atome (A')
             double dist = V3.distance(Ai.position, A.position); //Distance entre A et A'
             if (ListeForce[3]){
-                A.potentiel += potentielMorse(dist, dir, liaisonOrdre, A.NP, Ai.NP); //Appliquer la force de Morse
+                A.potentiel += potentielMorse(dist, dir, liaisonOrdre, A.NP, Ai.NP,morseDécalé); //Appliquer la force de Morse
             }
             
             //si force torsion
@@ -991,12 +993,12 @@ public class Atome{
                         //Si la liaison n'existe pas ou qu'elle est celle que nous évaluons en ce moment, passer à la prochaine
                         continue;
                     }
-                    Atome Aj=Environnement.get(A.liaisonIndexe.get(j));
+                    Atome Aj = Environnement.get(A.liaisonIndexe.get(j));
 
                     double potentiel = potentielTorsion(Ai, A, Aj);
                     
                     Ai.potentiel += potentiel; //Appliquer force de torsion à IA
-                    A.potentiel += potentiel;
+                    //A.potentiel += potentiel;
                 }
 
                 //Torsion Atome-Doublet
@@ -1004,9 +1006,9 @@ public class Atome{
                     double force = potentielTorsion(Ai,A,j); //Calculer force de torsion appliquer sur Ai
                     double forceDoublet = potentielTorsion(j,A,Ai); //Calculer force de torsion appliquer sur le doublet
                     Ai.potentiel += force; //Appliquer force de torsion à A'
-                    A.potentiel += force;
+                    //A.potentiel += force;
                     A.potentiel += forceDoublet; //Appliquer force au doublet
-                    A.potentiel += forceDoublet;
+                    //A.potentiel += forceDoublet;
                 }
             }
         }
@@ -1018,8 +1020,8 @@ public class Atome{
                     //Si on regarde le même doublet, passer au prochain
                     if(i==j){continue;} 
                     double forceDoublet = potentielTorsion(i,A,j);               
-                    //A.forceDoublet.get(i).addi(forceDoublet); //Appliquer force au doublet i
-                    //A.Force.addi(forceDoublet.opposé());
+                    A.potentiel += forceDoublet; //Appliquer force au doublet i
+                    //A.potentiel += forceDoublet;
                 }
             }
 
@@ -1159,7 +1161,7 @@ public class Atome{
      * @see <a href="https://journals.aps.org/pr/abstract/10.1103/PhysRev.34.57">Source : <i>P. M. Morse</i> (1929) Diatomic Molecules According to the Wave Mechanics. II. Vibrational Levels</a> Repéré sur <a href="https://en.wikipedia.org/wiki/Morse_potential">Wikipedia (2024)</a>
      *
      */
-    private static double potentielMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA){
+    private static double potentielMorse(double dist, Vecteur3D dir, int nLiaisons, int NP, int NPA, boolean morseDécalé){
         double l = 0; //Longueur de liaison
         if(nLiaisons == 1){
             l = (rayonsCovalents[NP-1] + rayonsCovalents[NPA-1] /*-9*Math.abs(AffinitéÉlectronique[NP]-AffinitéÉlectronique[NPA])*/); //Longueur d'ordre 1
@@ -1173,13 +1175,10 @@ public class Atome{
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
         double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
         double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
-        //Constante de force de la liaison. Est ajustée de façon ce que la force vale 1% (.99) du maximum 
-        // à 2 fois la longueur de liaison, de façons à ce que quand le lien se brise, le potentiel soit 
-        // quasiment identique à s'il n'était pas lié.
         double a = Math.sqrt(p/(2.0*D));
-        double module = D*Math.pow(1-Math.exp(-a*(dist-l)),2.0); //Appliquer la force de morse
+        double module = D*Math.pow(1.0-Math.exp(-a*(dist-l)),2.0) - (morseDécalé?D:0.0); //Appliquer la force de morse
 
-        double potentiel = module;
+        double potentiel = module; //Math.pow(-Math.exp(-(dist-l)),2.0);
         if (Double.isNaN(potentiel)){
             System.err.println("Potentiel de Morse renvoie NaN");
         }
@@ -1205,7 +1204,7 @@ public class Atome{
         
         Vecteur3D potdirection = new Vecteur3D(  V3.norm(V3.croix(IAxe,PlanAjAi)));
 
-        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(IAxe), V3.norm(JAxe)),-1),1));
+        double angle = Math.acos(Math.min(Math.max(V3.scal(V3.norm(IAxe), V3.norm(JAxe)),-2.0),2.0));
         double angle0; //Angle à l'équilibre entre I et J
         //Chercher l'angler à l'équilibre entre I et J //sela prend til en compte les doublets?
         switch(NBLiens+NBDoublets){
@@ -1238,11 +1237,11 @@ public class Atome{
 
         double D0 = angle0-angle; //Delta theta      
         //TODO doublet angle different doublet doublet, doublet atome
-        double force = 0.5*Kij*D0*D0;
+        double force = -Kij*(angle0*angle-0.5*angle*angle)*IAxe.longueur();
         if (Double.isNaN(force)){
             System.err.println("Force Torsion renvoie NaN");
         }
-        return 0;
+        return force;
     }
     
     private static double potentielTorsion(Atome Ai, Atome A, Atome Aj){

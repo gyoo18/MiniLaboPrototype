@@ -9,13 +9,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import java.awt.RenderingHints;
 
 public class App {
     private static Graphics2D g;
     public static int TailleX = 512; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 100f;
+    public static float Zoom = 40f;
     public static int FOV = 100;     //Champ de vision de la caméra
     public static int FOVet = FOV;
     private static int FOVBoite = FOV;
@@ -38,8 +39,11 @@ public class App {
     public static int sousÉtapes = 20;
 
     private static String[] AnalyseTexte = new String[12];
+    private static double[] AnalyseValeurs = new double[AnalyseTexte.length];
     private static String Valeurs = "";
     public static Vecteur3D ForceSytème = new Vecteur3D(0);
+    private static ArrayList<Vecteur2D> GraphiqueVal = new ArrayList<>();
+    private static ArrayList<Vecteur2D> GraphiqueVal2 = new ArrayList<>();
 
     private static JFrame frame;
 
@@ -64,6 +68,15 @@ public class App {
         frame.add(image);                           //Ajouter l'objet Image à l'écran
         frame.setVisible(true);                   //Afficher la fenêtre
 
+        g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         //Molécule de base
     
         MoléculeRéf H2O = MoléculeRéf.avoirH2O();
@@ -106,11 +119,11 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 1;  //Nombre de molécules voulus
+        int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;        //Nombre d'essais à placer la molécule
-        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.7;  //Zone tampon entre les atomes
+        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon = 0.5;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
         long timer = System.currentTimeMillis();
@@ -181,6 +194,8 @@ public class App {
             //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
+        //Hs.get(0).vélocité = new Vecteur3D(-1.45*Math.pow(10.0,12.0),0,0);
+        //Hs.get(1).vélocité = new Vecteur3D(1.45*Math.pow(10.0,12.0),0,0);
 
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
@@ -196,7 +211,7 @@ public class App {
         //    for (int j = 0; j < Hs.size(); j++) {
         //        Hs.get(j).ÉvaluerContraintes();
         //    }
-//
+        //
         //    if(System.currentTimeMillis() - timer > 1000){
         //        System.out.println("Initialisation des positions d'équilibre. " + String.format("%.0f",100.0*(double)i/(double)itérations) + "%");
         //    }
@@ -261,7 +276,7 @@ public class App {
                 DessinerAtome(Hs.get(indexe.get(i)), Hs);
             }
 
-            if (System.currentTimeMillis()-mailman > 1000){
+            if (System.currentTimeMillis()-mailman > 100){
                 mailman = System.currentTimeMillis();
                 analyse(MiseÀJours);
                 MiseÀJours = 0;
@@ -276,14 +291,14 @@ public class App {
                 }
             }
 
-           /*  g.setColor(new Color(50,50,50,200));
-            g.fillRect(TailleX/2, TailleY/2, 220, AnalyseTexte.length*15+10);
-            g.setColor(Color.WHITE);
-            for (int i = 0; i < AnalyseTexte.length; i++) {
-                if(AnalyseTexte[i] != null){
-                    g.drawString(AnalyseTexte[i], 5, (i+1)*15);
-                }
-            } */
+            //g.setColor(Color.BLUE);
+            //for (int i = 0; i < GraphiqueVal.size(); i++) {
+            //    g.fillOval((int)(300.0*GraphiqueVal.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal.get(i).y), 4, 4);
+            //}
+            //g.setColor(Color.RED);
+            //for (int i = 0; i < GraphiqueVal2.size(); i++) {
+            //    g.fillOval((int)(300.0*GraphiqueVal2.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal2.get(i).y), 4, 4);
+            //}
 
             Vecteur3D posI = new Vecteur3D(0);
             Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);
@@ -292,7 +307,7 @@ public class App {
             g.drawLine((TailleX/2) + (int)((posI.x)*multPersZF), (TailleY/2) - (int)((posI.y)*multPersZF), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
             
             SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
-            //try {Thread.sleep(100);} catch (Exception e) {}
+            //try {Thread.sleep(300);} catch (Exception e) {}
         }
     }
 
@@ -300,13 +315,14 @@ public class App {
         g.setColor(Color.WHITE);
         AnalyseTexte[0] = "====== Analyse ======";
         DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
-        chrono += System.currentTimeMillis()-départ-chrono;
+        double DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+        chrono = System.currentTimeMillis()-départ;
         temps += dt;
         AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
         AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/((double)DeltaT/1000.0));
 
         //Statistiques sur la vitesse de la simulation
-        AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (dt*Math.pow(10.0,15.0))/((double)DeltaT/1000.0)) + " fs/s";
+        AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
         //résultatTest += String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + ";";
         //longueurTest ++;
 
@@ -336,8 +352,10 @@ public class App {
             Hs.get(i).potentiel = 0;
         }
         for (int i = 0; i < Hs.size(); i++) {
-            Ek += Math.pow(Hs.get(i).vélocité.longueur(),2.0)*Hs.get(i).m*0.5;
-            Atome.évaluerÉnergiePotentielle(Hs.get(i));
+            //if(Hs.get(i).position.longueur()>0){
+                Ek += Math.pow(Hs.get(i).vélocité.longueur(),2.0)*Hs.get(i).m*0.5;
+            //}
+            Atome.évaluerÉnergiePotentielle(Hs.get(i),false);
         }
         for (int i = 0; i < Hs.size(); i++) {
             Ep += Hs.get(i).potentiel;
@@ -345,16 +363,30 @@ public class App {
         double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
         Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
-        AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.3E",Ep) + " JÅ";
-        AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.3E",Ek) + " JÅ";
-        AnalyseTexte[9] = "Énergie mécanique: " + String.format("%.3E",Ek+Ep) + " JÅ";
+        AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.5E",Ep) + " JÅ " + (AnalyseValeurs[7]-Ep<0.0?"▲":"▼");
+        AnalyseValeurs[7] = Ep;
+        AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.5E",Ek) + " JÅ " + (AnalyseValeurs[8]-Ek<0.0?"▲":"▼");
+        AnalyseValeurs[8] = Ek;
+        AnalyseTexte[9] = "Énergie mécanique: " + String.format("%.5E",Ek+Ep) + " JÅ " + (AnalyseValeurs[9]-(Ep+Ek)<0.0?"▲":"▼");
+        AnalyseValeurs[9] = Ek+Ep;
+        //GraphiqueVal.add(new Vecteur2D(dist,Ep));
+        //if(GraphiqueVal.size() > 200){
+        //    GraphiqueVal.remove(0);
+        //}
+        //GraphiqueVal2.add(new Vecteur2D(dist,Ek));
+        //if(GraphiqueVal2.size() > 200){
+        //    GraphiqueVal2.remove(0);
+        //}
 
         AnalyseTexte[10] = énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
 
         
         //AnalyseTexte[11] = dist + " Å de distance";
-        //double EkP =  2.0*((1.0/(12.0*Math.pow(0.64,12.0)))-(1.0/(12.0*Math.pow(dist,12.0))));
-        //AnalyseTexte[12] = "Énergie cinétique prédite: " + String.format("%.3E", EkP) + " JÅ. " + String.format("%.0f", 100.0*Math.abs(EkP-Ek)/Math.abs(EkP)) + "% d'écart.";
+        //double angle = Math.acos(V3.scal(V3.norm(Hs.get(1).position), V3.norm(Hs.get(2).position)));
+        //double EkP = -1000.0*((Math.PI)*(Math.PI/2.0)-0.5*(Math.PI/2.0)*(Math.PI/2.0))+1000.0*((Math.PI)*angle-0.5*angle*angle);
+        //EkP *= 2.0*1.07;
+        //double EpP = 1000.0*((Math.PI)*angle-0.5*angle*angle)
+        //AnalyseTexte[11] = "Énergie cinétique prédite: " + String.format("%.3E", EkP) + " JÅ. " + String.format("%.10f", 100.0*Math.abs(EkP-Ek)/Math.abs(EkP)) + "% d'écart.";
         //double EpP = (2.0/(12.0*Math.pow(dist,12.0)));
         //AnalyseTexte[13] = "Énergie potentielle prédite: " + String.format("%.3E", EpP) + " JÅ. " + String.format("%.0f", 100.0*Math.abs(EpP-Ep)/Math.abs(EpP)) + "% d'écart.";
     }
@@ -529,17 +561,17 @@ public class App {
             }
         }
          ////Dessiner force resultante
-         //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.05*Math.max(Math.log(Zoom*A.Force.longueur()+1.0),0.0)),A.position);
-         //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-         //g.setColor(Color.RED);       //Couleur de la force
-         //g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         //for (int i = 0; i < A.forceDoublet.size(); i++) {
-         //   Vecteur3D posI = Vecteur3D.addi(A.position, A.positionDoublet.get(i));
-         //   directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.forceDoublet.get(i)),0.03*Math.max(Math.log(Zoom*A.forceDoublet.get(i).longueur()+1.0),0.0)),posI);
-         //   multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-         //   g.setColor(Color.RED);       //Couleur de la force
-         //   g.drawLine((TailleX/2) + (int)((posI.x)*multPersZ), (TailleY/2) - (int)((posI.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
-         //}
+         Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.Force),0.05*Math.max(Math.log(Zoom*A.Force.longueur()+1.0),0.0)),A.position);
+         double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+         g.setColor(Color.RED);       //Couleur de la force
+         g.drawLine((TailleX/2) + (int)((A.position.x)*multPersZ), (TailleY/2) - (int)((A.position.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         for (int i = 0; i < A.forceDoublet.size(); i++) {
+            Vecteur3D posI = Vecteur3D.addi(A.position, A.positionDoublet.get(i));
+            directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.forceDoublet.get(i)),0.03*Math.max(Math.log(Zoom*A.forceDoublet.get(i).longueur()+1.0),0.0)),posI);
+            multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+            g.setColor(Color.RED);       //Couleur de la force
+            g.drawLine((TailleX/2) + (int)((posI.x)*multPersZ), (TailleY/2) - (int)((posI.y)*multPersZ), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+         }
          ////Vecteur vitesse
          //Vecteur3D directionV = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(A.vélocité),0.03*Math.log(Zoom*A.vélocité.longueur()+1)),A.position);
          //double multPersZV = (FOV*Zoom/((directionV.z+TailleZ/(2.0*Zoom)) + FOVet));

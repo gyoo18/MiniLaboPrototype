@@ -231,7 +231,6 @@ public class MoléculeRéf extends Molécule{
         return H3Op;
     }
 
-
     public static MoléculeRéf avoirNaOH(){
         MoléculeRéf NaOH = new MoléculeRéf();
 
@@ -268,7 +267,6 @@ public class MoléculeRéf extends Molécule{
 
         return NaOH;
     }
-
 
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
@@ -308,9 +306,9 @@ public class MoléculeRéf extends Molécule{
 
         Atome C = new Atome(6);
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(1,0,0);
+        H1.position = new Vecteur3D(0,1.07,0);
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(-1,0,0);
+        H2.position = new Vecteur3D(-1.07,0,0);
 
         CH2.ajouterAtome(C);
         CH2.ajouterAtome(H1);
@@ -333,7 +331,7 @@ public class MoléculeRéf extends Molécule{
         MiseÀJourEnvironnement(Environnement);
 
         CH2.calculerBEAA();
-        CH2.MiseÀJourPos();
+        //CH2.MiseÀJourPos();
 
         return CH2;
     }
@@ -343,13 +341,13 @@ public class MoléculeRéf extends Molécule{
 
         Atome C = new Atome(6);
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(1,0,0);
+        H1.position = new Vecteur3D(1.07,0,0);
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(-1,0,0);
+        H2.position = new Vecteur3D(-1.07,0,0);
         Atome H3 = new Atome(1);
-        H3.position = new Vecteur3D(0,-1,0);
+        H3.position = new Vecteur3D(0,-1.07,0);
         Atome H4 = new Atome(1);
-        H4.position = new Vecteur3D(0,0,1);
+        H4.position = new Vecteur3D(0,0,1.07);
 
         CH4.ajouterAtome(C);
         CH4.ajouterAtome(H1);
@@ -580,7 +578,6 @@ public class MoléculeRéf extends Molécule{
 
         return C2H6;
     }
-
 
     public static MoléculeRéf avoirC2H4(){
         MoléculeRéf C2H4 = new MoléculeRéf();
@@ -899,7 +896,6 @@ public class MoléculeRéf extends Molécule{
 
         return C6H6;
     }
-
 
     /* public static MoléculeRéf avoirCl2(){
         //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
