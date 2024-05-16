@@ -118,7 +118,7 @@ public class MoléculeRéf extends Molécule{
 
         double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
         double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
-        double module1=0.9;
+        double module1=1.0;
 
 
 
