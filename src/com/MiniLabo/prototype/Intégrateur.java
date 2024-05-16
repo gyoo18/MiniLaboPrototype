@@ -198,7 +198,7 @@ public class Intégrateur {
         calculerForces(O);
 
         for (Atome o : O) {
-            o.vélocité.addi( Vecteur3D.mult(o.Force,h/o.m) );
+            o.vélocité.addi( Vecteur3D.mult(o.Force,h/o.mN) );
             o.position.addi( Vecteur3D.mult(o.vélocité, h) );
 
             if(o.forceDoublet != null){
@@ -240,7 +240,7 @@ public class Intégrateur {
             if(Math.abs(o.position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
                 o.prevPosition= Vecteur3D.addi(o.prevPosition, new Vecteur3D(0,0,2*(o.position.z-o.prevPosition.z)) );
             } */
-            o.position = (Vecteur3D.addi(Vecteur3D.mult(o.position, 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosition, -1.0), Vecteur3D.mult(o.Force, h*h/o.m))));
+            o.position = (Vecteur3D.addi(Vecteur3D.mult(o.position, 2.0), Vecteur3D.addi(Vecteur3D.mult(o.prevPosition, -1.0), Vecteur3D.mult(o.Force, h*h/o.mN))));
             o.prevPosition = pPos.copier();
 
             o.vélocité = Vecteur3D.mult(Vecteur3D.sous(o.position, pPos),1.0/(2.0*h));
@@ -278,7 +278,7 @@ public class Intégrateur {
     private static void IterVerletV(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
-            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.m))));
+            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.mN))));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -320,7 +320,7 @@ public class Intégrateur {
     private static void IterVerletVB(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
-            o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
+            o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.mN)));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -331,7 +331,7 @@ public class Intégrateur {
         }
 
         for (Atome o : O) {
-            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.m))));
+            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.mN))));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -344,7 +344,7 @@ public class Intégrateur {
         calculerForces(O);
 
         for (Atome o : O) {
-            o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.m)));
+            o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.mN)));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -358,7 +358,7 @@ public class Intégrateur {
     private static void IterVerletVBCD(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
-            o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
+            o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.mN)));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -368,7 +368,7 @@ public class Intégrateur {
         }
 
         for (Atome o : O) {
-            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.m))));
+            o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.mN))));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
@@ -380,7 +380,7 @@ public class Intégrateur {
         calculerForces(O);
 
         for (Atome o : O) {
-            o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.m)));
+            o.vélocité.addi(Vecteur3D.mult( o.Force, h/(2.0*o.mN)));
 
             if(o.forceDoublet != null){
                 for (int i = 0; i < o.forceDoublet.size(); i++) {
