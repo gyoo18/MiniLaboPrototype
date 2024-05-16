@@ -140,10 +140,10 @@ public class App {
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
             double module = Atome.TempératureEnVitesse(Paramètres.TempératureInitiale+273.15, Hs.get(i).m);
-            double Angle1=Math.random()*2.0*Math.PI;
-            double Angle2=Math.random()*2.0*Math.PI;
+            double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
+            double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             
-            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+           // Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
         }
 
         System.out.println("Initialisation de l'ordre de dessin.");
@@ -218,8 +218,17 @@ public class App {
     public static void analyse(int MisesÀJours){
         //g.setColor(Color.WHITE);
         AnalyseTexte[0] = "====== Analyse ======";
-        DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
-        double DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+        double DeltaTD=0;
+        if (MisesÀJours==0){
+            DeltaT=Long.MAX_VALUE;
+            DeltaTD=Double.POSITIVE_INFINITY;
+        } else {
+            DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
+            DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+        }
+        
+        
+
         chrono = System.currentTimeMillis()-départ;
         temps += Paramètres.dt;
         AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";

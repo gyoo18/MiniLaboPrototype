@@ -377,7 +377,7 @@ public class Atome{
                     Ai.Force.addi(force); //Appliquer force de torsion à A'
                     A.Force.addi(force.opposé());
                     A.forceDoublet.get(j).addi(forceDoublet); //Appliquer force au doublet
-                    A.Force.addi(forceDoublet.opposé());
+                    //A.Force.addi(forceDoublet.opposé());
                 }
             }
         }
@@ -390,7 +390,7 @@ public class Atome{
                     if(i==j){continue;} 
                     Vecteur3D forceDoublet = ForceTorsion(i,A,j);               
                     A.forceDoublet.get(i).addi(forceDoublet); //Appliquer force au doublet i
-                    A.Force.addi(forceDoublet.opposé());
+                    //A.Force.addi(forceDoublet.opposé());
                 }
             }
 
@@ -457,7 +457,7 @@ public class Atome{
 
     public static void ÉquilibrerDoublets(Atome A){
         //Appliquer les forces des doublets sur l'atome.
-        for (int i = 0; i < A.positionDoublet.size(); i++) {
+          /* for (int i = 0; i < A.positionDoublet.size(); i++) {
             //Vecteur3D force = A.forceDoublet.get(i).opposé();
             double Sin0D;
             double Sin0N;
@@ -839,12 +839,19 @@ public class Atome{
 
         //Conserver la même distance entre les doublets et l'atome
         for (int i = 0; i < forceDoublet.size(); i++) {
+            V3 dirDN= new V3( V3.norm(positionDoublet.get(i))) ;
             positionDoublet.set(i, V3.mult(V3.norm(positionDoublet.get(i)), rayonCovalent));//Contraindre la position et la position précédente
             prevPosDoublet.set(i, V3.mult(V3.norm(prevPosDoublet.get(i)), rayonCovalent)); 
+        
             //Retirer la vitesse centripède
             if(vélDoublet.get(i).longueur() > 0){
-                vélDoublet.set(i, V3.sous(vélDoublet.get(i), V3.mult( positionDoublet.get(i), V3.scal(vélDoublet.get(i), positionDoublet.get(i))/(positionDoublet.get(i).longueur()*positionDoublet.get(i).longueur()) ) ));
-                vélDoublet.set(i, V3.mult(V3.norm(vélDoublet.get(i)), Math.min(vélDoublet.get(i).longueur(), 5.585*Math.pow(10.0,14.0))));
+                double ModuleVCentripete = V3.scal(vélDoublet.get(i),dirDN);
+                V3 VCentripete= new V3 (V3.mult(dirDN, ModuleVCentripete));
+                vélDoublet.set(i,V3.sous(vélDoublet.get(i),VCentripete));
+                /* vélDoublet.set(i, V3.sous(vélDoublet.get(i), V3.mult( positionDoublet.get(i), V3.scal(vélDoublet.get(i), positionDoublet.get(i))/(positionDoublet.get(i).longueur()*positionDoublet.get(i).longueur()) ) ));
+                vélDoublet.set(i, V3.mult(V3.norm(vélDoublet.get(i)), Math.min(vélDoublet.get(i).longueur(), 5.585*Math.pow(10.0,14.0)))); */
+                
+
             }
         }
     }
@@ -890,11 +897,11 @@ public class Atome{
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
-                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && Paramètres.voisin){
                                 voisin=true;   
                             }
                         }
-                        if (!voisin){
+                        if (!voisin ){
                             A.potentiel += potentielÉlectrique(A.charge, -2.0,dist,dir); //Appliquer la force électrique
                         }
                     }
@@ -915,7 +922,7 @@ public class Atome{
                             if(A.liaisonIndexe.get(i1)==-1){
                                 continue;
                             }
-                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1))){
+                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && Paramètres.voisin){
                                 voisin=true;
                             }
                         } 
@@ -1140,7 +1147,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),10);   //Température du système en °K    //paire
+        double T = Math.max(Température(paire),10.0);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("Température Nan");
         }
@@ -1150,7 +1157,7 @@ public class Atome{
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         double potentiel = 6.0*module/(7.0*Math.pow(dist,6.0));
         if (Double.isNaN(potentiel)){
-            System.err.println("Potentiel Paulie renvoie NaN");
+            System.err.println("Potentiel Van der walls renvoie NaN");
         }
         return potentiel;
     }
@@ -1230,7 +1237,11 @@ public class Atome{
         }
         double Kij;
         if(I == -1 || J == -1){
-            Kij = 1000.0;
+            Kij = 10000.0;
+            angle0 = angle0*1.1;
+            if (I == -1 && J == -1){
+                angle0 = angle0*1.1;
+            }
         }else{
             double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -1743,7 +1754,7 @@ public class Atome{
                                     if (0 <casesIndexe && casesIndexe <= 1-diff){
                                         CasePotVide = 2;
                                     }
-                                    if (1 <casesIndexe && casesIndexe <= 4-diff){
+                                    if (1-diff <casesIndexe && casesIndexe <= 4-diff){
                                         CasePotVide = 5;
                                     }
                                     if (4-diff < casesIndexe &&casesIndexe <= 5-diff){
@@ -2029,13 +2040,13 @@ public class Atome{
         double[] EkMod= new double[(int) KsA];
         double EkMode=0.0;
         for (int i = 0; i < A.size(); i++) {
-            MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
-            MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
+            MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
+            MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
         }
         Delta=(MaxEk-MinEk)/KsA;
         for (int i = 0; i < A.size(); i++) {
             for (int j = 0; j<KsA; j++){
-                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
+                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
                     EkMod[j]++;          
                 }
             }
@@ -2101,6 +2112,10 @@ public class Atome{
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         return Ek*2.0/(3.0*kB); */
+        if (Double.isNaN(Tmp)){
+            System.out.println("TempératureisNan");
+            Tmp=1.0;
+        }
         return (Tmp);//((EkMode*2.0/(3.0*kB)));
     }
 
