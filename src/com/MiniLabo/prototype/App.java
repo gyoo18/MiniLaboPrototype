@@ -13,8 +13,8 @@ import java.awt.RenderingHints;
 
 public class App {
     private static Graphics2D g;
-    public static int TailleX = 512; //Taille de simulation 
-    public static int TailleY = 512;
+    public static int TailleX = 1080; //Taille de simulation 
+    public static int TailleY = 720;
     public static int TailleZ = 512;
     public static float Zoom = 40f;
     public static int FOV = 100;     //Champ de vision de la caméra
@@ -79,7 +79,7 @@ public class App {
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         //Molécule de base
     
-        MoléculeRéf H2O = MoléculeRéf.avoirH2O();
+       /*  MoléculeRéf H2O = MoléculeRéf.avoirH2O();
         MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
         MoléculeRéf OHm = MoléculeRéf.avoirOHm();
         MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
@@ -87,7 +87,7 @@ public class App {
         MoléculeRéf HCl = MoléculeRéf.avoirHCl();
         MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
         MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
-        MoléculeRéf NaCl = MoléculeRéf.avoirNaCl();
+        MoléculeRéf NaCl = MoléculeRéf.avoirNaCl(); */
 
          /* Atome H = new Atome(1);
         H.retirerÉlectron();
@@ -97,13 +97,21 @@ public class App {
         H1.position= new V3(4,1,0);
        
         Hs.add(H1);
-        
+        */
 
-        Atome Cl = new Atome(17);
-        Cl.position= new V3(1,5,0);
-        Cl.retirerÉlectron();
+       /*  Atome Cl = new Atome(17);
+        Cl.position= new V3(1,4,0);
+        Cl.ajouterÉlectron();
         Cl.évaluerValence();
-        Hs.add(Cl); */
+        Hs.add(Cl); 
+
+        Atome Na = new Atome(11);
+        Na.position= new V3(4,4,5);
+        Na.retirerÉlectron();
+        Na.évaluerValence();
+        Hs.add(Na);  */
+
+        
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -121,19 +129,20 @@ public class App {
         //Initialiser les atomes selon l'algorithme de poisson
         int NbMolécules = 10;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
-        int essais = 0;        //Nombre d'essais à placer la molécule
-        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = 0.5;  //Zone tampon entre les atomes
+        int essais = 0;
+        int NBessais = 40;           //Nombre d'essais à placer la molécule
+        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon =1.77;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
         long timer = System.currentTimeMillis();
         //Placer une molécule dans la simulation tant qu'on n'aura pas atteint le total voulus.
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
-        while (totalMolécules < NbMolécules && essais < 30) {
+        while (totalMolécules < NbMolécules && essais < NBessais) {
             essais++;
-            MoléculeRéf mol = H2O;
-            if(totalMolécules < 3){
-                //mol = MoléculeRéf.avoirH3Op();
+            MoléculeRéf mol = MoléculeRéf.avoirH2O();
+            if(totalMolécules < 0){
+                mol = MoléculeRéf.avoirNaCl();
             }if(totalMolécules >= 3 && totalMolécules < 6){
                 //mol = MoléculeRéf.avoirOHm();
             }
@@ -187,11 +196,12 @@ public class App {
 
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
+            double module = Atome.TempératureEnVitesse(2005.0+273.15, Hs.get(i).m);
             //double module=Math.pow(10, 15);
-            double Angle1=Math.random()*2*Math.PI;
-            double Angle2=Math.random()*2*Math.PI;
+            double Angle1=Math.random()*2.0*Math.PI;
+            double Angle2=Math.random()*2.0*Math.PI;
             //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
         //Hs.get(0).vélocité = new Vecteur3D(-1.45*Math.pow(10.0,12.0),0,0);

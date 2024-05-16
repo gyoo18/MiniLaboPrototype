@@ -80,7 +80,7 @@ public class Atome{
      */
     public static boolean[] ListeForce = {
         true, //Force Paulie
-        false, //Force Vanderwal
+        true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
         true, //Force de Torsion
@@ -241,7 +241,7 @@ public class Atome{
                                     System.out.println("distance0");
                                 }
                                 if (ListeForce[0]){
-                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/16.0, dist, dir)); //Appliquer la force de Pauli
                                 }
                                 if (ListeForce[2]){
                                     boolean voisin=false;
@@ -270,7 +270,7 @@ public class Atome{
                                     System.out.println("distance0");
                                 }
                                 if (ListeForce[0]){
-                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
+                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/16.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
                                 }
                                 if (ListeForce[2]){
                                     boolean voisin=false;
@@ -295,7 +295,7 @@ public class Atome{
                                     eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                                     eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
                                     if (ListeForce[0]){
-                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/16.0,APrime.rayonCovalent/16.0, dist, dir)); //Appliquer la force de Pauli
                                     }
                                     if (ListeForce[2]){
                                         if (Double.isNaN(eDist)){
@@ -586,7 +586,7 @@ public class Atome{
 
         double équilibre = -chargeTotale/(liaisonIndexe.size()+1.0);
 
-        Vecteur3D momentDipolaire = new Vecteur3D(0);
+        Vecteur3D momentDipolaire = new Vecteur3D(0.0,0.0,0.0);
         for (int i = 0; i < liaisonIndexe.size(); i++) {
             if(liaisonIndexe.get(i) == -1){
                 continue;
@@ -1224,7 +1224,7 @@ public class Atome{
         }
         double Kij;
         if(I == -1 || J == -1){
-            Kij = 10000.0;
+            Kij = 1000.0;
         }else{
             double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
             if(nbOndeFondamental == 0.0){
@@ -1478,16 +1478,55 @@ public class Atome{
         int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
         int Ql = 0;         //Nombre quantique azimutal l.
         int Qm = 0;         //Nombre quantique magnétique m.
+        int CaseVide = -1; //Trouver le nombre de caseVide
         boolean trouvéNiveau = false;   //Indique si on a trouvé le niveau de la couche de valence
+        boolean NoDoublet=false;
         int casesIndexe = MAX_CASE;     //Curseur indexe des cases quantiques
         for (int i = 0; i < MAX_N; i++) {
             //Traverser n de MAX_N à 1
             Ql = Qn-1;
             for (int j = 0; j < Qn; j++) {
+                if (CaseVide==0 && NoDoublet){
+                    doublets=0;
+                    trouvéNiveau=true;
+                    break;
+                }
                 //Traverser l de n-1 à 0
                 Qm = Ql;
                 for(int j2 = 0; j2 < 2*Ql+1; j2++){
                     //Traverser m de l à -l
+                    if (cases[casesIndexe] != 0){
+                        int CasePotVide=0;
+                        if (casesIndexe <= 0){
+                            CasePotVide = 1;
+                        }
+                        if (0 <casesIndexe && casesIndexe <= 1){
+                            CasePotVide = 2;
+                        }
+                        if (1 <casesIndexe && casesIndexe <= 4){
+                            CasePotVide = 5;
+                        }
+                        if (4 < casesIndexe &&casesIndexe <= 5){
+                            CasePotVide = 6;
+                        }
+
+                        if (5 < casesIndexe &&casesIndexe <= 8){
+                            CasePotVide = 9;
+                        }
+                        if (8 < casesIndexe &&casesIndexe <= 9){
+                            CasePotVide = 10;
+                        }
+                        if (9 <casesIndexe &&casesIndexe <= 13){
+                            CasePotVide = 14;
+                        }
+                        CaseVide = CasePotVide-NP/2;
+                        if (CaseVide==0 && !trouvéNiveau){
+                            doublets=0;
+                            NoDoublet=true;
+                            trouvéNiveau=true;
+                            break;
+                        }
+                    }
                     if(cases[casesIndexe] != 0){
                         //Si la case n'est pas vide, c'est la première case  non-vide et donc elle appartient à la couche de valence
                         trouvéNiveau = true;
@@ -1497,6 +1536,8 @@ public class Atome{
                         doublets++; //Ajouter un doublet
                         
                     }
+
+                    
                     casesIndexe--; //Prochaine case
                     Qm--;          //Prochain m
                 }
@@ -1533,11 +1574,11 @@ public class Atome{
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < doublets; j++) {
                 forceDoublet.get(j).norm();
-                forceDoublet.get(j).mult(0.03);
+                forceDoublet.get(j).mult(0.3);
                 positionDoublet.get(j).addi(forceDoublet.get(j));
             }
             Force.norm();
-            Force.mult(0.03);
+            Force.mult(0.3);
             position.addi(Force);
         }
     }
@@ -1658,7 +1699,7 @@ public class Atome{
                 
                 Atome APrime = Atome.Environnement.get(j); //Référence à A' , A est l'atome ayant le doublets, A' n'importe qu'elle atome
                 double dist = Vecteur3D.distance(position, APrime.position); //Calculer la distance entre A et A'
-                if(dist < min_dist && dist < 2.0*(rayonCovalent + APrime.rayonCovalent)){
+                if(dist < min_dist && dist < 2*(rayonCovalent + APrime.rayonCovalent)){
                     int Qn = MAX_N;     //Nombre quantique principal n. On doit traverser les cases à l'envers, donc on commence à MAX_N
                     int Ql = 0;         //Nombre quantique azimutal l.
                     int Qm = 0;         //Nombre quantique magnétique m.
@@ -1680,30 +1721,40 @@ public class Atome{
                                 if (APrime.cases[casesIndexe] == 2 && trouvéNiveau) {
                                     //Si la case possède 2 électrons et qu'elle fait partie de la couche de valence
                                 }
+
+                                //regler Na+ et ect, idee Np
                                 if (APrime.cases[casesIndexe] != 0){
                                     int CasePotVide=0;
+                                    int diff=APrime.NP-APrime.NE;
+                                    if (diff >1){
+                                        diff=1;
+                                    }
+                                    if (diff<0){
+                                        diff=0;
+                                    }
                                     if (casesIndexe <= 0){
                                         CasePotVide = 1;
                                     }
-                                    if (0 <casesIndexe && casesIndexe <= 1){
+                                    if (0 <casesIndexe && casesIndexe <= 1-diff){
                                         CasePotVide = 2;
                                     }
-                                    if (1 <casesIndexe && casesIndexe <= 4){
+                                    if (1 <casesIndexe && casesIndexe <= 4-diff){
                                         CasePotVide = 5;
                                     }
-                                    if (4 < casesIndexe &&casesIndexe <= 5){
+                                    if (4-diff < casesIndexe &&casesIndexe <= 5-diff){
                                         CasePotVide = 6;
                                     }
 
-                                    if (5 < casesIndexe &&casesIndexe <= 8){
+                                    if (5-diff < casesIndexe &&casesIndexe <= 8-diff){
                                         CasePotVide = 9;
                                     }
-                                    if (8 < casesIndexe &&casesIndexe <= 9){
+                                    if (8-diff < casesIndexe &&casesIndexe <= 9-diff){
                                         CasePotVide = 10;
                                     }
-                                    if (9 <casesIndexe &&casesIndexe <= 13){
+                                    if (9-diff <casesIndexe &&casesIndexe <= 13-diff){
                                         CasePotVide = 14;
                                     }
+                                    
                                     CaseVide = CasePotVide-casesIndexe-1;
                                     break; //Cation, charge positive...
                                 }

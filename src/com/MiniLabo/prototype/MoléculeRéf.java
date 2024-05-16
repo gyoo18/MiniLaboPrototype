@@ -116,13 +116,21 @@ public class MoléculeRéf extends Molécule{
     public static MoléculeRéf avoirH2O(){
         MoléculeRéf H2O = new MoléculeRéf();
 
+        double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
+        double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
+        double module1=0.9;
+
+
+
         Atome O = new Atome(8);
         O.position = new Vecteur3D(0);
         //O.ajouterÉlectron();O.ajouterÉlectron();
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(1.0,0,0);
+        H1.position = new Vecteur3D(module1*Math.cos(Angle1)*Math.sin(Angle2),module1*Math.sin(Angle1)*Math.sin(Angle2),module1*Math.cos(Angle2) );
+
         Atome H2 = new Atome(1);
-        H2.position = new Vecteur3D(1.0*Math.cos(109.5*2.0*Math.PI/360.0),1.0*Math.sin(109.5*2.0*Math.PI/360.0),0);
+        H2.position = new Vecteur3D(module1*Math.cos(Angle1+104.5*2.0*Math.PI/360.0)*Math.sin(Angle2),  module1*Math.sin(Angle1+104.5*2.0*Math.PI/360.0)*Math.sin(Angle2),  module1*Math.cos(Angle2) ); 
+        //new Vecteur3D(1.0*Math.cos(109.5*2.0*Math.PI/360.0),1.0*Math.sin(109.5*2.0*Math.PI/360.0),0);
        
 
         H2O.ajouterAtome(O);
@@ -271,11 +279,17 @@ public class MoléculeRéf extends Molécule{
     public static MoléculeRéf avoirNaCl(){
         MoléculeRéf NaCl = new MoléculeRéf();
 
+        double Angle1=Math.random()*2*Math.PI;
+        double Angle2=Math.random()*2*Math.PI;
+        double module=2.54;
+
         Atome Na = new Atome(11);
         Atome Cl = new Atome(17);
 
         Na.position = new Vecteur3D(0);
-        Cl.position = new Vecteur3D(2.54,0,0);
+        Cl.position = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+
+        
 
         NaCl.ajouterAtome(Na);
         NaCl.ajouterAtome(Cl);
