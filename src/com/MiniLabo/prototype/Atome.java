@@ -377,7 +377,7 @@ public class Atome{
                     Ai.Force.addi(force); //Appliquer force de torsion à A'
                     A.Force.addi(force.opposé());
                     A.forceDoublet.get(j).addi(forceDoublet); //Appliquer force au doublet
-                    //A.Force.addi(forceDoublet.opposé());
+                    A.Force.addi(forceDoublet.opposé());
                 }
             }
         }
@@ -390,7 +390,7 @@ public class Atome{
                     if(i==j){continue;} 
                     Vecteur3D forceDoublet = ForceTorsion(i,A,j);               
                     A.forceDoublet.get(i).addi(forceDoublet); //Appliquer force au doublet i
-                    //A.Force.addi(forceDoublet.opposé());
+                    A.Force.addi(forceDoublet.opposé());
                 }
             }
 
@@ -457,7 +457,7 @@ public class Atome{
 
     public static void ÉquilibrerDoublets(Atome A){
         //Appliquer les forces des doublets sur l'atome.
-          /* for (int i = 0; i < A.positionDoublet.size(); i++) {
+           for (int i = 0; i < A.positionDoublet.size(); i++) {
             //Vecteur3D force = A.forceDoublet.get(i).opposé();
             double Sin0D;
             double Sin0N;
