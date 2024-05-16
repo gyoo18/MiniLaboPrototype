@@ -3,6 +3,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -30,10 +35,11 @@ public class App {
 
     private static String[] AnalyseTexte = new String[12];
     private static double[] AnalyseValeurs = new double[AnalyseTexte.length];
-    private static String Valeurs = "";
     public static Vecteur3D ForceSytème = new Vecteur3D(0);
     private static ArrayList<Vecteur2D> GraphiqueVal = new ArrayList<>();
     private static ArrayList<Vecteur2D> GraphiqueVal2 = new ArrayList<>();
+    private static File fichierAnalyse = new File(Paramètres.emplacementFichierAnalyse + "Analyse.csv");
+    private static FileWriter fileWriter;
 
     private static BoucleDessin boucleDessin = new BoucleDessin();
 
@@ -172,6 +178,14 @@ public class App {
             //try {Thread.sleep(10);} catch (Exception e) {}
         }
 
+        try{
+            fileWriter = new FileWriter(fichierAnalyse, Charset.forName("UTF-8"));
+            fileWriter.write("Molécules: ;" + NbMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + Paramètres.TempératureInitiale +";\n");
+            fileWriter.write("chrono (s); MPS; temps (fs); Température (°C); Volume (m^3); Pression (kPa); Énergie Potentielle (JÅ); Énergie Cinétique (JÅ); Énergie Mécanique (JÅ);\n");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
         System.out.println("Initialisation complète.");
     }
 
@@ -267,8 +281,12 @@ public class App {
         //}
 
         AnalyseTexte[10] = énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
-
         
+        try {
+            fileWriter.write(chrono/100 + ";" + String.format("%.03f",1/((double)DeltaT/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + String.format("%.0f",( température-273.15)) + ";" + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + ";" + String.format("%.3E",pression) + ";" + String.format("%.5E",Ep) + ";" + String.format("%.5E",Ek) + ";" + String.format("%.5E",Ek+Ep) + ";\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //AnalyseTexte[11] = dist + " Å de distance";
         //double angle = Math.acos(V3.scal(V3.norm(Hs.get(1).position), V3.norm(Hs.get(2).position)));
         //double EkP = -1000.0*((Math.PI)*(Math.PI/2.0)-0.5*(Math.PI/2.0)*(Math.PI/2.0))+1000.0*((Math.PI)*angle-0.5*angle*angle);
