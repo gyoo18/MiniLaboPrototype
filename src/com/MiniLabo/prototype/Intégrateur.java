@@ -8,6 +8,15 @@ import java.util.ArrayList;
 
 public class Intégrateur {
 
+    public enum Modèle {
+        EULER,
+        VERLET,
+        VERLET_V,
+        VERLET_VB,
+        VERLET_VBCD,
+        RK4
+    }
+
     /**Classe qui serat exécutée sur les fils d'exécutions pour le calcul des forces */
     private static class FilsDistributeur implements Runnable{
 
@@ -57,12 +66,14 @@ public class Intégrateur {
     /**Liste des classes qui s'exécuteront sur les fils d'exécutions pour le calcul des forces. */
     private static FilsDistributeur[] fils;
 
+    public static Modèle modèle = Modèle.VERLET_VB;
+
     /**
      * Initialise la classe Intégrateur. À appeler avant d'utiliser les fils d'exécutions.
      * @param O - Liste des atomes contenus dans la simulation
      * @param nbFils - Nombre de fils d'exécutions à utiliser. 10 est la valeur par défaut reccomandée, mais faites vos propres tests.
      */
-    public static void initialisation(ArrayList<Atome> O, int nbFils){
+    public static void initialisation(ArrayList<Atome> O, int nbFils ){
         bouc = new Thread[nbFils];
         fils = new FilsDistributeur[nbFils];
 
@@ -148,12 +159,41 @@ public class Intégrateur {
         }
     }
 
+    public static void Iter(ArrayList<Atome> O, double h){
+        switch (modèle) {
+            case EULER:
+                IterEuler(O, h);
+                break;
+            case VERLET:
+                IterVerlet(O, h);
+                break;
+            case VERLET_V:
+                IterVerletV(O, h);
+                break;
+            case VERLET_VB:
+                IterVerletVB(O, h);
+                break;
+            case VERLET_VBCD:
+                IterVerletVBCD(O, h);
+                break;
+            case RK4:
+                if(FilsExécution){
+                    System.err.println("ERREUR Intégrateur : Les fils d'exécutions ne fonctionnent pas avec RK4. Désactivation des fils d'exécution.");
+                    FilsExécution = false;
+                    IterRK4(O, h);
+                }else{
+                    IterRK4(O, h);
+                }
+                break;
+        }
+    }
+
     /**
      * Intègre selon la méthode d'Euler
      * @param O - la liste des Atomes à intégre
      * @param h - le delta temps
      */
-    public static void IterEuler(ArrayList<Atome> O, double h){
+    private static void IterEuler(ArrayList<Atome> O, double h){
 
         calculerForces(O);
 
@@ -177,7 +217,7 @@ public class Intégrateur {
      * @param O - La liste des Atomes à intégrer
      * @param h - Le delta temps
      */
-    public static void IterVerlet(ArrayList<Atome> O, double h){
+    private static void IterVerlet(ArrayList<Atome> O, double h){
 
         //TODO #5 Vincent Les doublets sont trop rapides
 
@@ -235,7 +275,7 @@ public class Intégrateur {
      * @param O - La liste des atomes à intégrer
      * @param h - Le delta temps
      */
-    public static void IterVerletV(ArrayList<Atome> O, double h){
+    private static void IterVerletV(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
             o.position.addi(Vecteur3D.addi(Vecteur3D.mult(o.vélocité,h), Vecteur3D.mult(o.Force, h*h/(2.0*o.m))));
@@ -277,7 +317,7 @@ public class Intégrateur {
      * @param O - La liste des atomes à intégrer
      * @param h - Le delta temps
      */
-    public static void IterVerletVB(ArrayList<Atome> O, double h){
+    private static void IterVerletVB(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
             o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
@@ -315,7 +355,7 @@ public class Intégrateur {
         
     }
 
-    public static void IterVerletVBCD(ArrayList<Atome> O, double h){
+    private static void IterVerletVBCD(ArrayList<Atome> O, double h){
 
         for (Atome o : O) {
             o.vélocité.addi(Vecteur3D.mult(o.Force, h/(2.0*o.m)));
@@ -358,7 +398,7 @@ public class Intégrateur {
      * @param O - La liste des atomes à intégrer
      * @param h - Le delta temps
      */
-    public static void IterRK4(ArrayList<Atome> O, double h){
+    private static void IterRK4(ArrayList<Atome> O, double h){
 
         //TODO Vincent intégrer les doublets dans RK4 
         

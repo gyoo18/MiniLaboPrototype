@@ -75,15 +75,7 @@ public class Atome{
      * List boolean des force en jeu dans la simulation
      * Paulie, Vanderwal, Electrique, Morse, Torsion, Diedre
      */
-    public static boolean[] ListeForce = {
-        true, //Force Paulie
-        false, //Force Vanderwal
-        true, //Force électrique
-        true, //Force de Morse
-        true, //Force de Torsion
-        false, //Force Diedre
-        false, //Boite Magique
-    };
+    public static boolean[] ListeForce = Paramètres.ListeForce;
 
     /**
      * Créé un nouvel atome.
@@ -175,7 +167,7 @@ public class Atome{
                                 APrime=Environnement.get(i);
                             }
                             
-                            PBoite= new V3 ( (double) iBoite*App.TailleX/App.Zoom, (double) jBoite*App.TailleY/App.Zoom, (double) kBoite*App.TailleZ/App.Zoom);
+                            PBoite= new V3 ( (double) iBoite*Paramètres.TailleX/Paramètres.Zoom, (double) jBoite*Paramètres.TailleY/Paramètres.Zoom, (double) kBoite*Paramètres.TailleZ/Paramètres.Zoom);
                             /* APrime = Environnement.get(i).copier(false); */
                             
                             
@@ -215,7 +207,7 @@ public class Atome{
                         if (0.0000001>(dist)){
                             System.out.println("distance0");
                         }
-                        if( dist <5.0*(A.rayonCovalent+APrime.rayonCovalent)) {// dist <100.0*(A.rayonCovalent+APrime.rayonCovalent)
+                        if( Paramètres.distForceÉval==0? true : dist<Paramètres.distForceÉval*(A.rayonCovalent+APrime.rayonCovalent)) {
                             //Si A' se situe à moins de N rayons covalents de A
                             if (ListeForce[0]){
                                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
@@ -442,11 +434,11 @@ public class Atome{
             }
         }
 
-        double ModuleFriction = -0.0000000000001;
-        //A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
-        //A.Force.addi(new Vecteur3D(0,-9.8*Math.pow(10.0,-10.0)*A.m,0.0)); //Appliquer une force de gravité
+        double ModuleFriction = Paramètres.ForceFriction;
+        A.Force.addi( V3.mult(A.vélocité,ModuleFriction)); //Appliquer une force de friction
+        A.Force.addi(new Vecteur3D(0,Paramètres.ForceGravité*A.m,0.0)); //Appliquer une force de gravité
         for (int i = 0; i < A.positionDoublet.size(); i++) {
-            //A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
+            A.forceDoublet.get(i).addi(V3.mult(A.vélDoublet.get(i),ModuleFriction));
         }
 
         //Mettre à jour la vélocité moyenne
@@ -795,24 +787,24 @@ public class Atome{
         //TODO #10 Le rebond de Verlet perd toujours de l'énergie
         //Appliquer des bords de domaine
         //Rebondir en Y
-        if(Math.abs(position.y) > (double)App.TailleY/(2.0*App.Zoom)){
-            position.y = Math.signum(position.y)*(double)App.TailleY/(2.0*App.Zoom); //Contraindre la position
+        if(Math.abs(position.y) > (double)Paramètres.TailleY/(2.0*Paramètres.Zoom)){
+            position.y = Math.signum(position.y)*(double)Paramètres.TailleY/(2.0*Paramètres.Zoom); //Contraindre la position
             vélocité.y = -vélocité.y; //Inverser la vitesse
             if(prevPosition != null){
                 //prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(0,2*(position.y-prevPosition.y),0) ); //Inverser la vitesse de Verlet
             }
         }
         //Rebondir en X
-        if(Math.abs(position.x) > (double)App.TailleX/(2.0*App.Zoom)){
-            position.x = Math.signum(position.x)*(double)App.TailleX/(2.0*App.Zoom); //Contraindre la position
+        if(Math.abs(position.x) > (double)Paramètres.TailleX/(2.0*Paramètres.Zoom)){
+            position.x = Math.signum(position.x)*(double)Paramètres.TailleX/(2.0*Paramètres.Zoom); //Contraindre la position
             vélocité.x = -vélocité.x; //Inverser la vitesse
             if(prevPosition != null){
                 //prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(2*(position.x-prevPosition.x),0,0)); //Inverser la vitesse de Verlet
             }  
         }
         //Rebondir en Z
-        if(Math.abs(position.z) > (double)App.TailleZ/(2.0*App.Zoom)){
-            position.z = Math.signum(position.z)*(double)App.TailleZ/(2.0*App.Zoom); //Contraindre la position
+        if(Math.abs(position.z) > (double)Paramètres.TailleZ/(2.0*Paramètres.Zoom)){
+            position.z = Math.signum(position.z)*(double)Paramètres.TailleZ/(2.0*Paramètres.Zoom); //Contraindre la position
             vélocité.z = -vélocité.z; //Inverser la vitesse
             if(prevPosition != null){
                 //prevPosition= Vecteur3D.addi(prevPosition, new Vecteur3D(0,0,2*(position.z-prevPosition.z)) ); //Inverser la vitesse de Verlet
