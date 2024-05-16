@@ -13,9 +13,18 @@ import java.awt.RenderingHints;
 
 public class App {
 
+   
+   
+   
     public static int TailleX = 1000; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
+    public static int TailleCanvaX = TailleX +200; //Taille de simulation 
+    public static int TailleCanvaY =TailleY + 100;
+    //public static int TailleCanvaZ =TailleZ;
+
+
+
     public static float Zoom = 30f;
     public static int FOV = 70;     //Champ de vision de la caméra
     public static int FOVet = FOV;
@@ -79,8 +88,8 @@ public class App {
         int NbMolécules = 1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;
-        int NBessais = 40;           //Nombre d'essais à placer la molécule
-        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        int NBessais = 55;           //Nombre d'essais à placer la molécule
+        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
         double tampon =0.1;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
@@ -145,13 +154,14 @@ public class App {
 
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(25.0+273.15, Hs.get(i).m);
-            //double module=Math.pow(10, 15);
-            double Angle1=Math.random()*2.0*Math.PI;
-            double Angle2=Math.random()*2.0*Math.PI;
+            //double module = Atome.TempératureEnVitesse(2500.0+273.15, Hs.get(i).m);
+            //double module =1000000000;
+            //double module=Math.pow(10, 10);
+            double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
+            double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
             
-            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+           // Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
         }
 
         System.out.println("Initialisation de l'ordre de dessin.");
@@ -220,8 +230,17 @@ public class App {
     public static void analyse(int MisesÀJours){
         //g.setColor(Color.WHITE);
         AnalyseTexte[0] = "====== Analyse ======";
-        DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
-        double DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+        double DeltaTD=0;
+        if (MisesÀJours==0){
+            DeltaT=Long.MAX_VALUE;
+            DeltaTD=Double.POSITIVE_INFINITY;
+        } else {
+            DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
+            DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+        }
+        
+        
+
         chrono = System.currentTimeMillis()-départ;
         temps += dt;
         AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
@@ -316,7 +335,7 @@ public class App {
 
             JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
             frame = new JFrame();                //Initialiser l'écran
-            frame.setSize(TailleX + 100,TailleY + 100); //Taille de la fenêtre
+            frame.setSize(TailleCanvaX + 100,TailleCanvaY + 100); //Taille de la fenêtre
             frame.add(image);                           //Ajouter l'objet Image à l'écran
             frame.setVisible(true);                   //Afficher la fenêtre
 
@@ -333,7 +352,7 @@ public class App {
             long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
             while (true) {
                 g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-                g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
+                g.fillRect(0, 0, TailleCanvaX, TailleCanvaY);             //Rafraîchir l'écran en effaçant tout
 
                 //Affichage de la simulation
                 DessinerBoite(g);  //Dessiner le domaine
@@ -355,7 +374,7 @@ public class App {
                 if (System.currentTimeMillis()-mailman > 5000 && mode == MODE.SIM){
                     mailman = System.currentTimeMillis();
                     analyse(MisesÀJours);
-                    MisesÀJours = 0;
+                    MisesÀJours = 1;
                 }
 
                 g.setColor(new Color(50,50,50,200));

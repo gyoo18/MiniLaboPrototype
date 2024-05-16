@@ -77,7 +77,7 @@ public class Atome{
      */
     public static boolean[] ListeForce = {
         true, //Force Paulie
-        false, //Force Vanderwal
+        true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
         true, //Force de Torsion
@@ -549,7 +549,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),1);   //Température du système en °K    //paire
+        double T = Math.max(Température(paire),1.0);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("TempératurenNan");
         }
@@ -1130,7 +1130,7 @@ public class Atome{
         paire.add(Environnement.get(indexeA));
         paire.add(Environnement.get(indexeB));
 
-        double T = Math.max(Température(paire),10);   //Température du système en °K    //paire
+        double T = Math.max(Température(paire),10.0);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
             System.out.println("Température Nan");
         }
@@ -1140,7 +1140,7 @@ public class Atome{
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         double potentiel = 6.0*module/(7.0*Math.pow(dist,6.0));
         if (Double.isNaN(potentiel)){
-            System.err.println("Potentiel Paulie renvoie NaN");
+            System.err.println("Potentiel Van der walls renvoie NaN");
         }
         return potentiel;
     }
@@ -2019,13 +2019,13 @@ public class Atome{
         double[] EkMod= new double[(int) KsA];
         double EkMode=0.0;
         for (int i = 0; i < A.size(); i++) {
-            MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
-            MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5);
+            MinEk=Math.min(MinEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
+            MaxEk=Math.max(MaxEk,Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5);
         }
         Delta=(MaxEk-MinEk)/KsA;
         for (int i = 0; i < A.size(); i++) {
             for (int j = 0; j<KsA; j++){
-                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
+                if (MinEk+j*Delta<= Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 && Math.pow(A.get(i).vélocité.longueur(),2)*A.get(i).m*0.5 <= MinEk+(j+1)*Delta){
                     EkMod[j]++;          
                 }
             }
@@ -2091,6 +2091,10 @@ public class Atome{
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         return Ek*2.0/(3.0*kB); */
+        if (Double.isNaN(Tmp)){
+            System.out.println("TempératureisNan");
+            Tmp=1.0;
+        }
         return (Tmp);//((EkMode*2.0/(3.0*kB)));
     }
 
