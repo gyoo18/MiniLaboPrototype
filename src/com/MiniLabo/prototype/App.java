@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import java.awt.RenderingHints;
 
 public class App {
-    private static Graphics2D g;
+
     public static int TailleX = 1000; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
@@ -35,8 +35,6 @@ public class App {
     public static double dt = 0;
     /**Delta temps en temps réel entre chaque mise à jour de la simulation en ms */
     public static long DeltaT = 0;
-    /**Nombre de sous-étapes entre chaque appel à dessin */
-    public static int sousÉtapes = 20;
 
     private static String[] AnalyseTexte = new String[12];
     private static double[] AnalyseValeurs = new double[AnalyseTexte.length];
@@ -45,7 +43,7 @@ public class App {
     private static ArrayList<Vecteur2D> GraphiqueVal = new ArrayList<>();
     private static ArrayList<Vecteur2D> GraphiqueVal2 = new ArrayList<>();
 
-    private static JFrame frame;
+    private static BoucleDessin boucleDessin = new BoucleDessin();
 
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
@@ -59,59 +57,10 @@ public class App {
     public static void Initialisation(){
         System.out.println("Initialisation");
 
-        BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
-        g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
-
-        JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
-        frame = new JFrame();                //Initialiser l'écran
-        frame.setSize(TailleX + 100,TailleY + 100); //Taille de la fenêtre
-        frame.add(image);                           //Ajouter l'objet Image à l'écran
-        frame.setVisible(true);                   //Afficher la fenêtre
-
-        g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        Thread thread = new Thread(boucleDessin);
+        boucleDessin.mode = com.MiniLabo.prototype.App.BoucleDessin.MODE.INIT;
+        thread.start();
         //Molécule de base
-    
-       /*  MoléculeRéf H2O = MoléculeRéf.avoirH2O();
-        MoléculeRéf H3Op = MoléculeRéf.avoirH3Op();
-        MoléculeRéf OHm = MoléculeRéf.avoirOHm();
-        MoléculeRéf C2H6 = MoléculeRéf.avoirC2H6();
-        MoléculeRéf NaOH = MoléculeRéf.avoirNaOH();
-        MoléculeRéf HCl = MoléculeRéf.avoirHCl();
-        MoléculeRéf C2H4 = MoléculeRéf.avoirC2H4();
-        MoléculeRéf C6H6 = MoléculeRéf.avoirC6H6();
-        MoléculeRéf NaCl = MoléculeRéf.avoirNaCl(); */
-
-         /* Atome H = new Atome(1);
-        H.retirerÉlectron();
-        H.évaluerValence();
-        Hs.add(H); */
-        /*Atome H1 = new Atome(1);
-        H1.position= new V3(4,1,0);
-       
-        Hs.add(H1);
-        */
-
-       /*  Atome Cl = new Atome(17);
-        Cl.position= new V3(1,4,0);
-        Cl.ajouterÉlectron();
-        Cl.évaluerValence();
-        Hs.add(Cl); 
-
-        Atome Na = new Atome(11);
-        Na.position= new V3(4,4,5);
-        Na.retirerÉlectron();
-        Na.évaluerValence();
-        Hs.add(Na);  */
-
-        
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -127,12 +76,12 @@ public class App {
         }*/
         
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = 500;  //Nombre de molécules voulus
+        int NbMolécules = 1000;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;
         int NBessais = 40;           //Nombre d'essais à placer la molécule
-        boolean BEAA = false;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon =0.7;  //Zone tampon entre les atomes
+        boolean BEAA = true;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon =0.1;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
         long timer = System.currentTimeMillis();
@@ -191,7 +140,7 @@ public class App {
 
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
-        Intégrateur.initialisation(Hs,10);
+        Intégrateur.initialisation(Hs,8);
         Intégrateur.FilsExécution = true;
 
         System.out.println("Initialisation de la température.");
@@ -200,9 +149,9 @@ public class App {
             //double module=Math.pow(10, 15);
             double Angle1=Math.random()*2.0*Math.PI;
             double Angle2=Math.random()*2.0*Math.PI;
-            Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
+            //Hs.get(i).vélocité = new Vecteur3D(2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module,2.0*(Math.random()-0.5)*module);
             
-            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
+            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.cos(Angle2),module*Math.sin(Angle1)*Math.cos(Angle2),module*Math.sin(Angle2) );
         }
 
         System.out.println("Initialisation de l'ordre de dessin.");
@@ -214,59 +163,27 @@ public class App {
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        int itérations = 10;
+        int itérations = 100;
         for (int i = 0; i < itérations; i++) {
             
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
-            //Sous-étapes. Répète N fois/image
-            for (int N = 0; N < sousÉtapes; N++) {
-                
-                ForceSytème = new Vecteur3D(0);
-                for (int j = 0; j < Hs.size(); j++) {
-                    Hs.get(j).miseÀJourLiens();    //Créer/Détruire les liens.
-                    //Hs.get(i).déplacerVersÉquilibre();
-                }
-                
-                //Intégrateur.IterVerletVB(Hs, dt);
-                Intégrateur.calculerForces(Hs);
-                for (int j = 0; j < Hs.size(); j++) {
-                    Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),0.1));
-                    for (int k = 0; k < Hs.get(j).forceDoublet.size(); k++) {
-                        Hs.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Hs.get(j).forceDoublet.get(k)), 0.1));
-                    }
-                    Hs.get(j).ÉvaluerContraintes();
-                }
+            ForceSytème = new Vecteur3D(0);
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).miseÀJourLiens();    //Créer/Détruire les liens.
             }
-
-            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-            g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
             
-            //Affichage de la simulation
-            DessinerBoite();  //Dessiner le domaine
-
-            //Ordonner les atomes pour résoudre le problème de visibilité
-            for (int j = 0; j < Hs.size()-1; j++) {
-                if(Hs.get(indexe.get(j)).position.z < Hs.get(indexe.get(j+1)).position.z){
-                    int a = indexe.get(j);
-                    indexe.set( j, indexe.get(j+1));
-                    indexe.set(j+1, a);
+            Intégrateur.calculerForces(Hs);
+            for (int j = 0; j < Hs.size(); j++) {
+                Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),0.01));
+                for (int k = 0; k < Hs.get(j).forceDoublet.size(); k++) {
+                    Hs.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Hs.get(j).forceDoublet.get(k)), 0.01));
                 }
+                Hs.get(j).ÉvaluerContraintes();
             }
 
-            //Dessiner les atomes dans l'ordre
-            for (int j = 0; j < indexe.size(); j++) {
-                DessinerAtome(Hs.get(indexe.get(j)), Hs);
-            }
-
-            g.setColor(new Color(50,50,50,200));
-            g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
-            g.setColor(Color.WHITE);
-            g.drawString("Initialisation de la position d'équilibre: ",5,15);
-            g.drawString(String.format("%.0f",100.0*(double)i/(double)itérations) + "% complété.",5,30);
-
-            SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
+            boucleDessin.progressionPlacement = 100.0*(double)i/(double)itérations;
             //try {Thread.sleep(10);} catch (Exception e) {}
         }
 
@@ -275,97 +192,33 @@ public class App {
 
     public static void simulation(){
         System.out.println("Début de la simulation.");
+        boucleDessin.mode = com.MiniLabo.prototype.App.BoucleDessin.MODE.SIM;
 
-        long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
         départ = System.currentTimeMillis();
-        dt =0.625*Math.pow(10.0,-17);              //Delta temps de la simulation
-        int MiseÀJours = 0;
+        dt =0.625*Math.pow(10.0,-16);              //Delta temps de la simulation
         while (true) {
             
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
             double T = 0.0; //Température moyenne
-            //Sous-étapes. Répète N fois/image
             /* double mailmanresonant =0; */
-            for (int N = 0; N < sousÉtapes; N++) {
-                MiseÀJours++;
-                
-                ForceSytème = new Vecteur3D(0);
-                for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
-                    //Hs.get(i).déplacerVersÉquilibre();
-                }
-                
-                Intégrateur.IterVerletVB(Hs, dt);
-                //Intégrateur.calculerForces(Hs);
-                //for (int i = 0; i < Hs.size(); i++) {
-                //    Hs.get(i).position.addi(V3.mult(V3.norm(Hs.get(i).Force),0.1));
-                //    for (int j = 0; j < Hs.get(i).forceDoublet.size(); j++) {
-                //        Hs.get(i).positionDoublet.get(j).addi(V3.mult(V3.norm(Hs.get(i).forceDoublet.get(j)), 0.1));
-                //    }
-                //    Hs.get(i).ÉvaluerContraintes();
-                //}
-                temps += dt;
-            }
-
-            g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-            g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
+            boucleDessin.MisesÀJours++;
             
-            //Affichage de la simulation
-            DessinerBoite();  //Dessiner le domaine
-
-            //Ordonner les atomes pour résoudre le problème de visibilité
-            for (int i = 0; i < Hs.size()-1; i++) {
-                if(Hs.get(indexe.get(i)).position.z < Hs.get(indexe.get(i+1)).position.z){
-                    int a = indexe.get(i);
-                    indexe.set( i, indexe.get(i+1));
-                    indexe.set(i+1, a);
-                }
+            ForceSytème = new Vecteur3D(0);
+            for (int i = 0; i < Hs.size(); i++) {
+                Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
             }
-
-            //Dessiner les atomes dans l'ordre
-            for (int i = 0; i < indexe.size(); i++) {
-                DessinerAtome(Hs.get(indexe.get(i)), Hs);
-            }
-
-            if (System.currentTimeMillis()-mailman > 1000){
-                mailman = System.currentTimeMillis();
-                analyse(MiseÀJours);
-                MiseÀJours = 0;
-            }
-
-            g.setColor(new Color(50,50,50,200));
-            g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
-            g.setColor(Color.WHITE);
-            for (int i = 0; i < AnalyseTexte.length; i++) {
-                if(AnalyseTexte[i] != null){
-                    g.drawString(AnalyseTexte[i], 5, (i+1)*15);
-                }
-            }
-
-            //g.setColor(Color.BLUE);
-            //for (int i = 0; i < GraphiqueVal.size(); i++) {
-            //    g.fillOval((int)(300.0*GraphiqueVal.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal.get(i).y), 4, 4);
-            //}
-            //g.setColor(Color.RED);
-            //for (int i = 0; i < GraphiqueVal2.size(); i++) {
-            //    g.fillOval((int)(300.0*GraphiqueVal2.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal2.get(i).y), 4, 4);
-            //}
-
-            Vecteur3D posI = new Vecteur3D(0);
-            Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);
-            double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-            g.setColor(Color.RED);       //Couleur de la force
-            g.drawLine((TailleX/2) + (int)((posI.x)*multPersZF), (TailleY/2) - (int)((posI.y)*multPersZF), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
             
-            SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
+            Intégrateur.IterVerletVB(Hs, dt);
+            temps += dt;
+            
             //try {Thread.sleep(10);} catch (Exception e) {}
         }
     }
 
     public static void analyse(int MisesÀJours){
-        g.setColor(Color.WHITE);
+        //g.setColor(Color.WHITE);
         AnalyseTexte[0] = "====== Analyse ======";
         DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
         double DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
@@ -443,8 +296,109 @@ public class App {
         //double EpP = (2.0/(12.0*Math.pow(dist,12.0)));
         //AnalyseTexte[13] = "Énergie potentielle prédite: " + String.format("%.3E", EpP) + " JÅ. " + String.format("%.0f", 100.0*Math.abs(EpP-Ep)/Math.abs(EpP)) + "% d'écart.";
     }
+    
+    private static class BoucleDessin implements Runnable{
+        private static Graphics2D g;
+        private static JFrame frame;
+
+        public static enum MODE{INIT,SIM}
+
+        public volatile MODE mode = MODE.INIT;
+
+        public volatile int MisesÀJours = 0;
+        public volatile double progressionPlacement = 0.0;
+
+        @Override
+        public void run(){
+
+            BufferedImage b = new BufferedImage(TailleX, TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
+            g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
+
+            JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
+            frame = new JFrame();                //Initialiser l'écran
+            frame.setSize(TailleX + 100,TailleY + 100); //Taille de la fenêtre
+            frame.add(image);                           //Ajouter l'objet Image à l'écran
+            frame.setVisible(true);                   //Afficher la fenêtre
+
+            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+            g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
+            long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
+            while (true) {
+                g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
+                g.fillRect(0, 0, TailleX, TailleY);             //Rafraîchir l'écran en effaçant tout
+
+                //Affichage de la simulation
+                DessinerBoite(g);  //Dessiner le domaine
+
+                //Ordonner les atomes pour résoudre le problème de visibilité
+                for (int i = 0; i < Hs.size()-1; i++) {
+                    if(Hs.get(indexe.get(i)).position.z < Hs.get(indexe.get(i+1)).position.z){
+                        int a = indexe.get(i);
+                        indexe.set( i, indexe.get(i+1));
+                        indexe.set(i+1, a);
+                    }
+                }
+
+                //Dessiner les atomes dans l'ordre
+                for (int i = 0; i < indexe.size(); i++) {
+                    DessinerAtome(g,Hs.get(indexe.get(i)), Hs);
+                }
+
+                if (System.currentTimeMillis()-mailman > 5000 && mode == MODE.SIM){
+                    mailman = System.currentTimeMillis();
+                    analyse(MisesÀJours);
+                    MisesÀJours = 0;
+                }
+
+                g.setColor(new Color(50,50,50,200));
+                g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
+                g.setColor(Color.WHITE);
+                if(mode == MODE.SIM){
+                    for (int i = 0; i < AnalyseTexte.length; i++) {
+                        if(AnalyseTexte[i] != null){
+                            g.drawString(AnalyseTexte[i], 5, (i+1)*15);
+                        }
+                    }
+                }else if(mode == MODE.INIT){
+                    
+                    g.setColor(new Color(50,50,50,200));
+                    g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
+                    g.setColor(Color.WHITE);
+                    g.drawString("Initialisation de la position d'équilibre: ",5,15);
+                    g.drawString(String.format("%.0f",progressionPlacement) + "% complété.",5,30);
+                }
+
+                //g.setColor(Color.BLUE);
+                //for (int i = 0; i < GraphiqueVal.size(); i++) {
+                //    g.fillOval((int)(300.0*GraphiqueVal.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal.get(i).y), 4, 4);
+                //}
+                //g.setColor(Color.RED);
+                //for (int i = 0; i < GraphiqueVal2.size(); i++) {
+                //    g.fillOval((int)(300.0*GraphiqueVal2.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal2.get(i).y), 4, 4);
+                //}
+
+                //Vecteur3D posI = new Vecteur3D(0);
+                //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);
+                //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
+                //g.setColor(Color.RED);       //Couleur de la force
+                //g.drawLine((TailleX/2) + (int)((posI.x)*multPersZF), (TailleY/2) - (int)((posI.y)*multPersZF), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
+
+                SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
+                try {Thread.sleep(30);} catch (Exception e) {}
+            }
+        }
+    }
+    
     /**Dessine une boite représentant le domaine de simulation à  l'écran */
-    public static void DessinerBoite(){
+    public static void DessinerBoite(Graphics2D g){
         double multPersZBoiteLoin=(FOVBoite/(TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
         double multPersZBoiteProche=(FOVBoite/(-TailleZ/(2*Zoom)+TailleZ/(2.0*Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
         g.setStroke(new BasicStroke());
@@ -543,7 +497,7 @@ public class App {
      * @param A - Atome à dessiner
      * @param B - Liste des atomes de la simulation. Est utilisé pour dessiner les liens.
      */
-    public static void DessinerAtome(Atome A, ArrayList<Atome> B){
+    public static void DessinerAtome(Graphics2D g, Atome A, ArrayList<Atome> B){
 
         double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet)); //Multiplicateur de profondeur (forme la perspective)
 
