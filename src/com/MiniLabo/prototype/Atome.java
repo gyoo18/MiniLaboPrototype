@@ -232,24 +232,24 @@ public class Atome{
                                     System.out.println("distance0");
                                 }
                                 if (ListeForce[0]){
-                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/16.0, dist, dir)); //Appliquer la force de Pauli
                                 }
                                 if (ListeForce[2]){
-                                    //boolean voisin=false;
-                                    //for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                    //    if(A.liaisonIndexe.get(i1)==-1){
-                                    //        continue;
-                                    //    }
-                                    //    if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
-                                    //        voisin=true;
-                                    //    }
-                                    //}
-                                    //if (!voisin){
-                                    //    if (Double.isNaN(dist)){
-                                    //        System.out.println("distanceNan");
-                                    //    }
-                                        A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
-                                    //}
+                                   boolean voisin=false;
+                                   for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                       if(A.liaisonIndexe.get(i1)==-1){
+                                           continue;
+                                       }
+                                       if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
+                                           voisin=true;
+                                       }
+                                   }
+                                   if (!voisin){
+                                       if (Double.isNaN(dist)){
+                                           System.out.println("distanceNan");
+                                       }
+                                     A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                   }
                                 }
                             }
                             //Forces de A' sur les doublets
@@ -261,24 +261,24 @@ public class Atome{
                                     System.out.println("distance0");
                                 }
                                 if (ListeForce[0]){
-                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
+                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/16.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
                                 }
                                 if (ListeForce[2]){
-                                    //boolean voisin=false;
-                                    //for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                    //    if(A.liaisonIndexe.get(i1)==-1){
-                                    //        continue;
-                                    //    }
-                                    //    if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
-                                    //        voisin=true;
-                                    //    }
-                                    //} 
-                                    //if (!voisin){
-                                    //    if (Double.isNaN(eDist)){
-                                    //        System.out.println("distanceNan");
-                                    //    }
-                                        A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
-                                    //}
+                                    boolean voisin=false;
+                                    for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                        if(A.liaisonIndexe.get(i1)==-1){
+                                            continue;
+                                        }
+                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale){
+                                            voisin=true;
+                                        }
+                                    } 
+                                    if (!voisin){
+                                        if (Double.isNaN(eDist)){
+                                            System.out.println("distanceNan");
+                                        }
+                                      A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                                    }
                                 }
                                 
                                 //Forces des doublets de A' sur les doublets de A
@@ -286,7 +286,7 @@ public class Atome{
                                     eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                                     eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
                                     if (ListeForce[0]){
-                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/16.0,APrime.rayonCovalent/16.0, dist, dir)); //Appliquer la force de Pauli
                                     }
                                     if (ListeForce[2]){
                                         if (Double.isNaN(eDist)){
@@ -310,7 +310,7 @@ public class Atome{
                 Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre doublet
                 double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et lautre doublet
                 if (ListeForce[0]){
-                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0, A.rayonCovalent/4.0, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
+                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/16.0, A.rayonCovalent/16.0, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
                 }
                 if (ListeForce[2]){
                     A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, -2.0, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
@@ -510,7 +510,7 @@ public class Atome{
                     //A.Force.addi(A.forceDoublet.get(i).opposé());
                     
 
-                    }
+                }
             }
         }
     }
@@ -546,7 +546,7 @@ public class Atome{
      *      <p>• <a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        Vecteur3D force = ( V3.mult(dir, (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
+        Vecteur3D force = ( V3.mult(dir, (Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
         if (Double.isNaN(force.longueur())){
             System.err.println("Force Paulie renvoie NaN");
         }
@@ -661,7 +661,7 @@ public class Atome{
 
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Paramètres.ordreGrandeurMorse;//Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
         double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
         double a = Math.sqrt(p/(2.0*D));
         double module = -2.0*a*D*( Math.exp(-a*(dist-l)) - Math.exp(-2.0*a*(dist-l))); //Appliquer la force de morse
@@ -712,7 +712,7 @@ public class Atome{
         }
         double Kij;
         if(I == -1 || J == -1){
-            Kij = 900.0;
+            Kij = 10000.0;
             angle0 = angle0*1.1;
             if (I == -1 && J == -1){
                 angle0 = angle0*1.1;
@@ -724,7 +724,7 @@ public class Atome{
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
             double masse = 1.0/((1.0/mI)+(1.0/mJ));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1.0; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
@@ -1147,7 +1147,7 @@ public class Atome{
      *      <p>•<a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static double potentielPauli(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        double potentiel = (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
+        double potentiel = (Math.pow(1.0*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
         if (Double.isNaN(potentiel)){
             System.err.println("Potentiel Paulie renvoie NaN");
         }
@@ -1216,8 +1216,8 @@ public class Atome{
 
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717; //*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
-        double p = ConstanteDeForce[NP-1][NPA-1]*100.0;
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Paramètres.ordreGrandeurMorse;//Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
+        double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
         double a = Math.sqrt(p/(2.0*D));
         double module = D*Math.pow(1.0-Math.exp(-a*(dist-l)),2.0) - (morseDécalé?D:0.0); //Appliquer la force de morse
 
@@ -1267,7 +1267,7 @@ public class Atome{
         }
         double Kij;
         if(I == -1 || J == -1){
-            Kij = 900.0;
+            Kij = 10000.0;
             angle0 = angle0*1.1;
             if (I == -1 && J == -1){
                 angle0 = angle0*1.1;
@@ -1279,12 +1279,12 @@ public class Atome{
             }
             double fréquenceFondamentale = c*nbOndeFondamental; //Fréquence fondamentale en Hz
             double masse = 1.0/((1.0/mI)+(1.0/mJ));
-            Kij = Math.pow(fréquenceFondamentale,2.0)*masse*1000.0; //Force du ressort angulaire
+            Kij = Math.pow(fréquenceFondamentale,2.0)*masse; //Force du ressort angulaire
         }
 
         double D0 = angle0-angle; //Delta theta      
         //TODO doublet angle different doublet doublet, doublet atome
-        double force = -Kij*(angle0*angle-0.5*angle*angle)*IAxe.longueur();
+        double force = -Kij*(angle0*angle-0.5*angle*angle)*IAxe.longueur(); //*D0
         if (Double.isNaN(force)){
             System.err.println("Force Torsion renvoie NaN");
         }
@@ -1772,8 +1772,8 @@ public class Atome{
                                 if (APrime.cases[casesIndexe] != 0){
                                     int CasePotVide=0;
                                     int diff=APrime.NP-APrime.NE;
-                                    if (diff >1){
-                                        diff=1;
+                                    if (diff >=1){
+                                        diff=0;
                                     }
                                     if (diff<0){
                                         diff=0;
@@ -2142,11 +2142,17 @@ public class Atome{
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         return Ek*2.0/(3.0*kB); */
+
+       
         if (Double.isNaN(Tmp)){
             System.out.println("TempératureisNan");
             Tmp=10.0;
         }
-        return (Tmp);//((EkMode*2.0/(3.0*kB)));
+
+        double retourT=Tmp;  
+        //((EkMode*2.0/(3.0*kB)));
+        //Tmp
+        return (retourT);
     }
 
     public static double TempératureEnVitesse(double T, double m){
