@@ -39,7 +39,7 @@ public class Paramètres {
     
     public static double ordreGrandeurMorse =Math.pow(10.0,23);
     public static double Morsep = 10000.0; //10000.0;
-    public static double ModulePaulie = 2.0;
+    public static double ModulePaulie = 2.0; // 2.0;
     public static double ModuleTorsionDoublet= 10000.0; //10000.0;
     public static double ModuleTorsion= 1000.0; //1000.0;
 

@@ -231,27 +231,30 @@ public class Atome{
                                 if (0.0000000000000001>(dist)){
                                     System.out.println("distance0");
                                 }
-                                if (ListeForce[0]){
-                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
-                                    A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
-                                }
-                                if (ListeForce[2]){
-                                   boolean voisin=false;
-                                   for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                       if(A.liaisonIndexe.get(i1)==-1){
-                                           continue;
-                                       }
-                                       if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
-                                           voisin=true;
-                                       }
+                                
+                               
+                               boolean voisin=false;
+                               for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                   if(A.liaisonIndexe.get(i1)==-1){
+                                       continue;
                                    }
-                                   if (!voisin){
-                                       if (Double.isNaN(dist)){
-                                           System.out.println("distanceNan");
-                                       }
-                                     A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                   if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
+                                       voisin=true;
                                    }
                                 }
+                                if (!voisin){
+                                    if (Double.isNaN(dist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    if (ListeForce[2]){
+                                    A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                    }
+                                    if (ListeForce[0]){
+                                        A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
+                                    
+                                    }
+                                }
+                                
                             }
                             //Forces de A' sur les doublets
                             for (int j = 0; j < A.forceDoublet.size(); j++) {
@@ -261,33 +264,35 @@ public class Atome{
                                 if (0.0000000000000001>(eDist)){
                                     System.out.println("distance0");
                                 }
-                                if (ListeForce[0]){
-                                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
-                                }
-                                if (ListeForce[2]){
-                                    boolean voisin=false;
-                                    for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                                        if(A.liaisonIndexe.get(i1)==-1){
-                                            continue;
-                                        }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
-                                            voisin=true;
-                                        }
-                                    } 
-                                    if (!voisin){
-                                        if (Double.isNaN(eDist)){
-                                            System.out.println("distanceNan");
-                                        }
-                                      A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                                
+                                
+                                boolean voisin=false;
+                                for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                                    if(A.liaisonIndexe.get(i1)==-1){
+                                        continue;
+                                    }
+                                    if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
+                                        voisin=true;
+                                    }
+                                } 
+                                if (!voisin){
+                                    if (Double.isNaN(eDist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    if (ListeForce[0]){
+                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
+                                    }
+                                    if (ListeForce[2]){
+                                    A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
                                     }
                                 }
+                            
                                 
                                 //Forces des doublets de A' sur les doublets de A
                                 for (int k = 0; k < APrime.forceDoublet.size(); k++) {
                                     eDir = Vecteur3D.norm(Vecteur3D.sous(Vecteur3D.addi(A.positionDoublet.get(j), A.position),Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                                     eDist = Vecteur3D.distance(Vecteur3D.addi(A.position,A.positionDoublet.get(j)), Vecteur3D.addi(APrime.positionDoublet.get(k), APrime.position)); //Distance entre le doublet et A'
                                     if (ListeForce[0]){
-                                        A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
                                         A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
                                     }
                                     if (ListeForce[2]){
@@ -312,7 +317,6 @@ public class Atome{
                 Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre doublet
                 double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et lautre doublet
                 if (ListeForce[0]){
-                    A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0, A.rayonCovalent/4.0, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
                     A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0, A.rayonCovalent/4.0, eDist, eDir)); //Appliquer la force électrique entre les deux doublet   
                 }
                 if (ListeForce[2]){
@@ -892,11 +896,9 @@ public class Atome{
                 for (int j = 0; j < APrime.forceDoublet.size(); j++) {
                     dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
                     dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
-                    if (ListeForce[0]){
-                        A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
-                    }
                     
-                    if (ListeForce[2]){
+                    
+                    
                         boolean voisin=false;
                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
@@ -907,9 +909,14 @@ public class Atome{
                             }
                         }
                         if (!voisin ){
+                            if (ListeForce[0]){
+                                A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
+                            }
+                            if (ListeForce[2]){
                             A.potentiel += potentielÉlectrique(A.charge, -2.0,dist,dir); //Appliquer la force électrique
+                            }
                         }
-                    }
+                    
                 }
 
                 //Forces de A' sur les doublets
@@ -917,11 +924,9 @@ public class Atome{
 
                     Vecteur3D eDir = V3.norm(V3.sous(V3.addi(A.positionDoublet.get(j), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
                     double eDist = V3.distance(V3.addi(A.position,A.positionDoublet.get(j)), APrime.position); //Distance entre le doublet et A'
-                    if (ListeForce[0]){
-                        A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir); //Appliquer la force de Pauli 
-                    }
                     
-                    if (ListeForce[2]){
+                    
+                    
                         boolean voisin=false;
                         for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
                             if(A.liaisonIndexe.get(i1)==-1){
@@ -932,9 +937,15 @@ public class Atome{
                             }
                         } 
                         if (!voisin){
+                           
+                            if (ListeForce[0]){
+                                A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir); //Appliquer la force de Pauli 
+                            }
+                            if (ListeForce[2]){
                             A.potentiel += potentielÉlectrique(-2.0, APrime.charge,eDist,eDir); //Appliquer la force électrique
+                            }
                         }
-                    }
+                    
 
                     //Forces des doublets de A' sur les doublets de A
                     for (int k = 0; k < APrime.forceDoublet.size(); k++) {
