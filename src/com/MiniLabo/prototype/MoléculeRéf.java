@@ -11,7 +11,7 @@ public class MoléculeRéf extends Molécule{
         calculerBEAA();
     }
     
-    private void calculerBEAA(){
+    public void calculerBEAA(){
         Vecteur3D max = new Vecteur3D(-Double.MAX_VALUE);
         Vecteur3D min = new Vecteur3D(Double.MAX_VALUE);
         for (int i = 0; i < Atomes.size(); i++) {
@@ -156,8 +156,6 @@ public class MoléculeRéf extends Molécule{
 
         H2O.calculerBEAA();
         H2O.MiseÀJourPos();
-      
-
 
         return H2O;
     }
@@ -323,7 +321,7 @@ public class MoléculeRéf extends Molécule{
 
         Atome C = new Atome(6);
         Atome H1 = new Atome(1);
-        H1.position = new Vecteur3D(0,1.07,0);
+        H1.position = new Vecteur3D(1.07,0,0);
         Atome H2 = new Atome(1);
         H2.position = new Vecteur3D(-1.07,0,0);
 
@@ -348,9 +346,48 @@ public class MoléculeRéf extends Molécule{
         MiseÀJourEnvironnement(Environnement);
 
         CH2.calculerBEAA();
-        //CH2.MiseÀJourPos();
+        CH2.MiseÀJourPos();
 
         return CH2;
+    }
+
+    public static MoléculeRéf avoirCH3(){
+        MoléculeRéf CH3 = new MoléculeRéf();
+
+        Atome C = new Atome(6);
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(0,1.07,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1.07,0,0);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(0,-1.07,0);
+
+        CH3.ajouterAtome(C);
+        CH3.ajouterAtome(H1);
+        CH3.ajouterAtome(H2);
+        CH3.ajouterAtome(H3);
+
+        for (int i = 0; i < CH3.Atomes.size(); i++) {
+            CH3.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(CH3.Atomes);
+        MiseÀJourEnvironnement(CH3.Atomes);
+        C.créerLien(1, 0, 0, 1, false);
+        C.créerLien(2, 1, 0, 1, false);
+        C.créerLien(3, 1, 0, 1, false);
+
+        CH3.évaluerSystèmesConjugués();
+        CH3.initialiserPositions();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        CH3.calculerBEAA();
+        CH3.MiseÀJourPos();
+
+        return CH3;
     }
 
     public static MoléculeRéf avoirCH4(){
@@ -394,6 +431,160 @@ public class MoléculeRéf extends Molécule{
         CH4.MiseÀJourPos();
 
         return CH4;
+    }
+
+    public static MoléculeRéf avoirCO2(){
+        MoléculeRéf CO2 = new MoléculeRéf();
+
+        Atome C = new Atome(6);
+        Atome O1 = new Atome(8);
+        O1.position = new Vecteur3D(0,1.07,0);
+        Atome O2 = new Atome(8);
+        O2.position = new Vecteur3D(-1.07,0,0);
+
+        CO2.ajouterAtome(C);
+        CO2.ajouterAtome(O1);
+        CO2.ajouterAtome(O2);
+
+        for (int i = 0; i < CO2.Atomes.size(); i++) {
+            CO2.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(CO2.Atomes);
+        MiseÀJourEnvironnement(CO2.Atomes);
+        C.créerLien(1, 0, 0, 1, false);
+        C.créerLien(2, 1, 0, 1, false);
+
+        CO2.évaluerSystèmesConjugués();
+        CO2.initialiserPositions();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        CO2.calculerBEAA();
+        CO2.MiseÀJourPos();
+
+        return CO2;
+    }
+
+    public static MoléculeRéf avoirNH2m(){
+        MoléculeRéf NH2 = new MoléculeRéf();
+
+        Atome N = new Atome(7);
+        N.ajouterÉlectron();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(0,1.07,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1.07,0,0);
+
+        NH2.ajouterAtome(N);
+        NH2.ajouterAtome(H1);
+        NH2.ajouterAtome(H2);
+
+        for (int i = 0; i < NH2.Atomes.size(); i++) {
+            NH2.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(NH2.Atomes);
+        MiseÀJourEnvironnement(NH2.Atomes);
+        N.créerLien(1, 0, 0, 1, false);
+        N.créerLien(2, 1, 0, 1, false);
+
+        NH2.évaluerSystèmesConjugués();
+        NH2.initialiserPositions();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        NH2.calculerBEAA();
+        NH2.MiseÀJourPos();
+
+        return NH2;
+    }
+
+    public static MoléculeRéf avoirNH3(){
+        MoléculeRéf NH3 = new MoléculeRéf();
+
+        Atome C = new Atome(7);
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(1.07,0,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1.07,0,0);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(0,1.07,0);
+
+        NH3.ajouterAtome(C);
+        NH3.ajouterAtome(H1);
+        NH3.ajouterAtome(H2);
+        NH3.ajouterAtome(H3);
+
+        for (int i = 0; i < NH3.Atomes.size(); i++) {
+            NH3.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(NH3.Atomes);
+        MiseÀJourEnvironnement(NH3.Atomes);
+        C.créerLien(1, 0, 0, 1, false);
+        C.créerLien(2, 1, 0, 1, false);
+        C.créerLien(3, 1, 0, 1, false);
+
+        NH3.évaluerSystèmesConjugués();
+        NH3.initialiserPositions();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        NH3.calculerBEAA();
+        NH3.MiseÀJourPos();
+
+        return NH3;
+    }
+
+    public static MoléculeRéf avoirNH4p(){
+        MoléculeRéf NH4 = new MoléculeRéf();
+
+        Atome N = new Atome(7);
+        N.retirerÉlectron();
+        Atome H1 = new Atome(1);
+        H1.position = new Vecteur3D(1.07,0,0);
+        Atome H2 = new Atome(1);
+        H2.position = new Vecteur3D(-1.07,0,0);
+        Atome H3 = new Atome(1);
+        H3.position = new Vecteur3D(0,1.07,0);
+        Atome H4 = new Atome(1);
+        H4.position = new Vecteur3D(0,-1.07,0);
+
+        NH4.ajouterAtome(N);
+        NH4.ajouterAtome(H1);
+        NH4.ajouterAtome(H2);
+        NH4.ajouterAtome(H3);
+        NH4.ajouterAtome(H4);
+
+        for (int i = 0; i < NH4.Atomes.size(); i++) {
+            NH4.Atomes.get(i).indexe = i;
+        }
+
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(NH4.Atomes);
+        MiseÀJourEnvironnement(NH4.Atomes);
+        N.créerLien(1, 0, 0, 1, false);
+        N.créerLien(2, 1, 0, 1, false);
+        N.créerLien(3, 1, 0, 1, false);
+        N.créerLien(4, 1, 0, 1, false);
+
+        NH4.évaluerSystèmesConjugués();
+        NH4.initialiserPositions();
+
+        Atome.MettreÀJourEnvironnement(Environnement);
+        MiseÀJourEnvironnement(Environnement);
+
+        NH4.calculerBEAA();
+        NH4.MiseÀJourPos();
+
+        return NH4;
     }
 
     public static MoléculeRéf avoir1_3_Dibutyle(){
@@ -778,6 +969,47 @@ public class MoléculeRéf extends Molécule{
         Cl2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
 
         return Cl2; //Renvoie la molécule
+    }
+
+    public static MoléculeRéf avoirF2(){
+        //Changer avoirMolécule() pour avoir[insérer nom de la molécule]()
+        MoléculeRéf F2 = new MoléculeRéf(); //Création de la molécule
+
+        //Créer chacun des atomes
+        Atome ClA = new Atome(9);    
+        ClA.position = new Vecteur3D(0,0,0);
+        Atome ClB = new Atome(9);    
+        ClB.position = new Vecteur3D(1,0,0);
+
+        //Ajouter chaque atome à la molécule
+        F2.ajouterAtome(ClA);
+        F2.ajouterAtome(ClB);
+
+        //Ne pas changer
+        for (int i = 0; i < F2.Atomes.size(); i++) {
+            F2.Atomes.get(i).indexe = i;
+        }
+
+        //Ne pas changer
+        ArrayList<Atome> Environnement = Atome.Environnement;
+        Atome.MettreÀJourEnvironnement(F2.Atomes);           
+        MiseÀJourEnvironnement(F2.Atomes);
+
+        //Créer les liens entre chaque atome
+        ClA.créerLien(ClB.indexe, 0, 0, 1, false);
+
+        //Ne pas changer
+        F2.évaluerSystèmesConjugués(); //Détecte la résonance
+        F2.initialiserPositions();      //Initialise la position des doublets à l'équilibre
+        //Ne pas changer
+        Atome.MettreÀJourEnvironnement(Environnement);//Remet la référence à l'environnement
+        MiseÀJourEnvironnement(Environnement);
+
+        //Ne pas changer
+        F2.calculerBEAA(); //Calcule la Boîte Englobante Alignée sur les Axes
+        F2.MiseÀJourPos(); //Calcule le centre de la molécule et déplace les atomes.
+
+        return F2; //Renvoie la molécule
     }
 
     public static MoléculeRéf avoir2eNaCl(){

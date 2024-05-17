@@ -17,12 +17,14 @@ import javax.swing.SwingUtilities;
 import java.awt.RenderingHints;
 
 public class App {
-    public static int FOVet = Paramètres.FOV;
-    private static int FOVBoite = Paramètres.FOV;
-    private static int FOVetBoite = Paramètres.FOV;
+    public static Paramètres p; // = Paramètres.avoirParamètres();
 
-    public static ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
-    public static ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
+    public static int FOVet; // = p.FOV;
+    private static int FOVBoite; // = p.FOV;
+    private static int FOVetBoite; // = p.FOV;
+
+    public static volatile ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
+    //public static volatile ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
     /**Temps réel de départ de la simulation en ms */
     public static long départ = System.currentTimeMillis();
@@ -38,26 +40,47 @@ public class App {
     public static Vecteur3D ForceSytème = new Vecteur3D(0);
     private static ArrayList<Vecteur2D> GraphiqueVal = new ArrayList<>();
     private static ArrayList<Vecteur2D> GraphiqueVal2 = new ArrayList<>();
-    private static File fichierAnalyse = new File(Paramètres.emplacementFichierAnalyse + "Analyse.csv");
+    private static File fichierAnalyse; // = new File(p.emplacementFichierAnalyse + "Analyse.csv");
     private static FileWriter fileWriter;
 
-    private static BoucleDessin boucleDessin = new BoucleDessin();
+    private static BoucleDessin boucleDessin; // = new BoucleDessin();
+    private static Thread thread;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
 
-        Initialisation();
-        simulation();
-        //Analyse se fait à partir de simulation();
+         for (int i = 0; i < 23; i++) { //MODIFIER PAR MAIKA SELON INSTRUCTION VOCAL VINCENT, AVANT MODIF = for (int i = 0; i < 23; i++) {
+            //int i = 0;
+            p = Paramètres.avoirParamètres(i+1);
+            p.mode = Paramètres.Mode.ENTRE_DEUX;
+            FOVet = p.FOV;
+            FOVBoite = p.FOV;
+            FOVetBoite = p.FOV;
+            fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+            Hs.clear();
+            if(boucleDessin != null){
+                boucleDessin.indexe.clear();
+            }
+            chrono = 0;
+            Initialisation();
+            simulation();
+            Intégrateur.tuerFils();
+            //Analyse se fait à partir de simulation();
+        }
         
     }
 
     public static void Initialisation(){
         System.out.println("Initialisation");
+        p.mode = Paramètres.Mode.INIT;
 
-        Thread thread = new Thread(boucleDessin);
-        Paramètres.mode = Paramètres.Mode.INIT;
-        thread.start();
+        if(boucleDessin == null){
+            boucleDessin = new BoucleDessin();
+            thread = new Thread(boucleDessin);
+            p.mode = Paramètres.Mode.INIT;
+            thread.start();
+        }
+        boucleDessin.init = true;
         //Molécule de base
 
         /*//Initialiser les atomes en grille
@@ -73,13 +96,14 @@ public class App {
             }
         }*/
         
+        p.mode = Paramètres.Mode.AJOUT_MOL;
         //Initialiser les atomes selon l'algorithme de poisson
-        int NbMolécules = Paramètres.NbMolécules;  //Nombre de molécules voulus
+        int NbMolécules = p.NbMolécules;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
         int essais = 0;
-        int NBessais = Paramètres.NBessais;           //Nombre d'essais à placer la molécule
-        boolean BEAA = Paramètres.BEAA;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
-        double tampon = Paramètres.tampon;  //Zone tampon entre les atomes
+        int NBessais = p.NBessais;           //Nombre d'essais à placer la molécule
+        boolean BEAA = p.BEAA;   //Mode de calcul d'intersection. Faux = sphère, Vrai = BEAA
+        double tampon = p.tampon;  //Zone tampon entre les atomes
 
         System.out.println("Placement des "+NbMolécules+" molécules.");
         long timer = System.currentTimeMillis();
@@ -87,10 +111,10 @@ public class App {
         //Si on essais de placer la molécule trops de fois, la simulation est déjà pleine et il faut arrêter.
         while (totalMolécules < NbMolécules && essais < NBessais) {
             essais++;
-            MoléculeRéf mol = Paramètres.PlacementMolécule(totalMolécules);
+            MoléculeRéf mol = p.PlacementMolécule(totalMolécules);
 
             //position aléatoire dans le domaine.
-            Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (Paramètres.TailleX/(2.0*Paramètres.Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (Paramètres.TailleY/(2.0*Paramètres.Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (Paramètres.TailleZ/(2.0*Paramètres.Zoom) - mol.BEAA.z));
+            Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (p.TailleX/(2.0*p.Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (p.TailleY/(2.0*p.Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (p.TailleZ/(2.0*p.Zoom) - mol.BEAA.z));
             //position = new Vecteur3D(0);
             boolean intersecte = false;
             for (int i = 0; i < Hs.size(); i++) {
@@ -105,7 +129,7 @@ public class App {
                     }
                 }else{
                     //Intesection avec la sphère
-                    if(Vecteur3D.distance(position,Hs.get(i).position) + Hs.get(i).rayonCovalent < mol.rayon){
+                    if(Vecteur3D.distance(position,Hs.get(i).position) + Hs.get(i).rayonCovalent + tampon < mol.rayon){
                         //S'il y a intersection
                         intersecte = true;
                         break; //Sortir de la boucle en n'ajoutant pas la molécule
@@ -131,56 +155,54 @@ public class App {
         System.out.println("Total Atomes : " + Hs.size());
         System.out.println("Initialisation des systèmes.");
 
+        boucleDessin.Hs = (ArrayList<Atome>) Hs.clone();
+
+        p.mode = Paramètres.Mode.INIT;
+
         Atome.MettreÀJourEnvironnement(Hs);
         Molécule.MiseÀJourEnvironnement(Hs);
-        Intégrateur.initialisation(Hs,Paramètres.NBFils);
-        Intégrateur.FilsExécution = Paramètres.UtiliserFilsExécution;
-        Intégrateur.modèle = Paramètres.modèleIntégrateur;
+        Intégrateur.initialisation(Hs,p.NBFils);
+        Intégrateur.FilsExécution = p.UtiliserFilsExécution;
+        Intégrateur.modèle = p.modèleIntégrateur;
 
         System.out.println("Initialisation de la température.");
         for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(Paramètres.TempératureInitiale+273.15, Hs.get(i).m);
+            double module = Atome.TempératureEnVitesse(p.TempératureInitiale+273.15, Hs.get(i).m);
             double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
             double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             
             //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
         }
 
-        System.out.println("Initialisation de l'ordre de dessin.");
-        //Ajouter les atomes dans l'ordre de dessin
-        for (int i = 0; i < Hs.size(); i++) {
-            indexe.add(i);
-        }
-
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
-        for (int i = 0; i < Paramètres.itérationsPlacementInitial; i++) {
+        for (int i = 0; i < p.itérationsPlacementInitial; i++) {
             
             Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
             Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
             ForceSytème = new Vecteur3D(0);
             for (int j = 0; j < Hs.size(); j++) {
-                Hs.get(j).miseÀJourLiens();    //Créer/Détruire les liens.
+                //Hs.get(j).miseÀJourLiens();    //Créer/Détruire les liens.
             }
             
             Intégrateur.calculerForces(Hs);
             for (int j = 0; j < Hs.size(); j++) {
-                Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),Paramètres.deltaPlacement));
+                Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),p.deltaPlacement));
                 for (int k = 0; k < Hs.get(j).forceDoublet.size(); k++) {
-                    Hs.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Hs.get(j).forceDoublet.get(k)), Paramètres.deltaPlacement));
+                    Hs.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Hs.get(j).forceDoublet.get(k)), p.deltaPlacement));
                 }
                 Hs.get(j).ÉvaluerContraintes();
             }
 
-            boucleDessin.progressionPlacement = 100.0*(double)i/(double)Paramètres.itérationsPlacementInitial;
-            //try {Thread.sleep(10);} catch (Exception e) {}
+            boucleDessin.progressionPlacement = 100.0*(double)i/(double)p.itérationsPlacementInitial;
+            //try {Thread.sleep(1);} catch (Exception e) {}
         }
 
         try{
             fileWriter = new FileWriter(fichierAnalyse, Charset.forName("UTF-8"));
-            fileWriter.write("Molécules: ;" + NbMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + Paramètres.TempératureInitiale +";\n");
+            fileWriter.write("Molécules: ;" + NbMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + p.TempératureInitiale +";\n");
             fileWriter.write("chrono (s); MPS; temps (fs); Température (°C); Volume (m^3); Pression (kPa); Énergie Potentielle (JÅ); Énergie Cinétique (JÅ); Énergie Mécanique (JÅ);\n");
         }catch(Exception e){
             e.printStackTrace();
@@ -191,28 +213,45 @@ public class App {
 
     public static void simulation(){
         System.out.println("Début de la simulation.");
-        Paramètres.mode = Paramètres.Mode.SIM;
+        p.mode = Paramètres.Mode.SIM;
 
         départ = System.currentTimeMillis();
-        while (true) {
-            
-            Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
-            Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
+        try{
+            while (chrono < 90000) {
 
-            double T = 0.0; //Température moyenne
-            /* double mailmanresonant =0; */
-            boucleDessin.MisesÀJours++;
-            
-            ForceSytème = new Vecteur3D(0);
-            for (int i = 0; i < Hs.size(); i++) {
-                Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                if(!thread.isAlive()){
+                    boucleDessin = new BoucleDessin();
+                    thread = new Thread(boucleDessin);
+                    p.mode = Paramètres.Mode.INIT;
+                    boucleDessin.Hs = (ArrayList<Atome>)Hs.clone();
+                    boucleDessin.init = true;
+                    boucleDessin.indexe.clear();
+                    thread.start();
+                }
+                
+                Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
+                Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
+
+                double T = 0.0; //Température moyenne
+                /* double mailmanresonant =0; */
+                boucleDessin.MisesÀJours++;
+                
+                ForceSytème = new Vecteur3D(0);
+                for (int i = 0; i < Hs.size(); i++) {
+                        Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                }
+                
+                Intégrateur.Iter(Hs, p.dt);
+                temps += p.dt;
+                
+                chrono = System.currentTimeMillis()-départ;
+                //try {Thread.sleep(10);} catch (Exception e) {}
             }
-            
-            Intégrateur.Iter(Hs, Paramètres.dt);
-            temps += Paramètres.dt;
-            
-            //try {Thread.sleep(10);} catch (Exception e) {}
+        }catch(Exception e){
+            e.printStackTrace();
         }
+        p.mode = Paramètres.Mode.FIN;
+        try {Thread.sleep(1000);} catch (Exception e) {}
     }
 
     public static void analyse(int MisesÀJours){
@@ -226,16 +265,12 @@ public class App {
             DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
             DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
         }
-        
-        
 
-        chrono = System.currentTimeMillis()-départ;
-        temps += Paramètres.dt;
         AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
         AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/((double)DeltaT/1000.0));
 
         //Statistiques sur la vitesse de la simulation
-        AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (Paramètres.dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
+        AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (p.dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
         //résultatTest += String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + ";";
         //longueurTest ++;
 
@@ -266,7 +301,7 @@ public class App {
         }
         for (int i = 0; i < Hs.size(); i++) {
             Ek += Math.pow(Hs.get(i).vélocité.longueur(),2.0)*Hs.get(i).m*0.5;
-            Atome.évaluerÉnergiePotentielle(Hs.get(i),Paramètres.PotentielMorseDécalé);
+            Atome.évaluerÉnergiePotentielle(Hs.get(i),p.PotentielMorseDécalé);
         }
         for (int i = 0; i < Hs.size(); i++) {
             Ep += Hs.get(i).potentiel;
@@ -313,35 +348,61 @@ public class App {
         public volatile int MisesÀJours = 0;
         public volatile double progressionPlacement = 0.0;
 
+        public volatile boolean init = false;
+
+        public ArrayList<Atome> Hs = new ArrayList<>();
+        public ArrayList<Integer> indexe = new ArrayList<>();
+
         @Override
         public void run(){
-
-            BufferedImage b = new BufferedImage(Paramètres.TailleX, Paramètres.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
+            System.out.println("Thread de dessin : " + Thread.currentThread().getName());
+            BufferedImage b = new BufferedImage(p.TailleX, p.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
             g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
-
             JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
             frame = new JFrame();                //Initialiser l'écran
-            frame.setSize(Paramètres.TailleX + 100,Paramètres.TailleY + 100); //Taille de la fenêtre
+            frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
             frame.add(image);                           //Ajouter l'objet Image à l'écran
             frame.setVisible(true);                   //Afficher la fenêtre
-
-            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-            g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+            init = false;
 
             long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
             while (true) {
+                if(p.mode == Paramètres.Mode.ENTRE_DEUX || p.mode == Paramètres.Mode.AJOUT_MOL || p.mode == Paramètres.Mode.FIN) {
+                    continue;
+                }
+                if(init){
+                    b = new BufferedImage(p.TailleX, p.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
+                    g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
+
+                    image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
+                    frame = new JFrame();                //Initialiser l'écran
+                    frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
+                    frame.add(image);                           //Ajouter l'objet Image à l'écran
+                    frame.setVisible(true);                   //Afficher la fenêtre
+
+                    g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+                    g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
+                    init = false;
+                }
+
                 g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
-                g.fillRect(0, 0, Paramètres.TailleX, Paramètres.TailleY);             //Rafraîchir l'écran en effaçant tout
+                g.fillRect(0, 0, p.TailleX, p.TailleY);             //Rafraîchir l'écran en effaçant tout
 
                 //Affichage de la simulation
                 DessinerBoite(g);  //Dessiner le domaine
+
+                //Ajouter les atomes dans l'ordre de dessin
+                while(Hs.size() > indexe.size()) {
+                    indexe.add(indexe.size());
+                }
 
                 //Ordonner les atomes pour résoudre le problème de visibilité
                 for (int i = 0; i < Hs.size()-1; i++) {
@@ -357,7 +418,7 @@ public class App {
                     DessinerAtome(g,Hs.get(indexe.get(i)), Hs);
                 }
 
-                if (System.currentTimeMillis()-mailman > Paramètres.tempsAttenteAnalyse && Paramètres.mode == Paramètres.Mode.SIM){
+                if (System.currentTimeMillis()-mailman > p.tempsAttenteAnalyse && p.mode == Paramètres.Mode.SIM){
                     mailman = System.currentTimeMillis();
                     analyse(MisesÀJours);
                     MisesÀJours = 0;
@@ -366,13 +427,13 @@ public class App {
                 g.setColor(new Color(50,50,50,200));
                 g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
                 g.setColor(Color.WHITE);
-                if(Paramètres.mode == Paramètres.Mode.SIM){
+                if(p.mode == Paramètres.Mode.SIM){
                     for (int i = 0; i < AnalyseTexte.length; i++) {
                         if(AnalyseTexte[i] != null){
                             g.drawString(AnalyseTexte[i], 5, (i+1)*15);
                         }
                     }
-                }else if(Paramètres.mode == Paramètres.Mode.INIT){
+                }else if(p.mode == Paramètres.Mode.INIT){
                     
                     g.setColor(new Color(50,50,50,200));
                     g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
@@ -404,13 +465,13 @@ public class App {
     
     /**Dessine une boite représentant le domaine de simulation à  l'écran */
     public static void DessinerBoite(Graphics2D g){
-        double multPersZBoiteLoin=(FOVBoite/(Paramètres.TailleZ/(2*Paramètres.Zoom)+Paramètres.TailleZ/(2.0*Paramètres.Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
-        double multPersZBoiteProche=(FOVBoite/(-Paramètres.TailleZ/(2*Paramètres.Zoom)+Paramètres.TailleZ/(2.0*Paramètres.Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
+        double multPersZBoiteLoin=(FOVBoite/(p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
+        double multPersZBoiteProche=(FOVBoite/(-p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
         g.setStroke(new BasicStroke());
         g.setColor(Color.MAGENTA);  //Couleur de la boîte
-        int TailleX = Paramètres.TailleX;
-        int TailleY = Paramètres.TailleY;
-        int TailleZ = Paramètres.TailleZ;
+        int TailleX = p.TailleX;
+        int TailleY = p.TailleY;
+        int TailleZ = p.TailleZ;
         //Face arrière
         g.drawLine( 
             (int)( (TailleX/2) + ( TailleX/2)*multPersZBoiteLoin ),  // Point +++
@@ -506,11 +567,11 @@ public class App {
      */
     public static void DessinerAtome(Graphics2D g, Atome A, ArrayList<Atome> B){
 
-        int FOV = Paramètres.FOV;
-        double Zoom = Paramètres.Zoom;
-        int TailleX = Paramètres.TailleX;
-        int TailleY = Paramètres.TailleY;
-        int TailleZ = Paramètres.TailleZ;
+        int FOV = p.FOV;
+        double Zoom = p.Zoom;
+        int TailleX = p.TailleX;
+        int TailleY = p.TailleY;
+        int TailleZ = p.TailleZ;
 
         double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet)); //Multiplicateur de profondeur (forme la perspective)
 

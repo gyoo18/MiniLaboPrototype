@@ -24,6 +24,7 @@ public class Intégrateur {
         private volatile ArrayList<Atome> ensemble;
         /**Indique si ce fil a terminé sa tâche de traitement. */
         private volatile boolean terminé = false;
+        public volatile boolean actif = true;
 
         public FilsDistributeur(){}
 
@@ -38,7 +39,7 @@ public class Intégrateur {
         @Override
         public void run() {
             System.out.println(Thread.currentThread().getName() + " est activé pour le calcul des forces.");
-            while (true) {
+            while (actif) {
                 synchronized (this){
                     try {
                         terminé = true;
@@ -74,12 +75,18 @@ public class Intégrateur {
      * @param nbFils - Nombre de fils d'exécutions à utiliser. 10 est la valeur par défaut reccomandée, mais faites vos propres tests.
      */
     public static void initialisation(ArrayList<Atome> O, int nbFils ){
-        bouc = new Thread[nbFils];
-        fils = new FilsDistributeur[nbFils];
 
+        if(bouc == null){
+            bouc = new Thread[nbFils];
+            fils = new FilsDistributeur[nbFils];
+        }
         for (int i = 0; i < bouc.length; i++) {
             if(bouc[i] != null){
-                bouc[i].interrupt();
+                synchronized (fils[i]){
+                    fils[i].actif = false;
+                    fils[i].notify();
+                    //bouc[i].interrupt();
+                }
             }
         }
         ArrayList<ArrayList<Atome>> Op = new ArrayList<>();
@@ -101,6 +108,18 @@ public class Intégrateur {
             fils[i].changerEnsemble(Op.get(i));
             bouc[i] = new Thread(fils[i]);
             bouc[i].start();
+        }
+    }
+
+    public static void tuerFils(){
+        for (int i = 0; i < bouc.length; i++) {
+            if(bouc[i] != null){
+                synchronized (fils[i]){
+                    fils[i].actif = false;
+                    fils[i].notify();
+                    //bouc[i].interrupt();
+                }
+            }
         }
     }
 
