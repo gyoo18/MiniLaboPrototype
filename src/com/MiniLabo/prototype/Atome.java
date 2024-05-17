@@ -241,7 +241,7 @@ public class Atome{
                                        if(A.liaisonIndexe.get(i1)==-1){
                                            continue;
                                        }
-                                       if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && Paramètres.voisin){
+                                       if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
                                            voisin=true;
                                        }
                                    }
@@ -270,7 +270,7 @@ public class Atome{
                                         if(A.liaisonIndexe.get(i1)==-1){
                                             continue;
                                         }
-                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && Paramètres.voisin){
+                                        if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && BoitePrincipale && App.p.voisin){
                                             voisin=true;
                                         }
                                     } 
@@ -944,7 +944,7 @@ public class Atome{
                             A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
                         }
                         if (ListeForce[2]){
-                            A.potentiel += potentielÉlectrique(-2, -2,eDist,eDir); //Appliquer la force électrique
+                            A.potentiel += potentielÉlectrique(-2.0, -2.0,eDist,eDir); //Appliquer la force électrique
                         }
                     }
                 }
@@ -2123,15 +2123,24 @@ public class Atome{
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         return Ek*2.0/(3.0*kB); */
-        if (Double.isNaN(Tmp)){
+        double retourT=Tmp;  
+        //((EkMode*2.0/(3.0*kB)));
+        //Tmp
+        if (Double.isNaN(retourT)){
             System.out.println("TempératureisNan");
-            Tmp=1.0;
+            retourT=1.0;
         }
-        return (Tmp);//((EkMode*2.0/(3.0*kB)));
+        
+        
+        return (retourT);
     }
 
     public static double TempératureEnVitesse(double T, double m){
-        return Math.sqrt(3.0*kB*T/m);
+        double VitesseCaré;
+        VitesseCaré = T*(kB*Math.log(1+1/m))/(0.5*m);
+       
+        return Math.sqrt(VitesseCaré);
+        //return Math.sqrt(3.0*kB*T/m);
     }
 
     /**
