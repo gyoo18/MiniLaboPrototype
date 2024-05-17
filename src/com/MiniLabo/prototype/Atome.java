@@ -695,9 +695,9 @@ public class Atome{
         double Kij;
         if(I == -1 || J == -1){
             Kij = Paramètres.ModuleTorsionDoublet;
-            angle0 = angle0*1.1;
+            angle0 = angle0*1.05;
             if (I == -1 && J == -1){
-                angle0 = angle0*1.1;
+                angle0 = angle0*1.05;
             }
         }else{
             double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
@@ -1254,9 +1254,9 @@ public class Atome{
         double Kij;
         if(I == -1 || J == -1){
             Kij = Paramètres.ModuleTorsionDoublet;
-            angle0 = angle0*1.1;
+            angle0 = angle0*1.05;
             if (I == -1 && J == -1){
-                angle0 = angle0*1.1;
+                angle0 = angle0*1.05;
             }
         }else{
             double nbOndeFondamental = fréquenceTorsion[K-1][I-1][J-1]*Math.pow(10.0,-8.0); //nombre d'onde fondamental en Å^-1
