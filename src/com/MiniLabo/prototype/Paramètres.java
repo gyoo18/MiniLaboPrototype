@@ -40,14 +40,10 @@ public class Paramètres {
     //Ces parametre sont utile pour debuger, et verifier.
     
     public static double ordreGrandeurMorse =Math.pow(10.0,23);
-    public static double Morsep = 100.0; //10000.0;
+    public static double Morsep = 10000.0; //10000.0;
     public static double ModulePaulie = 2.0; // 2.0;
     public static double ModuleTorsionDoublet= 10000.0; //10000.0;
     public static double ModuleTorsion= 1000.0; //1000.0;
-
-
-
-
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
     public double dt = 0.625*Math.pow(10.0,-18.0);
