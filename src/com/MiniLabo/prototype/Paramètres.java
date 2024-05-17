@@ -13,7 +13,7 @@ public class Paramètres {
     public static int TailleX = 1000; //Taille de simulation 
     public static int TailleY = 512;
     public static int TailleZ = 512;
-    public static float Zoom = 40f;
+    public static float Zoom = 30f;
     public static int FOV = 70;     //Champ de vision de la caméra
 
     public static long tempsAttenteAnalyse = 5000;
@@ -36,7 +36,7 @@ public class Paramètres {
     public static boolean voisin=true;
 
     public static MoléculeRéf PlacementMolécule(int i){
-        if(i < 0){
+        if(i < 3){
             return MoléculeRéf.avoirNaCl();
         }else{
             return MoléculeRéf.avoirH2O();
