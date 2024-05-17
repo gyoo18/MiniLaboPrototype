@@ -49,23 +49,38 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
 
-         for (int i = 0; i < 23; i++) { //MODIFIER PAR MAIKA SELON INSTRUCTION VOCAL VINCENT, AVANT MODIF = for (int i = 0; i < 23; i++) {
-            //int i = 0;
-            p = Paramètres.avoirParamètres(i+1);
-            p.mode = Paramètres.Mode.ENTRE_DEUX;
-            FOVet = p.FOV;
-            FOVBoite = p.FOV;
-            FOVetBoite = p.FOV;
-            fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
-            Hs.clear();
-            if(boucleDessin != null){
-                boucleDessin.indexe.clear();
+        int essais = 0;
+         for (int i = 0; i < 23; i++) {
+            boolean commencer = true;
+            while (commencer || p.répéter) {
+                //int i = 0;
+                p = Paramètres.avoirParamètres(i+1);
+                p.mode = Paramètres.Mode.ENTRE_DEUX;
+                FOVet = p.FOV;
+                FOVBoite = p.FOV;
+                FOVetBoite = p.FOV;
+                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+                Hs.clear();
+                if(boucleDessin != null){
+                    boucleDessin.indexe.clear();
+                }
+                chrono = 0;
+                if(p.répéter){
+                    essais ++;
+                }else{
+                    essais = 0;
+                }
+                commencer = false;
+                p.répéter = false;
+                Initialisation();
+                simulation();
+                //Analyse se fait à partir de simulation();
+                Intégrateur.tuerFils();
+                if(essais > 5 && p.répéter){
+                    p.répéter = false;
+                    essais = 0;
+                }
             }
-            chrono = 0;
-            Initialisation();
-            simulation();
-            Intégrateur.tuerFils();
-            //Analyse se fait à partir de simulation();
         }
         
     }
@@ -172,6 +187,7 @@ public class App {
             double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             
             Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
+            //Hs.get(i).vélocité = V3.mult(V3.norm(new Vecteur3D(Math.random(),Math.random(),Math.random())),module);
         }
 
         System.out.println("Initialisation des positions d'équilibre.");
@@ -216,8 +232,8 @@ public class App {
         p.mode = Paramètres.Mode.SIM;
 
         départ = System.currentTimeMillis();
-        try{
-            while (chrono < 90000) {
+        //try{
+            while (chrono < 180000 && !App.p.répéter) {
 
                 if(!thread.isAlive()){
                     boucleDessin = new BoucleDessin();
@@ -247,9 +263,9 @@ public class App {
                 chrono = System.currentTimeMillis()-départ;
                 //try {Thread.sleep(10);} catch (Exception e) {}
             }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        //}catch(Exception e){
+        //    e.printStackTrace();
+        //}
         p.mode = Paramètres.Mode.FIN;
         try {Thread.sleep(1000);} catch (Exception e) {}
     }

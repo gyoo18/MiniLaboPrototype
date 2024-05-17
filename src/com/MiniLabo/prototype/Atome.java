@@ -12,7 +12,7 @@ public class Atome{
     public Vecteur3D position = new Vecteur3D(0,0,0);   //Position présente de l'atome
     public Vecteur3D vélocité = new Vecteur3D(0,0,0);     //Vélocité présente
     public Vecteur3D vélocitéMoyenne;// = new Vecteur3D(0);   //Vélocité moyenne sur le temps de l'atome.
-    private double facteurMixVélMoyen = 0.99;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
+    private double facteurMixVélMoyen = 0.99999;                  //Facteur de mélange entre les vieilles vélocités et la nouvelle
     public Vecteur3D Force = new Vecteur3D(0);              //Force appliquée présentement
     public double potentiel = 0;
 
@@ -132,6 +132,7 @@ public class Atome{
     */
     public static void ÉvaluerForces(Atome A){
         if (Double.isNaN(A.position.x)){
+            App.p.répéter = true;
             System.out.println("Atome postition Nan");
         }
         int Bfrontiere=0;
@@ -148,6 +149,7 @@ public class Atome{
                         //Pour tout les atomes
                         Atome APrime=null;
                         if (Double.isNaN(A.position.x)){
+                            App.p.répéter = true;
                             System.out.println("Atome postition Nan");
                         }
                         if(Environnement.get(i) == A && BoitePrincipale){
@@ -502,6 +504,7 @@ public class Atome{
     private static Vecteur3D ForceÉlectrique(double q1, double q2, double r, Vecteur3D dir){
         Vecteur3D force = ( V3.mult(dir,(K*q1*e*q2*e/Math.pow(r,2.0)) ));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force électrique renvoie NaN");
         }
         return force;
@@ -523,6 +526,7 @@ public class Atome{
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
         Vecteur3D force = ( V3.mult(dir, (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force Paulie renvoie NaN");
         }
         return force;
@@ -569,6 +573,7 @@ public class Atome{
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         Vecteur3D force = ( V3.mult(dir, 6.0*module/Math.pow(dist,7.0)));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force Paulie renvoie NaN");
         }
         return force;//(-(1.0*Math.pow(2.0*(rayonsCovalents[NP-1]/100.0+rayonsCovalents[NPA-1]/100.0),7.0)/Math.pow(dist,7.0)) )
@@ -605,6 +610,7 @@ public class Atome{
 
             momentDipolaire.addi(V3.mult(dir, dist*(Ap.charge-équilibre)));
             if (Double.isNaN(momentDipolaire.longueur())){
+                App.p.répéter = true;
                 System.err.println("Moment Dipolaire renvoie NaN");
             }
         }
@@ -643,6 +649,7 @@ public class Atome{
 
         Vecteur3D force = ( Vecteur3D.mult(dir, module) );
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force de Morse renvoie NaN");
         }
         return force;
@@ -702,6 +709,7 @@ public class Atome{
         //TODO doublet angle different doublet doublet, doublet atome
         Vecteur3D force = ( Vecteur3D.mult(potdirection, -D0*Kij ));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force Torsion renvoie NaN");
         }
         return force;
@@ -795,6 +803,7 @@ public class Atome{
        
         Vecteur3D force = ( Vecteur3D.mult(direction, FDiedre ));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force Dièdre renvoie NaN");
         }
         return force;
@@ -1096,6 +1105,7 @@ public class Atome{
     private static double potentielÉlectrique(double q1, double q2, double r, Vecteur3D dir){
         double potentiel = K*q1*e*q2*e/r;
         if (Double.isNaN(potentiel)){
+            App.p.répéter = true;
             System.err.println("Potentiel électrique renvoie NaN");
         }
         return potentiel;
@@ -1117,6 +1127,7 @@ public class Atome{
     private static double potentielPauli(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
         double potentiel = (Math.pow(2.0*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
         if (Double.isNaN(potentiel)){
+            App.p.répéter = true;
             System.err.println("Potentiel Paulie renvoie NaN");
         }
         return potentiel;
@@ -1147,6 +1158,7 @@ public class Atome{
 
         double T = Math.max(Température(paire),10.0);   //Température du système en °K    //paire
         if (Double.isNaN(T)){
+            App.p.répéter = true;
             System.out.println("Température Nan");
         }
         double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*kB*T);             //Forces de Keesom
@@ -1155,6 +1167,7 @@ public class Atome{
         double module = -(Keesom + Debye + London);                                                   //Module des forces de Van der Walls. Nécessite d'implémenter les variables ci-dessus d'abords.
         double potentiel = 6.0*module/(7.0*Math.pow(dist,6.0));
         if (Double.isNaN(potentiel)){
+            App.p.répéter = true;
             System.err.println("Potentiel Van der walls renvoie NaN");
         }
         return potentiel;
@@ -1191,6 +1204,7 @@ public class Atome{
 
         double potentiel = module; //Math.pow(-Math.exp(-(dist-l)),2.0);
         if (Double.isNaN(potentiel)){
+            App.p.répéter = true;
             System.err.println("Potentiel de Morse renvoie NaN");
         }
         return potentiel;
@@ -1344,6 +1358,7 @@ public class Atome{
        
         Vecteur3D force = ( Vecteur3D.mult(direction, FDiedre ));
         if (Double.isNaN(force.longueur())){
+            App.p.répéter = true;
             System.err.println("Force Dièdre renvoie NaN");
         }
         return -1;
@@ -2035,7 +2050,7 @@ public class Atome{
         double v1 = 0.0;
         double Ek = 0.0;
 
-         double Kstruges=1.0 + 4.3*Math.log10(A.size());
+        /* double Kstruges=1.0 + 4.3*Math.log10(A.size());
         //double Yule = 
         double KsA= Math.ceil(Kstruges);
         double Delta =0.0 ;
@@ -2055,9 +2070,9 @@ public class Atome{
                 }
             }
         }
-            /** Donne la popularite de la/les cases les plus remplis
-             * 
-             * */
+            ///** Donne la popularite de la/les cases les plus remplis
+            // * 
+            // * 
         double Population=0.0;
 
         for (int i = 0; i <KsA  ; i++) {
@@ -2080,18 +2095,18 @@ public class Atome{
           masemo=+ A.get(i).m;
         }
         masemo=masemo/A.size();
-        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo));
+        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo)); */
         //EkMode=EkMode/n;
 
-         /* for (int i = 0; i < A.size(); i++) {
-            v1 += A.get(i).vélocitéMoyenne.longueur();
-            Ek += Math.pow(VitesseMode,2)*A.get(i).m*0.5;
+        for (int i = 0; i < A.size(); i++) {
+            v1 += A.get(i).vélocité.longueur();
+            Ek += Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5;
             
-        }  */
+        } 
         
       //  Ek = Math.pow(   ,2.0)*A.get(i).m*0.5;
-        //v1 = v1/(double)A.size();
-        //Ek = Ek/A.size();
+        v1 = v1/(double)A.size();
+        Ek = Ek/A.size();
  
 
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s"); Ek*2.0/(3.0*kB)
@@ -2116,11 +2131,12 @@ public class Atome{
         Ek = Ek/A.size();
         //System.out.println("v1 : " + String.format("%.03G",v1) + " m/s");
         return Ek*2.0/(3.0*kB); */
-        if (Double.isNaN(Tmp)){
+        double température = ((Ek*2.0/(3.0*kB)));
+        if (Double.isNaN(température)){
             System.out.println("TempératureisNan");
-            Tmp=1.0;
+            température=273.5;
         }
-        return (Tmp);//((EkMode*2.0/(3.0*kB)));
+        return (température);//((EkMode*2.0/(3.0*kB)));
     }
 
     public static double TempératureEnVitesse(double T, double m){

@@ -22,6 +22,8 @@ public class Paramètres {
     public float Zoom = 30f;
     public int FOV = 70;     //Champ de vision de la caméra
 
+    public boolean répéter = false;
+
     public long tempsAttenteAnalyse = 500;
 
     public Intégrateur.Modèle modèleIntégrateur = Intégrateur.Modèle.VERLET_VB;
