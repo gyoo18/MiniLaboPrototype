@@ -2068,7 +2068,7 @@ public class Atome{
         double v1 = 0.0;
         double Ek = 0.0;
 
-        /* double Kstruges=1.0 + 4.3*Math.log10(A.size());
+        double Kstruges=1.0 + 4.3*Math.log10(A.size());
         //double Yule = 
         double KsA= Math.ceil(Kstruges);
         double Delta =0.0 ;
@@ -2113,10 +2113,10 @@ public class Atome{
           masemo=+ A.get(i).m;
         }
         masemo=masemo/A.size();
-        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo)); */
+        double Tmp= EkMode/(kB*Math.log(1+A.size()/masemo));
         //EkMode=EkMode/n;
 
-        for (int i = 0; i < A.size(); i++) {
+        /*for (int i = 0; i < A.size(); i++) {
             v1 += A.get(i).vélocité.longueur();
             Ek += Math.pow(A.get(i).vélocitéMoyenne.longueur(),2)*A.get(i).m*0.5;
             
@@ -2151,13 +2151,10 @@ public class Atome{
         return Ek*2.0/(3.0*kB); */
         double retourT=Tmp;  
         //((EkMode*2.0/(3.0*kB)));
-        //Tmp
         if (Double.isNaN(retourT)){
             System.out.println("TempératureisNan");
             retourT=1.0;
         }
-        
-        
         return (retourT);
     }
 
