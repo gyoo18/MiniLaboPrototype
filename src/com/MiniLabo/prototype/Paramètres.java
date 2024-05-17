@@ -14,7 +14,7 @@ public class Paramètres {
 
     public volatile Mode mode = Mode.INIT;
 
-    public String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
+    public String emplacementFichierAnalyse = "C:\\Users\\Poliv\\Documents\\Math\\New folder\\";
 
     public int TailleX = 1000; //Taille de simulation 
     public int TailleY = 512;
@@ -31,10 +31,23 @@ public class Paramètres {
     public boolean UtiliserFilsExécution = false;
     public int NBFils = 10;
 
-    public int itérationsPlacementInitial = 100;
-    public double deltaPlacement = 0.01;
+    public static int itérationsPlacementInitial = 1000;
+    public static double deltaPlacement = 0.01;
 
-    public double ordreGrandeurMorse = Math.pow(10.0,23);
+
+
+    
+    //Ces parametre sont utile pour debuger, et verifier.
+    
+    public static double ordreGrandeurMorse =Math.pow(10.0,23);
+    public static double Morsep = 100.0; //10000.0;
+    public static double ModulePaulie = 2.0; // 2.0;
+    public static double ModuleTorsionDoublet= 10000.0; //10000.0;
+    public static double ModuleTorsion= 1000.0; //1000.0;
+
+
+
+
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
     public double dt = 0.625*Math.pow(10.0,-18.0);
@@ -146,7 +159,7 @@ public class Paramètres {
         }
     }
 
-    public double TempératureInitiale = 25.0;
+    public double TempératureInitiale = 0.0;
 
     public boolean ListeForce[] = {
         true, //Force Paulie
