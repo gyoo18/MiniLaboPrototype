@@ -8,7 +8,7 @@ public class Paramètres {
     }
     public static Mode mode = Mode.INIT;
 
-    public static String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
+    public static String emplacementFichierAnalyse = "C:\\Users\\Poliv\\Documents\\Math";
 
     public static int TailleX = 1000; //Taille de simulation 
     public static int TailleY = 512;
@@ -16,7 +16,7 @@ public class Paramètres {
     public static float Zoom = 30f;
     public static int FOV = 70;     //Champ de vision de la caméra
 
-    public static long tempsAttenteAnalyse = 5000;
+    public static long tempsAttenteAnalyse = 500;
 
     public static Intégrateur.Modèle modèleIntégrateur = Intégrateur.Modèle.VERLET_VB;
 
@@ -24,15 +24,17 @@ public class Paramètres {
     public static int NBFils = 10;
 
     public static int itérationsPlacementInitial = 1000;
-    public static double deltaPlacement = 0.01;
+    public static double deltaPlacement = 0.05;
+
+    public static double ordreGrandeurMorse = Math.pow(10.0,23);
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
-    public static double dt = 0.625*Math.pow(10.0,-17.0);
+    public static double dt = 0.625*Math.pow(10.0,-18.0);
 
-    public static int NbMolécules = 1000;
-    public static int NBessais = 40;
-    public static boolean BEAA = false;
-    public static double tampon = 0.7;
+    public static int NbMolécules = 1450;
+    public static int NBessais = 5;
+    public static boolean BEAA = true;
+    public static double tampon = 1.7;
     public static boolean voisin=true;
 
     public static MoléculeRéf PlacementMolécule(int i){
@@ -43,7 +45,7 @@ public class Paramètres {
         }
     }
 
-    public static double TempératureInitiale = 25.0;
+    public static double TempératureInitiale = 10.0 -273.15;
 
     public static boolean ListeForce[] = {
         true, //Force Paulie
@@ -55,7 +57,7 @@ public class Paramètres {
         false, //Boite Magique
     };
 
-    public static double distForceÉval = 5.0;
+    public static double distForceÉval = 100.0;
     public static double ForceFriction = -0.0000000000000;
     public static double ForceGravité = 0.0;
 

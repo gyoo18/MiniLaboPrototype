@@ -327,7 +327,7 @@ public class Intégrateur {
                     o.vélDoublet.get(i).addi(Vecteur3D.mult(o.forceDoublet.get(i), h/(4.0*Atome.mE)));
                 }
             }
-            o.ÉvaluerContraintes();
+           o.ÉvaluerContraintes();
         }
 
         for (Atome o : O) {
