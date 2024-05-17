@@ -171,7 +171,7 @@ public class App {
             double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
             double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             
-            //Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
+            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
         }
 
         System.out.println("Initialisation des positions d'équilibre.");
@@ -217,7 +217,7 @@ public class App {
 
         départ = System.currentTimeMillis();
         try{
-            while (chrono < 90000) {
+            while (chrono < 1800000) {
 
                 if(!thread.isAlive()){
                     boucleDessin = new BoucleDessin();

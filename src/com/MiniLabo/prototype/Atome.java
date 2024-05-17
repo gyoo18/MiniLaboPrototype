@@ -639,8 +639,8 @@ public class Atome{
 
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
-        double p = ConstanteDeForce[NP-1][NPA-1]*10000.0;
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Paramètres.ordreGrandeurMorse;     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
+        double p = ConstanteDeForce[NP-1][NPA-1]*Paramètres.Morsep;
         double a = Math.sqrt(p/(2.0*D));
         double module = -2.0*a*D*( Math.exp(-a*(dist-l)) - Math.exp(-2.0*a*(dist-l))); //Appliquer la force de morse
 
@@ -1191,8 +1191,8 @@ public class Atome{
 
 
         l = l/100.0;    //La longueur est en pm et on travaille en Å.
-        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717; //*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
-        double p = ConstanteDeForce[NP-1][NPA-1]*100.0;
+        double D = ÉnergieDeDissociation[NP-1][NPA-1]*0.166053906717*Paramètres.ordreGrandeurMorse; //*Math.pow(10.0,23.0);     //Énergie de dissociation du lien. Conversion de kJ/mol en J_Å
+        double p = ConstanteDeForce[NP-1][NPA-1]*Paramètres.Morsep;
         double a = Math.sqrt(p/(2.0*D));
         double module = D*Math.pow(1.0-Math.exp(-a*(dist-l)),2.0) - (morseDécalé?D:0.0); //Appliquer la force de morse
 
