@@ -14,7 +14,7 @@ public class Paramètres {
 
     public volatile Mode mode = Mode.INIT;
 
-    public String emplacementFichierAnalyse = "C:\\Users\\Poliv\\Documents\\Math\\New folder\\";
+    public String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
 
     public int TailleX = 1000; //Taille de simulation 
     public int TailleY = 512;
@@ -31,11 +31,8 @@ public class Paramètres {
     public boolean UtiliserFilsExécution = false;
     public int NBFils = 10;
 
-    public static int itérationsPlacementInitial = 1000;
+    public static int itérationsPlacementInitial = 500;
     public static double deltaPlacement = 0.01;
-
-
-
     
     //Ces parametre sont utile pour debuger, et verifier.
     
@@ -51,7 +48,7 @@ public class Paramètres {
     public int NbMolécules = 150;
     public int NBessais = 100;
     public boolean BEAA = false;
-    public double tampon = 1.7;
+    public double tampon = 0.1;
     public boolean voisin=false;
 
     private int SimMolécules = 0;
@@ -159,7 +156,7 @@ public class Paramètres {
 
     public boolean ListeForce[] = {
         true, //Force Paulie
-        false, //Force Vanderwal
+        true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
         true, //Force de Torsion
@@ -319,7 +316,7 @@ public class Paramètres {
                 paramètres.tempsAttenteAnalyse = 5000;
                 break;
             case 3:
-                paramètres.Zoom = 40f;
+                paramètres.Zoom = 30f;
                 paramètres.TailleX = 1420;
                 paramètres.TailleY = 512;
                 paramètres.TailleZ = 512;

@@ -124,7 +124,7 @@ public class Atome{
      * @param E - Liste des atomes de la simulation
     */
     public static void MettreÀJourEnvironnement(ArrayList<Atome> E){
-        Environnement = E;
+        Environnement = (ArrayList<Atome>)E.clone();
     }
 
     /**Retourne les forces appliqués sur l'atome
@@ -563,16 +563,18 @@ public class Atome{
         paire.add(Environnement.get(indexeB));
 
         double T = 0.0;
-        if(App.p.mode == Paramètres.Mode.INIT){
+        if(App.p.mode == Paramètres.Mode.INIT) {// || App.p.mode == Paramètres.Mode.){
             T = App.p.TempératureInitiale+273.5;
         }else if(App.p.mode == Paramètres.Mode.SIM){
             T = Math.max(Température(paire),1);   //Température du système en °K    //paire
         }else{
-            System.err.println("ERREUR ForceVanDerWalls(): Paramètre.mode n'est ni INIT, ni SIM" );
-            System.exit(-1);
+            System.err.println("ERREUR ForceVanDerWalls(): Paramètre.mode n'est ni INIT, ni SIM, il est : " + App.p.mode.name() );
+            T = 273.5;
+            //System.exit(-1);
         }
         if (Double.isNaN(T)){
-            System.out.println("TempératurenNan");
+            App.p.répéter = true;
+            System.out.println("TempératurenNaN");
         }
         double Keesom = (2.0*mu1*mu1*mu2*mu2)/(3.0*kB*T);             //Forces de Keesom
         double Debye = (a1*mu2*mu2 + a2*mu1*mu1);                   //Forces de Debye

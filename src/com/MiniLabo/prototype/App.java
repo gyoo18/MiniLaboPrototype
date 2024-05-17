@@ -23,7 +23,7 @@ public class App {
     private static int FOVBoite; // = p.FOV;
     private static int FOVetBoite; // = p.FOV;
 
-    public static volatile ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
+    public static ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
     //public static volatile ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
 
     /**Temps réel de départ de la simulation en ms */
@@ -134,7 +134,7 @@ public class App {
             boolean intersecte = false;
             for (int i = 0; i < Hs.size(); i++) {
                 //Réessayer si cet emplacement intersecte un atome dans la simulation
-                if(BEAA){
+                if(p.BEAA){
                     //Intersection avec la BEAA
                     Vecteur3D posRel = Vecteur3D.sous(Hs.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
                     if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.z/2.0){
@@ -195,8 +195,8 @@ public class App {
 
         for (int i = 0; i < p.itérationsPlacementInitial; i++) {
             
-            Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
-            Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
+            //Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
+            //Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
             ForceSytème = new Vecteur3D(0);
             for (int j = 0; j < Hs.size(); j++) {
@@ -232,8 +232,9 @@ public class App {
         p.mode = Paramètres.Mode.SIM;
 
         départ = System.currentTimeMillis();
+        chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < 1000 && !App.p.répéter) {
+            while (chrono < 180000 && !p.répéter) {
 
                 if(!thread.isAlive()){
                     boucleDessin = new BoucleDessin();
@@ -245,8 +246,8 @@ public class App {
                     thread.start();
                 }
                 
-                Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
-                Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
+                //Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
+                //Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
 
                 double T = 0.0; //Température moyenne
                 /* double mailmanresonant =0; */

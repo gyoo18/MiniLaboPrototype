@@ -31,7 +31,7 @@ public class Molécule {
      * @param E - Liste des atomes de la simulation
      */
     public static void MiseÀJourEnvironnement(ArrayList<Atome> E){
-        Environnement = E;
+        Environnement = (ArrayList<Atome>)E.clone();
     }
     
     /**
