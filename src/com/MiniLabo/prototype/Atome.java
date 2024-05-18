@@ -911,7 +911,22 @@ public class Atome{
             double dist = V3.distance(APrime.position, A.position); //Distance entre A et A'
 
             if( App.p.distForceÉval==0.0? true : dist<App.p.distForceÉval*(A.rayonCovalent+APrime.rayonCovalent)){
+                
+                
+                
                 //Si A' se situe à moins de N rayons covalents de A
+                boolean voisin=false;
+                for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
+                    if(A.liaisonIndexe.get(i1)==-1){
+                        continue;
+                    }
+                    if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && App.p.voisin){
+                        voisin=true;
+                    }
+                } 
+            
+                
+                
                 if (ListeForce[0]){
                     A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent, dist, dir); //Appliquer la force de Pauli   
                 }
@@ -919,9 +934,14 @@ public class Atome{
                     A.potentiel += potentielVanDerWalls(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir); //Appliquer les forces de Van der Walls
                 }
                 if (ListeForce[2]){
-                    A.potentiel += potentielÉlectrique(A.charge, APrime.charge,dist,dir); //Appliquer la force électrique
+                    if (!voisin){
+                        A.potentiel += potentielÉlectrique(A.charge, APrime.charge,dist,dir); //Appliquer la force électrique
+                    } else {
+                        A.potentiel += potentielÉlectrique(A.charge-2.0* (double)A.doublets, APrime.charge-2.0* (double)APrime.doublets,dist,dir); //Appliquer la force électrique
+                    }
                 }
 
+                if (!voisin){
                 //Forces des doublets d'A' sur A
                 for (int j = 0; j < APrime.forceDoublet.size(); j++) {
                     dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
@@ -929,26 +949,19 @@ public class Atome{
                     
                     
                     
-                        boolean voisin=false;
-                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                            if(A.liaisonIndexe.get(i1)==-1){
-                                continue;
-                            }
-                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && App.p.voisin){
-                                voisin=true;   
-                            }
-                        }
-                        if (!voisin ){
+                        
                             if (ListeForce[0]){
                                 A.potentiel += potentielPauli(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir); //Appliquer la force de Pauli
                             }
                             if (ListeForce[2]){
                             A.potentiel += potentielÉlectrique(A.charge, -2.0,dist,dir); //Appliquer la force électrique
                             }
-                        }
+                        
                     
                 }
+                }
 
+                if (!voisin){
                 //Forces de A' sur les doublets
                 for (int j = 0; j < A.forceDoublet.size(); j++) {
 
@@ -956,17 +969,8 @@ public class Atome{
                     double eDist = V3.distance(V3.addi(A.position,A.positionDoublet.get(j)), APrime.position); //Distance entre le doublet et A'
                     
                     
-                    
-                        boolean voisin=false;
-                        for (int i1=0; i1<A.liaisonIndexe.size(); i1++){
-                            if(A.liaisonIndexe.get(i1)==-1){
-                                continue;
-                            }
-                            if (APrime == Environnement.get(A.liaisonIndexe.get(i1)) && App.p.voisin){
-                                voisin=true;
-                            }
-                        } 
-                        if (!voisin){
+                
+                       
                            
                             if (ListeForce[0]){
                                 A.potentiel += potentielPauli(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir); //Appliquer la force de Pauli 
@@ -974,7 +978,7 @@ public class Atome{
                             if (ListeForce[2]){
                             A.potentiel += potentielÉlectrique(-2.0, APrime.charge,eDist,eDir); //Appliquer la force électrique
                             }
-                        }
+                        
                     
 
                     //Forces des doublets de A' sur les doublets de A
@@ -989,6 +993,7 @@ public class Atome{
                         }
                     }
                 }
+                }
             
             }
         }
@@ -1001,7 +1006,7 @@ public class Atome{
                 Vecteur3D eDir = Vecteur3D.norm(Vecteur3D.sous(A.positionDoublet.get(j),A.positionDoublet.get(k))); //Vecteur de direction vers l'autre doublet
                 double eDist = Vecteur3D.distance( A.positionDoublet.get(j), A.positionDoublet.get(k)); //Distance entre le doublet et lautre doublet
                 if (ListeForce[2]){
-                    A.potentiel += potentielÉlectrique(-2, -2, eDist, eDir); //Appliquer la force électrique entre les deux doublet   
+                    A.potentiel += potentielÉlectrique(-2.0, -2.0, eDist, eDir); //Appliquer la force électrique entre les deux doublet   
                 }
                 
             }
@@ -1164,7 +1169,7 @@ public class Atome{
      *      <p>•<a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static double potentielPauli(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        double potentiel = (Math.pow(Paramètres.ModulePaulie*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
+        double potentiel = (Math.pow(Paramètres.DistancePaulie*(RayonCovalent1+RayonCovalent2),13.0)/(12.0*Math.pow(dist,12.0)));
         if (Double.isNaN(potentiel)){
             App.p.répéter = true;
             System.err.println("Potentiel Paulie renvoie NaN");
