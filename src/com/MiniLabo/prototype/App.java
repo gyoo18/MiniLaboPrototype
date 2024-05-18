@@ -234,7 +234,7 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < 360000 && !p.répéter) {
+            while (chrono < (int)(1584000.0*p.tempsSim) && !p.répéter) {
 
                 if(!thread.isAlive()){
                     //boucleDessin = new BoucleDessin();
