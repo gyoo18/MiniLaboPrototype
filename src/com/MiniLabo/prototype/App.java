@@ -309,8 +309,8 @@ public class App {
 
         double volume = (max.x-min.x)*(max.y-min.y)*(max.z-min.z);
         AnalyseTexte[5] = "Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3";
-        double pression = Hs.size()*Atome.R*température/volume;
-        AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
+       // double pression = Hs.size()*Atome.R*température/volume;
+        
 
         double Ek = 0;
         double Ep = 0;
@@ -327,6 +327,11 @@ public class App {
         double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
         Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
+
+
+        double pression = Ek/(volume);
+
+        AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
         AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.5E",Ep) + " JÅ " + (AnalyseValeurs[7]-Ep<0.0?"▲":"▼");
         AnalyseValeurs[7] = Ep;
         AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.5E",Ek) + " JÅ " + (AnalyseValeurs[8]-Ek<0.0?"▲":"▼");
