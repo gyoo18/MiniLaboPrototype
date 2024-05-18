@@ -1,5 +1,7 @@
 package com.MiniLabo.prototype;
 
+import com.MiniLabo.prototype.Intégrateur.Modèle;
+
 public class Paramètres {
 
     public enum Mode{
@@ -31,8 +33,8 @@ public class Paramètres {
     public boolean UtiliserFilsExécution = false;
     public int NBFils = 10;
 
-    public static int itérationsPlacementInitial =500;
-    public static double deltaPlacement = 0.01;
+    public static int itérationsPlacementInitial =200;
+    public static double deltaPlacement = 0.1;
 
     public static double tempsSim = 0.0;
     
@@ -179,7 +181,7 @@ public class Paramètres {
         }
         paramètres.type = 0;
         paramètres.NbMolécules = 0;
-        switch (i) {
+        /* switch (i) {
             case 1://1
                 paramètres.type = 0;
                 paramètres.SimMolécules = 1;
@@ -279,6 +281,41 @@ public class Paramètres {
                 break;
             default:
                 break;
+        } */
+
+        switch (i) {
+            case 1:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.EULER;
+                break;
+            case 2:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.VERLET;
+                break;
+            case 3:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.VERLET_V;
+                break;
+            case 4:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.VERLET_VB;
+                break;
+            case 5:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.VERLET_VBCD;
+                break;
+            case 6:
+                paramètres.type = 2;
+                paramètres.SimMolécules = 2;
+                paramètres.modèleIntégrateur = Modèle.RK4;
+                break;
+            default:
+                break;
         }
         
         switch (paramètres.type) {
@@ -320,8 +357,8 @@ public class Paramètres {
                 paramètres.distForceÉval = 5.0;
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
-                paramètres.tempsAttenteAnalyse = 5000;
-                paramètres.tempsSim = 0.5;
+                paramètres.tempsAttenteAnalyse = 500;
+                paramètres.tempsSim = 1.0;
                 paramètres.ListeForce[1] = true;
                 break;
             case 3:

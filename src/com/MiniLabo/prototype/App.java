@@ -50,7 +50,7 @@ public class App {
         System.out.println("Bienvenue dans MiniLabo!");
 
         int essais = 0;
-        for (int i = 0; i < 23; i++) {
+        for (int i = 0; i < 6; i++) {
             boolean commencer = true;
             while (commencer || p.répéter) {
                 //int i = 0;
@@ -60,7 +60,7 @@ public class App {
                 FOVet = p.FOV;
                 FOVBoite = p.FOV;
                 FOVetBoite = p.FOV;
-                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" +i + ".csv");
+                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
                 Hs.clear();
                 if(boucleDessin != null){
                     boucleDessin.indexe.clear();
@@ -234,7 +234,7 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < (int)(1584000.0*p.tempsSim) && !p.répéter) {
+            while (chrono < (int)(600000.0*p.tempsSim) && !p.répéter) {
 
                 if(!thread.isAlive()){
                     //boucleDessin = new BoucleDessin();
@@ -255,7 +255,7 @@ public class App {
                 
                 ForceSytème = new Vecteur3D(0);
                 for (int i = 0; i < Hs.size(); i++) {
-                        Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
                 
                 Intégrateur.Iter(Hs, p.dt);

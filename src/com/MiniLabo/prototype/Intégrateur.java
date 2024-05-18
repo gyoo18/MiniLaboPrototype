@@ -472,8 +472,8 @@ public class Intégrateur {
             Atome.ÉvaluerForces(O.get(i));
             K1a[i] = Vecteur3D.mult(O.get(i).Force,1.0/O.get(i).m);
 
-            K1vd[i] = (Vecteur3D[]) O.get(i).vélDoublet.clone();
-            K1ad[i] = (Vecteur3D[]) O.get(i).forceDoublet.clone();
+            K1vd[i] = O.get(i).vélDoublet.toArray(new Vecteur3D[O.get(i).vélDoublet.size()]);
+            K1ad[i] = O.get(i).forceDoublet.toArray(new Vecteur3D[O.get(i).forceDoublet.size()]);
 
             for (int j = 0; j < K1ad[i].length; j++) {
                 //float K1x = s.v;
