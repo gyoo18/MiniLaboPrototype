@@ -217,7 +217,7 @@ public class Atome{
                                 A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent, dist, dir)); //Appliquer la force de Pauli   
                             }
                             if (ListeForce[1]){
-                                A.Force.addi( ForceVanDerWall(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
+                                A.Force.addi( ForceVanDerWalls(A.NP, A.indexe, APrime.NP, APrime.indexe, dist, dir)); //Appliquer les forces de Van der Walls
                             }
                             if (ListeForce[2]){
                                 if (Double.isNaN(dist)){
@@ -548,7 +548,7 @@ public class Atome{
      * @return Vecteur de force en Newtons Angströmiens
      * @see <a href="https://staff.ulsu.ru/moliver/ref/corr/lond36.pdf">Source : <i>F. London</i> (1937) The General Theory of Molecular Forces</a>
      */
-    private static Vecteur3D ForceVanDerWall(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
+    private static Vecteur3D ForceVanDerWalls(int NP, int indexeA, int NPA, int indexeB, double dist, Vecteur3D dir){
         //TODO #27 réviser calculerMomentDipolaire()
         double mu1 = Environnement.get(indexeA).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 1
         double mu2 = Environnement.get(indexeB).évaluerMomentDipolaire().longueur(); //Moment dipolaire de la particule 2
