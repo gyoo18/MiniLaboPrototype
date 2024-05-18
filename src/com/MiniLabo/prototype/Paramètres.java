@@ -14,7 +14,7 @@ public class Paramètres {
 
     public volatile Mode mode = Mode.INIT;
 
-    public String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
+    public String emplacementFichierAnalyse = "C:\\Users\\Poliv\\Documents\\Math\\New folder\\";
 
     public int TailleX = 1000; //Taille de simulation 
     public int TailleY = 512;
@@ -36,11 +36,12 @@ public class Paramètres {
     
     //Ces parametre sont utile pour debuger, et verifier.
     
-    public static double ordreGrandeurMorse =Math.pow(10.0,23);
-    public static double Morsep = 10000.0; //10000.0;
-    public static double ModulePaulie = 2.0; // 2.0;
-    public static double ModuleTorsionDoublet= 10000.0; //10000.0;
-    public static double ModuleTorsion= 1000.0; //1000.0;
+    public static double ordreGrandeurMorse =1.0;
+    public static double Morsep = 100.0; //10000.0;
+    public static double ModulePaulie = 1.0; 
+    public static double DistancePaulie= 1.0;// 2.0;
+    public static double ModuleTorsionDoublet= 0.5; //10000.0;
+    public static double ModuleTorsion= 0.5; //1000.0;
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
     public double dt = 0.625*Math.pow(10.0,-18.0);
@@ -49,7 +50,7 @@ public class Paramètres {
     public int NBessais = 100;
     public boolean BEAA = false;
     public double tampon = 0.1;
-    public boolean voisin=false;
+    public boolean voisin=true;
 
     private int SimMolécules = 0;
     private int type = -1;
@@ -159,13 +160,13 @@ public class Paramètres {
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
-        true, //Force de Torsion
+       true, //Force de Torsion
         false, //Force Diedre
         false, //Boite Magique
     };
 
     public double distForceÉval = 1.0;
-    public double ForceFriction = -0.0000000000000;
+    public double ForceFriction = -0.00000000000000;
     public double ForceGravité = 0.0;
 
     public boolean PotentielMorseDécalé = false;
