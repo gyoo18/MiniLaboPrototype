@@ -117,7 +117,15 @@ public class Intégrateur {
                 synchronized (fils[i]){
                     fils[i].actif = false;
                     fils[i].notify();
-                    //bouc[i].interrupt();
+                }
+            }
+        }
+        boolean terminé = false;
+        while (!terminé) {
+            terminé = true;
+            for (int i = 0; i < bouc.length; i++) {
+                synchronized (fils[i]){
+                    terminé = terminé && !bouc[i].isAlive();
                 }
             }
         }

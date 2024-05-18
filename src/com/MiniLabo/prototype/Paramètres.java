@@ -14,7 +14,7 @@ public class Paramètres {
 
     public volatile Mode mode = Mode.INIT;
 
-    public String emplacementFichierAnalyse = "C:\\Users\\Poliv\\Documents\\Math\\New folder\\";
+    public String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
 
     public int TailleX = 1000; //Taille de simulation 
     public int TailleY = 512;
@@ -33,15 +33,17 @@ public class Paramètres {
 
     public static int itérationsPlacementInitial = 500;
     public static double deltaPlacement = 0.01;
+
+    public static double tempsSim = 0.0;
     
     //Ces parametre sont utile pour debuger, et verifier.
     
-    public static double ordreGrandeurMorse =Math.pow(10,23);
-    public static double Morsep = 10000.0; //10000.0;
+    public static double ordreGrandeurMorse = Math.pow(10.0,23.0);
+    public static double Morsep = 10000.0;
     public static double ModulePaulie = 1.0; 
-    public static double DistancePaulie= 2.0;// 2.0;
-    public static double ModuleTorsionDoublet= 10000.0; //10000.0;
-    public static double ModuleTorsion= 1000.0; //1000.0;
+    public static double DistancePaulie= 2.0;
+    public static double ModuleTorsionDoublet= 10000.0;
+    public static double ModuleTorsion= 1000.0;
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
     public double dt = 0.625*Math.pow(10.0,-18.0);
@@ -49,7 +51,7 @@ public class Paramètres {
     public int NbMolécules = 150;
     public int NBessais = 100;
     public boolean BEAA = false;
-    public double tampon = 0.1;
+    public double tampon = 1.1;
     public boolean voisin=true;
 
     private int SimMolécules = 0;
@@ -160,9 +162,9 @@ public class Paramètres {
         true, //Force Vanderwal
         true, //Force électrique
         true, //Force de Morse
-       true, //Force de Torsion
-        false, //Force Diedre
-        false, //Boite Magique
+        true, //Force de Torsion
+        true, //Force Diedre
+        true, //Boite Magique
     };
 
     public double distForceÉval = 1.0;
@@ -289,8 +291,9 @@ public class Paramètres {
                 paramètres.NbMolécules = 1;
                 paramètres.distForceÉval = 0.0;
                 paramètres.TempératureInitiale = 25.0;
-                paramètres.dt = 0.625*Math.pow(10.0,-19.0);
+                paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 500;
+                paramètres.tempsSim = 0.1;
                 break;
             case 1:
                 paramètres.Zoom = 60f;
@@ -303,6 +306,7 @@ public class Paramètres {
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 1000;
+                paramètres.tempsSim = 0.3;
                 break;
             case 2:
                 paramètres.Zoom = 40f;
@@ -315,6 +319,7 @@ public class Paramètres {
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 5000;
+                paramètres.tempsSim = 0.5;
                 break;
             case 3:
                 paramètres.Zoom = 30f;
@@ -327,6 +332,7 @@ public class Paramètres {
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 5000;
+                paramètres.tempsSim = 1.0;
                 break;
             default:
                 break;

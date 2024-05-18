@@ -50,11 +50,12 @@ public class App {
         System.out.println("Bienvenue dans MiniLabo!");
 
         int essais = 0;
-         for (int i = 0; i < 23; i++) {
+        for (int i = 0; i < 23; i++) {
             boolean commencer = true;
             while (commencer || p.répéter) {
                 //int i = 0;
                 p = Paramètres.avoirParamètres(i+1);
+                //p.dt = 0.625*Math.pow(10.0,-17.0);
                 p.mode = Paramètres.Mode.ENTRE_DEUX;
                 FOVet = p.FOV;
                 FOVBoite = p.FOV;
@@ -75,7 +76,6 @@ public class App {
                 Initialisation();
                 simulation();
                 //Analyse se fait à partir de simulation();
-                Intégrateur.tuerFils();
                 if(essais > 5 && p.répéter){
                     p.répéter = false;
                     essais = 0;
@@ -234,10 +234,10 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < 180000 && !p.répéter) {
+            while (chrono < (int)(1584000.0*p.tempsSim) && !p.répéter) {
 
                 if(!thread.isAlive()){
-                    boucleDessin = new BoucleDessin();
+                    //boucleDessin = new BoucleDessin();
                     thread = new Thread(boucleDessin);
                     p.mode = Paramètres.Mode.INIT;
                     boucleDessin.Hs = (ArrayList<Atome>)Hs.clone();
@@ -267,6 +267,7 @@ public class App {
         //}catch(Exception e){
         //    e.printStackTrace();
         //}
+        Intégrateur.tuerFils();
         p.mode = Paramètres.Mode.FIN;
         try {Thread.sleep(1000);} catch (Exception e) {}
     }
@@ -372,8 +373,8 @@ public class App {
 
         public volatile boolean init = false;
 
-        public ArrayList<Atome> Hs = new ArrayList<>();
-        public ArrayList<Integer> indexe = new ArrayList<>();
+        public volatile ArrayList<Atome> Hs = new ArrayList<>();
+        public volatile ArrayList<Integer> indexe = new ArrayList<>();
 
         @Override
         public void run(){
