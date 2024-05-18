@@ -438,7 +438,7 @@ public class MoléculeRéf extends Molécule{
 
         Atome C = new Atome(6);
         Atome O1 = new Atome(8);
-        O1.position = new Vecteur3D(0,1.07,0);
+        O1.position = new Vecteur3D(1.07,0,0);
         Atome O2 = new Atome(8);
         O2.position = new Vecteur3D(-1.07,0,0);
 

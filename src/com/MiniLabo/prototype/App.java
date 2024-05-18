@@ -60,7 +60,7 @@ public class App {
                 FOVet = p.FOV;
                 FOVBoite = p.FOV;
                 FOVetBoite = p.FOV;
-                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" +i + ".csv");
                 Hs.clear();
                 if(boucleDessin != null){
                     boucleDessin.indexe.clear();
@@ -213,7 +213,7 @@ public class App {
             }
 
             boucleDessin.progressionPlacement = 100.0*(double)i/(double)p.itérationsPlacementInitial;
-            //try {Thread.sleep(1);} catch (Exception e) {}
+            try {Thread.sleep(1);} catch (Exception e) {}
         }
 
         try{

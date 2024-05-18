@@ -248,30 +248,26 @@ public class Atome{
 
 
                             if (!voisin){
-                            //Forces des doublets d'A' sur A
-                            for (int j = 0; j < APrime.forceDoublet.size(); j++) {
-                                dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
-                                dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
-                                if (0.0000000000000001>(dist)){
-                                    System.out.println("distance0");
-                                }
-    
-                                if (Double.isNaN(dist)){
-                                     System.out.println("distanceNan");
-                                 }
-                                if (ListeForce[2]){
-                                    A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                //Forces des doublets d'A' sur A
+                                for (int j = 0; j < APrime.forceDoublet.size(); j++) {
+                                    dir = V3.norm(V3.sous( A.position,V3.addi(APrime.positionDoublet.get(j), APrime.position))); //Vecteur de direction vers l'autre atome (A')
+                                    dist = V3.distance(A.position, V3.addi(APrime.positionDoublet.get(j), APrime.position)); //Distance entre le doublet et A'
+                                    if (0.0000000000000001>(dist)){
+                                        System.out.println("distance0");
                                     }
-                                if (ListeForce[0]){
+        
+                                    if (Double.isNaN(dist)){
+                                        System.out.println("distanceNan");
+                                    }
+                                    if (ListeForce[2]){
+                                        A.Force.addi( ForceÉlectrique(A.charge, -2.0,dist,dir)); //Appliquer la force électrique
+                                    }
+                                    if (ListeForce[0]){
                                         A.Force.addi( ForcePaulie(A.rayonCovalent,APrime.rayonCovalent/4.0, dist, dir)); //Appliquer la force de Pauli
-                                    
+                                        
                                     }
-                            }
-                                
-                            }
-
-                            if (!voisin){
-                            //Forces de A' sur les doublets
+                                }
+                                //Forces de A' sur les doublets
                                 for (int j = 0; j < A.forceDoublet.size(); j++) {
 
                                     Vecteur3D eDir = V3.norm(V3.sous(V3.addi(A.positionDoublet.get(j), A.position),APrime.position)); //Vecteur de direction vers l'autre atome (A')
@@ -279,9 +275,6 @@ public class Atome{
                                     if (0.0000000000000001>(eDist)){
                                         System.out.println("distance0");
                                     }
-                                    
-                                    
-
                                 
                                     if (Double.isNaN(eDist)){
                                         System.out.println("distanceNan");
@@ -290,7 +283,7 @@ public class Atome{
                                         A.forceDoublet.get(j).addi( ForcePaulie(A.rayonCovalent/4.0,APrime.rayonCovalent, eDist, eDir)); //Appliquer la force de Pauli 
                                     }
                                     if (ListeForce[2]){
-                                    A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
+                                        A.forceDoublet.get(j).addi( ForceÉlectrique(-2.0, APrime.charge,eDist,eDir) ); //Appliquer la force électrique
                                     }
 
 
@@ -541,7 +534,7 @@ public class Atome{
      *      <p>• <a href="https://iopscience.iop.org/article/10.1088/0959-5309/43/5/301"><i>J. E. Lennard-Jones</i> (1931) Cohesion</a>;</p>
      */
     private static Vecteur3D ForcePaulie(double RayonCovalent1, double RayonCovalent2, double dist, Vecteur3D dir){
-        Vecteur3D force = ( V3.mult(dir, Paramètres.ModulePaulie*(Math.pow(Paramètres.DistancePaulie*(RayonCovalent1+RayonCovalent2),1.0)/Math.pow(dist,1.0)) ));
+        Vecteur3D force = ( V3.mult(dir, Paramètres.ModulePaulie*(Math.pow(Paramètres.DistancePaulie*(RayonCovalent1+RayonCovalent2),13.0)/Math.pow(dist,13.0)) ));
         /* if ((force.longueur())>Math.pow(10,15)){
             System.err.println("Force forte Paulie");
             force = V3.mult(dir, Math.pow(10,15));
@@ -716,8 +709,8 @@ public class Atome{
                 angle0 = 73.0*Math.PI/120.0;
                 break;
             default:
-                angle0 = angle;
-            //  System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
+                angle0 = Math.PI;
+                //System.err.println("Force de torsion : le nombre de liens n'est pas 2,3 ou 4");
                 break;
         }
         double Kij;
@@ -750,21 +743,45 @@ public class Atome{
     private static Vecteur3D ForceTorsion(Atome Ai, Atome A, Atome Aj){
         Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
         Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
-        return ForceTorsion(IAxe, JAxe, Ai.m, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, Aj.NP);
+        int NBLiens = 0;
+        for (int i = 0; i < A.liaisonIndexe.size(); i++) {
+            if(!A.liaisonType.get(i)){
+                NBLiens ++;
+            }
+        }
+        return ForceTorsion(IAxe, JAxe, Ai.m, Aj.m, NBLiens, A.doublets, A.NP, Ai.NP, Aj.NP);
     }
    
     private static Vecteur3D ForceTorsion(Atome Ai, Atome A,  int Doubletj){
        Vecteur3D IAxe = Vecteur3D.sous(Ai.position,A.position);
-       return ForceTorsion(IAxe, A.positionDoublet.get(Doubletj), Ai.m, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, Ai.NP, -1);
+       int NBLiens = 0;
+       for (int i = 0; i < A.liaisonIndexe.size(); i++) {
+           if(!A.liaisonType.get(i)){
+               NBLiens ++;
+           }
+       }
+       return ForceTorsion(IAxe, A.positionDoublet.get(Doubletj), Ai.m, 2.0*mE, NBLiens, A.doublets, A.NP, Ai.NP, -1);
     }
 
     private static Vecteur3D ForceTorsion(int Doubleti, Atome A,  Atome Aj){
         Vecteur3D JAxe = Vecteur3D.sous(Aj.position,A.position);
-        return ForceTorsion(A.positionDoublet.get(Doubleti), JAxe, 2.0*mE, Aj.m, A.liaisonIndexe.size(), A.doublets, A.NP, -1, Aj.NP);
+        int NBLiens = 0;
+        for (int i = 0; i < A.liaisonIndexe.size(); i++) {
+            if(!A.liaisonType.get(i)){
+                NBLiens ++;
+            }
+        }
+        return ForceTorsion(A.positionDoublet.get(Doubleti), JAxe, 2.0*mE, Aj.m, NBLiens, A.doublets, A.NP, -1, Aj.NP);
      }
    
     private static Vecteur3D ForceTorsion(int Doubleti, Atome A,  int Doubletj){
-       return ForceTorsion(A.positionDoublet.get(Doubleti), A.positionDoublet.get(Doubletj), 2.0*mE, 2.0*mE, A.liaisonIndexe.size(), A.doublets, A.NP, -1, -1);
+        int NBLiens = 0;
+        for (int i = 0; i < A.liaisonIndexe.size(); i++) {
+            if(!A.liaisonType.get(i)){
+                NBLiens ++;
+            }
+        }
+       return ForceTorsion(A.positionDoublet.get(Doubleti), A.positionDoublet.get(Doubletj), 2.0*mE, 2.0*mE, NBLiens, A.doublets, A.NP, -1, -1);
     }
 
     private static Vecteur3D ForceDiedre(Atome Ai, Atome A, Atome Aj, Atome Ak){
@@ -890,7 +907,7 @@ public class Atome{
                 V3 VCentripete= new V3 (V3.mult(dirDN, ModuleVCentripete));
                 vélDoublet.set(i,V3.sous(vélDoublet.get(i),VCentripete));
                 //vélDoublet.set(i, V3.sous(vélDoublet.get(i), V3.mult( positionDoublet.get(i), V3.scal(vélDoublet.get(i), positionDoublet.get(i))/(positionDoublet.get(i).longueur()*positionDoublet.get(i).longueur()) ) ));
-                vélDoublet.set(i, V3.mult(V3.norm(vélDoublet.get(i)), Math.min(vélDoublet.get(i).longueur(), 5.585*Math.pow(10.0,18.0))));
+                vélDoublet.set(i, V3.mult(V3.norm(vélDoublet.get(i)), Math.min(vélDoublet.get(i).longueur(), 5.585*Math.pow(10.0,16.0))));
             }
         }
     }
@@ -2182,6 +2199,7 @@ public class Atome{
     public static double TempératureEnVitesse(double T, double m){
         double VitesseCaré;
         VitesseCaré = T*(kB*Math.log(1+1/m))/(0.5*m);
+        //VitesseCaré = 3.0*kB*T/m;
        
         return Math.sqrt(VitesseCaré);
         //return Math.sqrt(3.0*kB*T/m);

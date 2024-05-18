@@ -31,7 +31,7 @@ public class Paramètres {
     public boolean UtiliserFilsExécution = false;
     public int NBFils = 10;
 
-    public static int itérationsPlacementInitial = 500;
+    public static int itérationsPlacementInitial =500;
     public static double deltaPlacement = 0.01;
 
     public static double tempsSim = 0.0;
@@ -43,7 +43,7 @@ public class Paramètres {
     public static double ModulePaulie = 1.0; 
     public static double DistancePaulie= 2.0;
     public static double ModuleTorsionDoublet= 10000.0;
-    public static double ModuleTorsion= 1000.0;
+    public static double ModuleTorsion= 10000.0;
 
     /**Delta temps de simulation entre chaque mise à jour de la simulation en fs */
     public double dt = 0.625*Math.pow(10.0,-18.0);
@@ -51,7 +51,7 @@ public class Paramètres {
     public int NbMolécules = 150;
     public int NBessais = 100;
     public boolean BEAA = false;
-    public double tampon = 0.1;
+    public double tampon = 0.5;
     public boolean voisin=true;
 
     private int SimMolécules = 0;
@@ -164,7 +164,7 @@ public class Paramètres {
         true, //Force de Morse
         true, //Force de Torsion
         true, //Force Diedre
-        true, //Boite Magique
+        false, //Boite Magique
     };
 
     public double distForceÉval = 1.0;
@@ -294,6 +294,7 @@ public class Paramètres {
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 500;
                 paramètres.tempsSim = 0.1;
+                paramètres.ListeForce[1] = false;
                 break;
             case 1:
                 paramètres.Zoom = 60f;
@@ -302,11 +303,12 @@ public class Paramètres {
                 paramètres.TailleZ = 512;
                 paramètres.UtiliserFilsExécution = false;
                 paramètres.NbMolécules = 20;
-                paramètres.distForceÉval = 0.0;
+                paramètres.distForceÉval = 5.0;
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 1000;
                 paramètres.tempsSim = 0.3;
+                paramètres.ListeForce[1] = true;
                 break;
             case 2:
                 paramètres.Zoom = 40f;
@@ -315,11 +317,12 @@ public class Paramètres {
                 paramètres.TailleZ = 512;
                 paramètres.UtiliserFilsExécution = true;
                 paramètres.NbMolécules = 150;
-                paramètres.distForceÉval = 0.0;
+                paramètres.distForceÉval = 5.0;
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 5000;
                 paramètres.tempsSim = 0.5;
+                paramètres.ListeForce[1] = true;
                 break;
             case 3:
                 paramètres.Zoom = 30f;
@@ -333,6 +336,7 @@ public class Paramètres {
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
                 paramètres.tempsAttenteAnalyse = 5000;
                 paramètres.tempsSim = 1.0;
+                paramètres.ListeForce[1] = true;
                 break;
             default:
                 break;
