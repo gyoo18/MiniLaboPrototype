@@ -7,16 +7,17 @@ public class Paramètres {
     public enum Mode{
         SIM,
         INIT,
-        FIN,
+        FIN_SIM,
         ENTRE_DEUX,
         AJOUT_MOL,
+        FIN_PROGRAME
     }
 
     private static Paramètres paramètres;
 
     public volatile Mode mode = Mode.INIT;
 
-    public String emplacementFichierAnalyse = "C:\\Users\\vince\\Documents\\École\\Cégep Hiver 2024\\Projet Math\\Analyses\\";
+    public String emplacementFichierAnalyse = System.getProperty("user.dir") + "\\";
 
     public int TailleX = 1000; //Taille de simulation 
     public int TailleY = 512;

@@ -1,6 +1,7 @@
 package com.MiniLabo.prototype;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,7 +15,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import java.awt.RenderingHints;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 public class App {
     public static Paramètres p; // = Paramètres.avoirParamètres();
@@ -230,7 +236,7 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < (int)(228000.0*p.tempsSim) && !p.répéter) {
+            while (chrono < (int)(300000.0*p.tempsSim) && !p.répéter && p.mode != Paramètres.Mode.FIN_SIM && p.mode != Paramètres.Mode.FIN_PROGRAME) {
 
                 if(!thread.isAlive()){
                     //boucleDessin = new BoucleDessin();
@@ -259,7 +265,7 @@ public class App {
         //}catch(Exception e){
         //    e.printStackTrace();
         //}
-        p.mode = Paramètres.Mode.FIN;
+        p.mode = Paramètres.Mode.FIN_SIM;
         Intégrateur.tuerFils();
         //try {Thread.sleep(1000);} catch (Exception e) {}
     }
@@ -346,6 +352,8 @@ public class App {
         public volatile ArrayList<Atome> Hs = new ArrayList<>();
         public volatile ArrayList<Integer> indexe = new ArrayList<>();
 
+        private boolean frameActivé = false;
+
         @Override
         public void run(){
             System.out.println("Thread de dessin : " + Thread.currentThread().getName());
@@ -353,25 +361,40 @@ public class App {
             g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
             JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
             frame = new JFrame();                //Initialiser l'écran
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
             frame.add(image);                           //Ajouter l'objet Image à l'écran
             frame.setVisible(true);                   //Afficher la fenêtre
+
+            g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+            g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
             init = false;
 
             long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
             while (true) {
-                if(p.mode == Paramètres.Mode.ENTRE_DEUX || p.mode == Paramètres.Mode.AJOUT_MOL || p.mode == Paramètres.Mode.FIN) {
+                if(p.mode == Paramètres.Mode.ENTRE_DEUX || p.mode == Paramètres.Mode.AJOUT_MOL || p.mode == Paramètres.Mode.FIN_SIM) {
                     continue;
                 }
                 if(init){
                     b = new BufferedImage(p.TailleX, p.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
                     g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
-
+                    
+                    if(image != null){
+                        frame.remove(image);
+                    }
                     image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
-                    frame = new JFrame();                //Initialiser l'écran
+                    //frame = new JFrame();                //Initialiser l'écran
                     frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
                     frame.add(image);                           //Ajouter l'objet Image à l'écran
                     frame.setVisible(true);                   //Afficher la fenêtre
+                    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
                     g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -382,7 +405,7 @@ public class App {
                     g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
+                    
                     init = false;
                 }
 
