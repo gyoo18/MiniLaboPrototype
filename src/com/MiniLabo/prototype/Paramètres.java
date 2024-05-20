@@ -181,7 +181,7 @@ public class Paramètres {
         }
         paramètres.type = 0;
         paramètres.NbMolécules = 0;
-        /* switch (i) {
+        switch (i) {
             case 1://1
                 paramètres.type = 0;
                 paramètres.SimMolécules = 1;
@@ -281,9 +281,9 @@ public class Paramètres {
                 break;
             default:
                 break;
-        } */
+        }
 
-        switch (i) {
+        /* switch (i) {
             case 1:
                 paramètres.type = 2;
                 paramètres.SimMolécules = 2;
@@ -316,7 +316,7 @@ public class Paramètres {
                 break;
             default:
                 break;
-        }
+        } */
         
         switch (paramètres.type) {
             case 0:
@@ -357,7 +357,7 @@ public class Paramètres {
                 paramètres.distForceÉval = 5.0;
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
-                paramètres.tempsAttenteAnalyse = 500;
+                paramètres.tempsAttenteAnalyse = 1000;
                 paramètres.tempsSim = 1.0;
                 paramètres.ListeForce[1] = true;
                 break;
@@ -371,7 +371,7 @@ public class Paramètres {
                 paramètres.distForceÉval = 5.0;
                 paramètres.TempératureInitiale = 25.0;
                 paramètres.dt = 0.625*Math.pow(10.0,-17.0);
-                paramètres.tempsAttenteAnalyse = 5000;
+                paramètres.tempsAttenteAnalyse = 1000;
                 paramètres.tempsSim = 1.0;
                 paramètres.ListeForce[1] = true;
                 break;

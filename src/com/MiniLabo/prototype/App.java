@@ -37,30 +37,33 @@ public class App {
 
     private static String[] AnalyseTexte = new String[12];
     private static double[] AnalyseValeurs = new double[AnalyseTexte.length];
-    public static Vecteur3D ForceSytème = new Vecteur3D(0);
-    private static ArrayList<Vecteur2D> GraphiqueVal = new ArrayList<>();
-    private static ArrayList<Vecteur2D> GraphiqueVal2 = new ArrayList<>();
     private static File fichierAnalyse; // = new File(p.emplacementFichierAnalyse + "Analyse.csv");
     private static FileWriter fileWriter;
 
-    private static BoucleDessin boucleDessin; // = new BoucleDessin();
+    private static BoucleDessin boucleDessin;
     private static Thread thread;
+
+    private static ArrayList<ArrayList<String>> fichierAnalyseContenu = new ArrayList<>();
+    private static int simI = 0;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
 
         int essais = 0;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 23; i++) {
+            simI = i;
+            fichierAnalyseContenu.add(new ArrayList<String>());
             boolean commencer = true;
             while (commencer || p.répéter) {
-                //int i = 0;
+                //int i = 1;
                 p = Paramètres.avoirParamètres(i+1);
-                //p.dt = 0.625*Math.pow(10.0,-17.0);
+
+                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+
                 p.mode = Paramètres.Mode.ENTRE_DEUX;
                 FOVet = p.FOV;
                 FOVBoite = p.FOV;
                 FOVetBoite = p.FOV;
-                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
                 Hs.clear();
                 if(boucleDessin != null){
                     boucleDessin.indexe.clear();
@@ -82,12 +85,14 @@ public class App {
                 }
             }
         }
-        
     }
 
     public static void Initialisation(){
         System.out.println("Initialisation");
         p.mode = Paramètres.Mode.INIT;
+
+        temps = 0;
+        chrono = 0;
 
         if(boucleDessin == null){
             boucleDessin = new BoucleDessin();
@@ -187,22 +192,13 @@ public class App {
             double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
             
             Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
-            //Hs.get(i).vélocité = V3.mult(V3.norm(new Vecteur3D(Math.random(),Math.random(),Math.random())),module);
         }
 
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
         for (int i = 0; i < p.itérationsPlacementInitial; i++) {
-            
-            //Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
-            //Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
-
-            ForceSytème = new Vecteur3D(0);
-            for (int j = 0; j < Hs.size(); j++) {
-                //Hs.get(j).miseÀJourLiens();    //Créer/Détruire les liens.
-            }
-            
+                        
             Intégrateur.calculerForces(Hs);
             for (int j = 0; j < Hs.size(); j++) {
                 Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),p.deltaPlacement));
@@ -218,7 +214,7 @@ public class App {
 
         try{
             fileWriter = new FileWriter(fichierAnalyse, Charset.forName("UTF-8"));
-            fileWriter.write("Molécules: ;" + NbMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + p.TempératureInitiale +";\n");
+            fileWriter.write("Molécules: ;" + totalMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + p.TempératureInitiale + "; Solution : ;" + énoncerMolécules(Hs) + "; Intégrateur : ;" + p.modèleIntégrateur.name() + ";\n");
             fileWriter.write("chrono (s); MPS; temps (fs); Température (°C); Volume (m^3); Pression (kPa); Énergie Potentielle (JÅ); Énergie Cinétique (JÅ); Énergie Mécanique (JÅ);\n");
         }catch(Exception e){
             e.printStackTrace();
@@ -234,7 +230,7 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < (int)(600000.0*p.tempsSim) && !p.répéter) {
+            while (chrono < (int)(228000.0*p.tempsSim) && !p.répéter) {
 
                 if(!thread.isAlive()){
                     //boucleDessin = new BoucleDessin();
@@ -246,14 +242,10 @@ public class App {
                     thread.start();
                 }
                 
-                //Atome.MettreÀJourEnvironnement(Hs);                 //Mettre à jour l'environnement du point de vue des atomes.
-                //Molécule.MiseÀJourEnvironnement(Hs);                //Mettre à jour l'environnement du point de vue des molécules.
-
                 double T = 0.0; //Température moyenne
                 /* double mailmanresonant =0; */
                 boucleDessin.MisesÀJours++;
                 
-                ForceSytème = new Vecteur3D(0);
                 for (int i = 0; i < Hs.size(); i++) {
                     Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
                 }
@@ -267,14 +259,13 @@ public class App {
         //}catch(Exception e){
         //    e.printStackTrace();
         //}
-        Intégrateur.tuerFils();
         p.mode = Paramètres.Mode.FIN;
-        try {Thread.sleep(1000);} catch (Exception e) {}
+        Intégrateur.tuerFils();
+        //try {Thread.sleep(1000);} catch (Exception e) {}
     }
 
     public static void analyse(int MisesÀJours){
-        //g.setColor(Color.WHITE);
-        AnalyseTexte[0] = "====== Analyse ======";
+        AnalyseTexte[0] = "====== Analyse ====== " + Intégrateur.modèle.name();
         double DeltaTD=0;
         if (MisesÀJours==0){
             DeltaT=Long.MAX_VALUE;
@@ -285,12 +276,9 @@ public class App {
         }
 
         AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
-        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/((double)DeltaT/1000.0));
+        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/(DeltaTD/1000.0));
 
-        //Statistiques sur la vitesse de la simulation
         AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (p.dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
-        //résultatTest += String.format("%.03f", (temps*Math.pow(10.0,15.0))/((double)(System.currentTimeMillis()-chorono)/1000.0)) + ";";
-        //longueurTest ++;
 
         double température = Atome.Température(Hs);
         AnalyseTexte[4] = "Température: " + String.format("%.0f",( température-273.15)) + "°C";
@@ -309,7 +297,7 @@ public class App {
 
         double volume = (max.x-min.x)*(max.y-min.y)*(max.z-min.z);
         AnalyseTexte[5] = "Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3";
-       // double pression = Hs.size()*Atome.R*température/volume;
+        double pression = Hs.size()*Atome.R*température/volume;
         
 
         double Ek = 0;
@@ -327,41 +315,23 @@ public class App {
         double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
         Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
+        //double pression = Ek/(volume);
 
-
-        double pression = Ek/(volume);
-
-        AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
+        //AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
         AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.5E",Ep) + " JÅ " + (AnalyseValeurs[7]-Ep<0.0?"▲":"▼");
         AnalyseValeurs[7] = Ep;
         AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.5E",Ek) + " JÅ " + (AnalyseValeurs[8]-Ek<0.0?"▲":"▼");
         AnalyseValeurs[8] = Ek;
         AnalyseTexte[9] = "Énergie mécanique: " + String.format("%.5E",Ek+Ep) + " JÅ " + (AnalyseValeurs[9]-(Ep+Ek)<0.0?"▲":"▼");
         AnalyseValeurs[9] = Ek+Ep;
-        //GraphiqueVal.add(new Vecteur2D(dist,Ep));
-        //if(GraphiqueVal.size() > 200){
-        //    GraphiqueVal.remove(0);
-        //}
-        //GraphiqueVal2.add(new Vecteur2D(dist,Ek));
-        //if(GraphiqueVal2.size() > 200){
-        //    GraphiqueVal2.remove(0);
-        //}
 
         AnalyseTexte[10] = énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
-        
+
         try {
-            fileWriter.write(chrono/1000 + ";" + String.format("%.03f",1/((double)DeltaT/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + String.format("%.0f",( température-273.15)) + ";" + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + ";" + String.format("%.3E",pression) + ";" + String.format("%.5E",Ep) + ";" + String.format("%.5E",Ek) + ";" + String.format("%.5E",Ek+Ep) + ";\n");
+            fileWriter.write(chrono + ";" + String.format("%.03f",1/(DeltaTD/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + température + ";" + volume + ";" + pression + ";" + Ep + ";" + Ek + ";" + (Ep+Ek) + ";\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //AnalyseTexte[11] = dist + " Å de distance";
-        //double angle = Math.acos(V3.scal(V3.norm(Hs.get(1).position), V3.norm(Hs.get(2).position)));
-        //double EkP = -1000.0*((Math.PI)*(Math.PI/2.0)-0.5*(Math.PI/2.0)*(Math.PI/2.0))+1000.0*((Math.PI)*angle-0.5*angle*angle);
-        //EkP *= 2.0*1.07;
-        //double EpP = 1000.0*((Math.PI)*angle-0.5*angle*angle)
-        //AnalyseTexte[11] = "Énergie cinétique prédite: " + String.format("%.3E", EkP) + " JÅ. " + String.format("%.10f", 100.0*Math.abs(EkP-Ek)/Math.abs(EkP)) + "% d'écart.";
-        //double EpP = (2.0/(12.0*Math.pow(dist,12.0)));
-        //AnalyseTexte[13] = "Énergie potentielle prédite: " + String.format("%.3E", EpP) + " JÅ. " + String.format("%.0f", 100.0*Math.abs(EpP-Ep)/Math.abs(EpP)) + "% d'écart.";
     }
     
     private static class BoucleDessin implements Runnable{
@@ -464,21 +434,6 @@ public class App {
                     g.drawString("Initialisation de la position d'équilibre: ",5,15);
                     g.drawString(String.format("%.0f",progressionPlacement) + "% complété.",5,30);
                 }
-
-                //g.setColor(Color.BLUE);
-                //for (int i = 0; i < GraphiqueVal.size(); i++) {
-                //    g.fillOval((int)(300.0*GraphiqueVal.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal.get(i).y), 4, 4);
-                //}
-                //g.setColor(Color.RED);
-                //for (int i = 0; i < GraphiqueVal2.size(); i++) {
-                //    g.fillOval((int)(300.0*GraphiqueVal2.get(i).x), 2*AnalyseTexte.length*15-(int)(1.0*GraphiqueVal2.get(i).y), 4, 4);
-                //}
-
-                //Vecteur3D posI = new Vecteur3D(0);
-                //Vecteur3D directionF = Vecteur3D.addi(Vecteur3D.mult(Vecteur3D.norm(ForceSytème),0.03*Math.max(Math.log(Zoom*ForceSytème.longueur()+1.0),0.0)),posI);
-                //double multPersZF = (FOV*Zoom/((directionF.z+TailleZ/(2.0*Zoom)) + FOVet));
-                //g.setColor(Color.RED);       //Couleur de la force
-                //g.drawLine((TailleX/2) + (int)((posI.x)*multPersZF), (TailleY/2) - (int)((posI.y)*multPersZF), (TailleX/2) + (int)((+directionF.x)*multPersZF) , (TailleY/2) - (int)((directionF.y)*multPersZF));
 
                 SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
                 try {Thread.sleep(30);} catch (Exception e) {}
