@@ -387,6 +387,9 @@ public class Paramètres {
         paramètres = new Paramètres();
         try {
             File fichierParam = new File(System.getProperty("user.dir") + "\\MiniLaboPrototype\\param.txt");
+            if(!fichierParam.exists()){
+                fichierParam = new File(System.getProperty("user.dir") + "\\param.txt");
+            }
             FileReader fileReader = new FileReader(fichierParam);
 
             ArrayList<String> listeParamNom = new ArrayList<>();

@@ -47,14 +47,12 @@ public class App {
     private static Thread thread;
 
     private static ArrayList<ArrayList<String>> fichierAnalyseContenu = new ArrayList<>();
-    private static int simI = 0;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
 
         int essais = 0;
         for (int i = 0; i < 23; i++) {
-            simI = i;
             fichierAnalyseContenu.add(new ArrayList<String>());
             boolean commencer = true;
             while (commencer || p.répéter) {
@@ -272,7 +270,7 @@ public class App {
     }
 
     public static void analyse(int MisesÀJours, long analyseChrono){
-        AnalyseTexte[0] = "====== Analyse ====== " + Intégrateur.modèle.name();
+        AnalyseTexte[0] = "====== Analyse ====== " + Intégrateur.modèle.name() + " ";
         double DeltaTD=0;
         if (MisesÀJours==0){
             DeltaT=Long.MAX_VALUE;
