@@ -18,16 +18,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import java.awt.RenderingHints;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 public class App {
     public static Paramètres p; // = Paramètres.avoirParamètres();
 
-    public static int FOVet; // = p.FOV;
-    private static int FOVBoite; // = p.FOV;
-    private static int FOVetBoite; // = p.FOV;
+    public static float FOVet; // = p.FOV;
+    private static float FOVBoite; // = p.FOV;
+    private static float FOVetBoite; // = p.FOV;
 
     public static ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
     //public static volatile ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
@@ -62,9 +59,13 @@ public class App {
             boolean commencer = true;
             while (commencer || p.répéter) {
                 //int i = 1;
-                p = Paramètres.avoirParamètres(i+1);
+                p = Paramètres.chargerDepuisFichier();
 
-                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+                File dossier = new File(p.dossierAnalyse);
+                if(!dossier.exists()){
+                    dossier.mkdirs();
+                }
+                fichierAnalyse = new File(p.dossierAnalyse + "Sim_" + i + ".csv");
 
                 p.mode = Paramètres.Mode.ENTRE_DEUX;
                 FOVet = p.FOV;
@@ -236,7 +237,7 @@ public class App {
         départ = System.currentTimeMillis();
         chrono = System.currentTimeMillis()-départ;
         //try{
-            while (chrono < (int)(300000.0*p.tempsSim) && !p.répéter && p.mode != Paramètres.Mode.FIN_SIM && p.mode != Paramètres.Mode.FIN_PROGRAME) {
+            while (chrono < p.simDurée && !p.répéter && p.mode != Paramètres.Mode.FIN_SIM && p.mode != Paramètres.Mode.FIN_PROGRAME) {
 
                 if(!thread.isAlive()){
                     //boucleDessin = new BoucleDessin();
@@ -270,19 +271,19 @@ public class App {
         //try {Thread.sleep(1000);} catch (Exception e) {}
     }
 
-    public static void analyse(int MisesÀJours){
+    public static void analyse(int MisesÀJours, long analyseChrono){
         AnalyseTexte[0] = "====== Analyse ====== " + Intégrateur.modèle.name();
         double DeltaTD=0;
         if (MisesÀJours==0){
             DeltaT=Long.MAX_VALUE;
             DeltaTD=Double.POSITIVE_INFINITY;
         } else {
-            DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
-            DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+            DeltaT = (System.currentTimeMillis()-départ-analyseChrono)/MisesÀJours;
+            DeltaTD = (double)(System.currentTimeMillis()-départ-analyseChrono)/(double)MisesÀJours;
         }
 
-        AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
-        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/(DeltaTD/1000.0));
+        AnalyseTexte[1] = "chrono: " + analyseChrono/1000 + "s";
+        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1.0/(DeltaTD/1000.0));
 
         AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (p.dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
 
@@ -303,7 +304,7 @@ public class App {
 
         double volume = (max.x-min.x)*(max.y-min.y)*(max.z-min.z);
         AnalyseTexte[5] = "Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3";
-        double pression = Hs.size()*Atome.R*température/volume;
+        //double pression = Hs.size()*Atome.R*température/volume;
         
 
         double Ek = 0;
@@ -321,9 +322,9 @@ public class App {
         double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
         Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
-        //double pression = Ek/(volume);
+        double pression = Ek/(volume);
 
-        //AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
+        AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
         AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.5E",Ep) + " JÅ " + (AnalyseValeurs[7]-Ep<0.0?"▲":"▼");
         AnalyseValeurs[7] = Ep;
         AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.5E",Ek) + " JÅ " + (AnalyseValeurs[8]-Ek<0.0?"▲":"▼");
@@ -334,7 +335,7 @@ public class App {
         AnalyseTexte[10] = énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
 
         try {
-            fileWriter.write(chrono + ";" + String.format("%.03f",1/(DeltaTD/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + température + ";" + volume + ";" + pression + ";" + Ep + ";" + Ek + ";" + (Ep+Ek) + ";\n");
+            fileWriter.write(analyseChrono + ";" + String.format("%.03f",1/(DeltaTD/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + température + ";" + volume + ";" + pression + ";" + Ep + ";" + Ek + ";" + (Ep+Ek) + ";\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -353,6 +354,8 @@ public class App {
         public volatile ArrayList<Integer> indexe = new ArrayList<>();
 
         private boolean frameActivé = false;
+
+        private long analyseChrono;
 
         @Override
         public void run(){
@@ -434,9 +437,10 @@ public class App {
                     DessinerAtome(g,Hs.get(indexe.get(i)), Hs);
                 }
 
-                if (System.currentTimeMillis()-mailman > p.tempsAttenteAnalyse && p.mode == Paramètres.Mode.SIM){
+                if (System.currentTimeMillis()-mailman > p.analyseÉchantillonsIntervalles && p.mode == Paramètres.Mode.SIM){
                     mailman = System.currentTimeMillis();
-                    analyse(MisesÀJours);
+                    analyse(MisesÀJours,analyseChrono);
+                    analyseChrono = System.currentTimeMillis()-départ;
                     MisesÀJours = 0;
                 }
 
@@ -568,8 +572,8 @@ public class App {
      */
     public static void DessinerAtome(Graphics2D g, Atome A, ArrayList<Atome> B){
 
-        int FOV = p.FOV;
-        double Zoom = p.Zoom;
+        float FOV = p.FOV;
+        float Zoom = p.Zoom;
         int TailleX = p.TailleX;
         int TailleY = p.TailleY;
         int TailleZ = p.TailleZ;
