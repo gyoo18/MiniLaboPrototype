@@ -1,0 +1,140 @@
+# _____  _____   ___   ____   ___   ___   ___       ________    ________   ________        __ ___\_\
+#│     \/     │ │   │ │    \ │   │ │   │ │   │     /   __   \  │   __   │ │   __   │      /_/ °    ° \/\ 
+#│            │ │   │ │     \│   │ │   │ │   │    │   │__│   │ │  │__│  │ │  │  │  │       /    __    \/
+#│   │\__/│   │ │   │ │   │\     │ │   │ │   │    │    __    │ │   __  <  │  │  │  │     /│o   |__|   o│_
+#│   │    │   │ │   │ │   │ \    │ │   │ │   └──┐ │   │  │   │ │  │__│  │ │  │__│  │     \/\  ˳    ˳  /_/
+#│___│    │___│ │___│ │___│  \___│ │___│ │______│ │___│  │___│ │________│ │________│        \________/
+#                                                                  ___                      |_|    \_\
+# ________    ________    ________    ________    _____  _____   __\__\_    _________   ________   _______   ________ 
+#|   __   |  /   __   \  |   __   |  /   __   \  │     \/     │ │   ____│  |         │ |   __   | │   ____│ │    ____│
+#|  |__|  | │   │__│   │ |  |__|  | │   │__│   │ │            │ │  │__     └──┐   ┌──┘ |  |__|  | │  │__    │   |____
+#|   _____| │    __    │ |      __| │    __    │ │   │\__/│   │ │   __|       │   │    |      __| │   __|   │____    | 
+#|  |       │   │  │   │ |  |\  \   │   │  │   │ │   │    │   │ │  │____      │   │    |  |\  \   │  │____   ____│   │
+#|__|       │___│  │___│ |__| \__\  │___│  │___│ │___│    │___│ │_______│     │___│    |__| \__\  │_______│ │________│
+#
+# Ceci est le fichier de paramètres de la simulation.
+# Vous pouvez retirer des paramèetres sans causer d'erreur
+# Un paramètre mal éppelé ne serat tout simplement pas considéré
+
+# Détermine le champs de vision de la caméra
+    FOV = 70
+
+#|=====================================================================|
+#| • Cette section est consacrée à l'initialisation de la simulation • |
+#|=====================================================================|
+
+# Taille du domaine de simulation en X,Y,Z, en pixels. 
+# Doit être divisé par ZOOM pour convertir en Å
+    INI_TAILLE_X = 512
+    INI_TAILLE_Y = 512
+    INI_TAILLE_Z = 512
+# Paramètre de Zoom. Plus élevé = simulation plus petite.
+    INI_ZOOM = 30
+
+#======================================================================================
+# | Les molécules seront placées dans l'espace selon l'algorithme de Poisson.
+# | C'est-à-dire qu'elle seront placées aléatoirement dans l'espace, puis supprimées
+# | si elles intersectes un autre atome.
+#-------------------------------------------------------------------------------------
+# Le nombre de molécules à placer
+    INI_NB_MOLÉCULES = 30
+# Tentra de placer la molécule INI_NB_ESSAIS fois, après quoi arrêtera de placer des molécules, faute d'espace
+# Plus élevé = plus de chances d'atteindre le nombre de molécules voulus, mais initialisation plus longue
+    INI_NB_ESSAIS = 100
+# Forme du collisionneur déterminant l'intersection entre un atome et une molécule
+# Valeurs acceptées : 
+# • BEAA - Utilise une Boîte Englobante Alignée sur les Axes.
+# • SPHÈRE - Utilise une sphère.
+# INI_COLLISION = BEAA
+# Distance supplémentaire minimale entre une molécule et un atome
+    INI_TAMPON = 0.1
+#======================================================================================
+
+#======================================================================================
+# | Après être placées dans l'espace, les atomes seront déplacées vers un
+# | minimum d'énergie potentielle afin d'initialiser la simulation dans un
+# | état stable et à la bonne température.
+#-------------------------------------------------------------------------------------
+# Nombre d'itérations du déplacement des atomes.
+# Plus élevé = simulation plus stable, température plus précise, mais initialisation plus longue
+    INI_NB_ITÉRATIONS = 1000
+# Déplacement de l'atome à chaque itération en Å 
+# Moins élevé = minimum local plus précis, simulation plus stable, température plus précise, mais initialisation plus longue
+    INI_DELTA_S = 0.001
+#======================================================================================
+
+# Température initiale en °C
+    INI_TEMPÉRATURE = 25.0
+
+#|=================================================|
+#| • Cette section est consacrée à la simulation • |
+#|=================================================|
+
+# Durée de la simulation en temps réel, en s
+    SIM_DURÉE = 1000
+# Bonds de temps à chaque itérations, en fs.
+# Plus élevé = simulation plus rapide, mais moins précise/stable
+    SIM_DELTA_TEMPS = 0.00625
+# Détermine si le programme utilise le calcul parallèle pour accélérer la simulation
+# Déconseillé pour un petit nombre d'atomes
+# Valeurs acceptées : true, false
+    SIM_FILS_EXÉCUTIONS = false
+# Détrmine le nombre de fils de calcul parallèles à utiliser.
+# Reccomandé : 10, mais faites vos propres tests, le nombre optimal varie d'ordinateur en ordinateur.
+    SIM_NB_FILS = 10
+
+# Modèle d'intégrateur à utiliser 
+# Valeures acceptées :
+# • EULER - Utilise l'algorithme d'Euler. Générallement instable et ne conserve pas l'énergie, mais très rapide.
+# • VERLET - NE PAS UTILISER, PRÉSENTEMENT BRISÉ. Utilise l'algorithme de Verlet à deux pas (Störmer-Verlet). Plus stable, conserve l'énergie et assez rapide.
+# • VERLET_V - Utilie l'algorithme de Verlet à un pas (Velocity-Verlet). Plus stable, conserve l'énergie et assez rapide.
+# • VERLET_VB - RECCOMANDÉ. Utilise l'algorithme de Verlet à un pas, en deux temps. Plus stable, conserve très bien l'énergie et assez rapide.
+# • VERLET_VBCD - ???
+# • RK4 - Utilise l'algorithme de Rung-Kutta d'ordre 4. Le plus Stable, ne conserve pas l'énergie et le plus lent.
+    SIM_MODÈLE_INTÉGRATEUR = VERLET_VB
+
+# | Détermine quelles force sont appliquées
+# | Valeurs acceptées : true, false
+# Force de Paulie. Repousse tout atome et doublet (Sorte de « collision »).
+    SIM_F_PAULIE = true
+# Forces de Van Der Walls. Faible attraction dûes aux dipôles des molécules.
+    SIM_F_VAN_DER_WALLS = true
+# Force électrostatique. Attraction/répulsion dûe aux charges des atomes.
+    SIM_F_ÉLECTRIQUE = true
+# Force de Morse. Maintient les liens chimiques entre les atomes.
+    SIM_F_MORSE = true
+# Force de Torsion. Maintient les angles entre les liens pour la géométrie moléculaire.
+    SIM_F_TORSION = true
+# Forces Dièdres. Maintient les conformations des molécules pouvant tourner autour d'un lien.
+    SIM_F_DIÈDRE = true
+# Force de gravitée. Attire faiblement les atomes vers le bas.
+    SIM_F_GRAVITÉ = 9.8
+# Module de la force de friction. Sera multiplié par la vitesse pour trouver la force.
+# Ralentis les atomes et retire de l'énergie au système. Utile pour observer les positions à l'équilibre.
+    SIM_F_FRICTION = 0.0
+# Détermine si le programme simule les forces non-liantes entre deux atomes liés
+# Valeurs acceptées = true, false
+    SIM_FORCES_INTRA_LIENS = true
+# Rayon d'influence d'un atome en longueurs de liaions. Au-delà de cette distance, aucune force ne sera appliquée aux deux atomes. À 0, les forces s'appliqueront toujours.
+SIM_RAYON_INFLUENCE = 2.0
+
+# Conditions frontières de la simulation.
+# Valeurs acceptées : 
+# • COLLISION - Les atomes rebondirons sur les parois du domaine de simulation.
+# • RÉPÉTÉ - ATTENTION LENT. Le domaine de simulation est répété par-delà les parois du domaine de simluation et un atome qui traverse la paroi se retrouvera de l'autre côté du domaine (pour l'instant, rebondis sur les parois).
+    SIM_CONDITIONS_FRONTIÈRES = COLLISION
+
+#|==========================================|
+#| • Cette section est dédiée à l'analyse • |
+#|==========================================|
+
+# Chemin du dossier dans lequel les données d'analyses seront récoltées. « $$/ » indique le dossier dans lequel le programme se trouve actuellement.
+    ANALYSE_DOSSIER = $$/Analyses/
+# Intervalles de temps (en temps réel, en s) entre l'échantillonage pour l'analyse.
+# Plus élevé = plus précis, mais plus lent.
+    AN_ÉCHANTILLONS_INTERVALLES = 1.0
+# Indique si l'énergie potentielle de la force de Morse est décalée vers le bas ou non.
+# Valeures acceptées :
+# • true - Le potentiel à l'infini (Non-lié) sera égal à 0. Le potentiel autour de la valeur d'équilibre sera très grand par rapport aux autres potentiels et il est possible qu'ils ne soient pas détectables dans les chiffres significatifs.
+# • false - Le potentiel autour de la valeur d'équilibre sera égal à 0. Les autres potentiels domineront, mais une grande variation d'énergie mécanique sera visible à chaque création/destruction de liens.
+    AN_POTENTIEL_MORSE_DÉCALÉ = false

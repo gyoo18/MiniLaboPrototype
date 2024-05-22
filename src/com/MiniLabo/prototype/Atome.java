@@ -572,7 +572,7 @@ public class Atome{
         paire.add(Environnement.get(indexeB));
 
         double T = 0.0;
-        if(App.p.mode == Paramètres.Mode.INIT) {// || App.p.mode == Paramètres.Mode.){
+        if(App.p.mode == Paramètres.Mode.INI) {// || App.p.mode == Paramètres.Mode.){
             T = App.p.TempératureInitiale+273.15;
         }else if(App.p.mode == Paramètres.Mode.SIM){
             T = Math.max(Température(paire),1);   //Température du système en °K    //paire

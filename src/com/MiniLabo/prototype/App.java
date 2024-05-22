@@ -1,6 +1,7 @@
 package com.MiniLabo.prototype;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,17 +15,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import java.awt.RenderingHints;
 
 public class App {
-    public static Paramètres p; // = Paramètres.avoirParamètres();
-
-    public static int FOVet; // = p.FOV;
-    private static int FOVBoite; // = p.FOV;
-    private static int FOVetBoite; // = p.FOV;
-
-    public static ArrayList<Atome> Hs = new ArrayList<>();       //Liste des atomes
-    //public static volatile ArrayList<Integer> indexe = new ArrayList<>(); //Ordre de dessin des atomes.
+    /**Liste de paramètre */
+    public static Paramètres p;
+    /**Liste d'atomes */
+    public static ArrayList<Atome> Atomes = new ArrayList<>();       //Liste des atomes
 
     /**Temps réel de départ de la simulation en ms */
     public static long départ = System.currentTimeMillis();
@@ -35,73 +34,78 @@ public class App {
     /**Delta temps en temps réel entre chaque mise à jour de la simulation en ms */
     public static long DeltaT = 0;
 
+    /**Texte de l'analyse qui sera affiché à l'écran. Chaque élément de la liste est une ligne de texte */
     private static String[] AnalyseTexte = new String[12];
+    /**Valeures des éléments d'analyses. Utilisé pour certains calculs dans le temps. */
     private static double[] AnalyseValeurs = new double[AnalyseTexte.length];
-    private static File fichierAnalyse; // = new File(p.emplacementFichierAnalyse + "Analyse.csv");
+    /**Fichier dans lequel sera écrite l'analyse */
+    private static File fichierAnalyse;
     private static FileWriter fileWriter;
 
+    /**Fil d'exécution pour dessiner l'écran en parallèle de la simulation */
     private static BoucleDessin boucleDessin;
     private static Thread thread;
-
-    private static ArrayList<ArrayList<String>> fichierAnalyseContenu = new ArrayList<>();
-    private static int simI = 0;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Bienvenue dans MiniLabo!");
 
-        int essais = 0;
-        for (int i = 0; i < 23; i++) {
-            simI = i;
-            fichierAnalyseContenu.add(new ArrayList<String>());
-            boolean commencer = true;
-            while (commencer || p.répéter) {
-                //int i = 1;
-                p = Paramètres.avoirParamètres(i+1);
+        //boucle pour reccomencer la simulation si elle plante
+        int essais = 0; //Nombre de fois que la simulation a reccomancé
+        boolean commencer = true;
+        //Reccomencer tant que p.répéter est vrai
+        while (commencer || p.répéter) {
+            p = Paramètres.chargerDepuisFichier(); //Aller chercher les paramètres dans le fichier param.txt
 
-                fichierAnalyse = new File(p.emplacementFichierAnalyse + "Analyse_" + i + ".csv");
+            //Créer le fichier d'analyse, s'il n'existe pas déjà
+            File dossier = new File(p.dossierAnalyse);
+            if(!dossier.exists()){
+                dossier.mkdirs();
+            }
+            fichierAnalyse = new File(p.dossierAnalyse + "Sim.csv");
 
-                p.mode = Paramètres.Mode.ENTRE_DEUX;
-                FOVet = p.FOV;
-                FOVBoite = p.FOV;
-                FOVetBoite = p.FOV;
-                Hs.clear();
-                if(boucleDessin != null){
-                    boucleDessin.indexe.clear();
-                }
-                chrono = 0;
-                if(p.répéter){
-                    essais ++;
-                }else{
-                    essais = 0;
-                }
-                commencer = false;
+            //Si la simulation a planté et qu'on a dû reccomencer, ajouter un essais,
+            //sinon, passer à la prochaine et réinitialiser le compteur
+            if(p.répéter){
+                essais ++;
+            }else{
+                essais = 0;
+            }
+            commencer = false;
+            p.répéter = false;
+            Initialisation();
+            simulation();
+            //Analyse se fait à partir de simulation();
+
+            //Si on a fait plus de 5 essais, annuler la simulation et passer à la prochaine.
+            if(essais > 5 && p.répéter){
                 p.répéter = false;
-                Initialisation();
-                simulation();
-                //Analyse se fait à partir de simulation();
-                if(essais > 5 && p.répéter){
-                    p.répéter = false;
-                    essais = 0;
-                }
+                essais = 0;
             }
         }
     }
 
     public static void Initialisation(){
         System.out.println("Initialisation");
-        p.mode = Paramètres.Mode.INIT;
+        p.mode = Paramètres.Mode.INI; //Mettre la simulation en mode initialisation
 
-        temps = 0;
-        chrono = 0;
+        temps = 0; //Réinitialiser le temps de simulation
+        chrono = 0;//Réinitialiser le temps réel
 
+        //Si la boucle de dessin n'est pas initialisée, la partire
         if(boucleDessin == null){
             boucleDessin = new BoucleDessin();
             thread = new Thread(boucleDessin);
-            p.mode = Paramètres.Mode.INIT;
+            p.mode = Paramètres.Mode.INI;
             thread.start();
         }
-        boucleDessin.init = true;
-        //Molécule de base
+        boucleDessin.ini = true;
+
+        p.mode = Paramètres.Mode.AJOUT_MOL; //Mettre la simulation en mode ajout de molécules
+        //Retirer tout les atomes de la liste de simulation, pour commencer la prochaine.
+        Atomes.clear();
+        if(boucleDessin != null){
+            boucleDessin.indexe.clear();
+        }
 
         /*//Initialiser les atomes en grille
         float [] espacement = {3f,2f,2f};        //Espacement entre les atomes en x,y,z
@@ -116,7 +120,6 @@ public class App {
             }
         }*/
         
-        p.mode = Paramètres.Mode.AJOUT_MOL;
         //Initialiser les atomes selon l'algorithme de poisson
         int NbMolécules = p.NbMolécules;  //Nombre de molécules voulus
         int totalMolécules = 0;//Nombre de molécules ajoutés
@@ -137,19 +140,19 @@ public class App {
             Vecteur3D position = new Vecteur3D(2.0*(Math.random()-0.5) * (p.TailleX/(2.0*p.Zoom) - mol.BEAA.x),2.0*(Math.random()-0.5) * (p.TailleY/(2.0*p.Zoom) - mol.BEAA.y),2.0*(Math.random()-0.5) * (p.TailleZ/(2.0*p.Zoom) - mol.BEAA.z));
             //position = new Vecteur3D(0);
             boolean intersecte = false;
-            for (int i = 0; i < Hs.size(); i++) {
+            for (int i = 0; i < Atomes.size(); i++) {
                 //Réessayer si cet emplacement intersecte un atome dans la simulation
                 if(p.BEAA){
                     //Intersection avec la BEAA
-                    Vecteur3D posRel = Vecteur3D.sous(Hs.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
-                    if(Math.max(Math.abs(posRel.x) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Hs.get(i).rayonCovalent - tampon,0) < mol.BEAA.z/2.0){
+                    Vecteur3D posRel = Vecteur3D.sous(Atomes.get(i).position,position); //Position relative de l'atome par rapport à la nouvelle molécule
+                    if(Math.max(Math.abs(posRel.x) - Atomes.get(i).rayonCovalent - tampon,0) < mol.BEAA.x/2.0 && Math.max(Math.abs(posRel.y) - Atomes.get(i).rayonCovalent - tampon,0) < mol.BEAA.y/2.0 && Math.max(Math.abs(posRel.z) - Atomes.get(i).rayonCovalent - tampon,0) < mol.BEAA.z/2.0){
                         //S'il y a intersection
                         intersecte = true;
                         break; //Sortir de la boucle en n'ajoutant pas la molécule
                     }
                 }else{
                     //Intesection avec la sphère
-                    if(Vecteur3D.distance(position,Hs.get(i).position) + Hs.get(i).rayonCovalent + tampon < mol.rayon){
+                    if(Vecteur3D.distance(position,Atomes.get(i).position) + Atomes.get(i).rayonCovalent + tampon < mol.rayon){
                         //S'il y a intersection
                         intersecte = true;
                         break; //Sortir de la boucle en n'ajoutant pas la molécule
@@ -160,11 +163,12 @@ public class App {
             //S'il n'y a pas d'intersection
             if(!intersecte){
                 mol.position = position;
-                MoléculeRéf.intégrerÀSimulation(Hs, mol); //Ajouter molécule à simulation
+                MoléculeRéf.intégrerÀSimulation(Atomes, mol); //Ajouter molécule à simulation
                 essais = 0;
                 totalMolécules++;
             }
 
+            //Mettre à jour la barre de progression de l'initialisation
             if(System.currentTimeMillis()-timer > 1000){
                 timer = System.currentTimeMillis();
                 System.out.println("Placement des molécules " + String.format("%.0f",100.0*(double)totalMolécules/(double)NbMolécules) + "%");
@@ -172,49 +176,62 @@ public class App {
         }
 
         System.out.println("Molécules placées. " + totalMolécules + " molécules sont rentrées dans la zone de simulation.");
-        System.out.println("Total Atomes : " + Hs.size());
+        System.out.println("Total Atomes : " + Atomes.size());
         System.out.println("Initialisation des systèmes.");
 
-        boucleDessin.Hs = (ArrayList<Atome>) Hs.clone();
+        boucleDessin.Hs = (ArrayList<Atome>) Atomes.clone(); //Donner les atomes à la boucle de dessin
 
-        p.mode = Paramètres.Mode.INIT;
+        p.mode = Paramètres.Mode.INI; //Passer la simulation en mode initialisation
 
-        Atome.MettreÀJourEnvironnement(Hs);
-        Molécule.MiseÀJourEnvironnement(Hs);
-        Intégrateur.initialisation(Hs,p.NBFils);
-        Intégrateur.FilsExécution = p.UtiliserFilsExécution;
-        Intégrateur.modèle = p.modèleIntégrateur;
+        Atome.MettreÀJourEnvironnement(Atomes); //Donner une référence de tout les atomes à la classe atome
+        Molécule.MiseÀJourEnvironnement(Atomes); //Donner une référence de tout les atomes à la classe Molécule
+        Intégrateur.initialisation(Atomes,p.NBFils); //Initialiser l'intégrateur
+        Intégrateur.FilsExécution = p.UtiliserFilsExécution; //Indiquer si on utilise les fils d'exécutions
+        Intégrateur.modèle = p.modèleIntégrateur; //Indiquer le modèle d'intégrateur utilisé
 
+        //Initialiser la température initiale
         System.out.println("Initialisation de la température.");
-        for (int i = 0; i < Hs.size(); i++) {
-            double module = Atome.TempératureEnVitesse(p.TempératureInitiale+273.15, Hs.get(i).m);
-            double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI;
-            double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;
-            
-            Hs.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
+        for (int i = 0; i < Atomes.size(); i++) {
+            //Pour tout les atomes
+            double module = Atome.TempératureEnVitesse(p.TempératureInitiale+273.15, Atomes.get(i).m); //Aller chercher le module de la vitesse
+            double Angle1=Math.random()*2.0*Math.PI- 1.0*Math.PI; //Prendre un angle horizontal aléatoire
+            double Angle2=Math.random()*1.0*Math.PI - 0.5*Math.PI;//Prendre un angle azimutal aléatoire
+            //Donner une vélocité selon le module de la vitesse dans une direction aléatoire
+            Atomes.get(i).vélocité = new Vecteur3D(module*Math.cos(Angle1)*Math.sin(Angle2),module*Math.sin(Angle1)*Math.sin(Angle2),module*Math.cos(Angle2) );
         }
 
+        //Les atomes sont positionnés de façons aléatoires dans l'espace, ce qui veut dire que beaucoups
+        //d'entre eux sont dans des situations très instables, ce qui leur donne énormément d'énergie
+        //potentielle, qui se convertis rapidement en énergie cintétique et donc en température. Pour
+        //conserver la bonne température initiale, nous les positionnons dans un minimum local d'énergie
+        //potentielle (qui ne peut donc pas se transformer en énergie cinétique : ils sont au repos) et
+        //nous leur donnons une vitesse initiale. Afin de trouver ce minimum local, nous utilisond le fait
+        //que F = -∇U, et utilisons la méthode de la déscente du gradient.
         System.out.println("Initialisation des positions d'équilibre.");
         timer = System.currentTimeMillis();
 
         for (int i = 0; i < p.itérationsPlacementInitial; i++) {
                         
-            Intégrateur.calculerForces(Hs);
-            for (int j = 0; j < Hs.size(); j++) {
-                Hs.get(j).position.addi(V3.mult(V3.norm(Hs.get(j).Force),p.deltaPlacement));
-                for (int k = 0; k < Hs.get(j).forceDoublet.size(); k++) {
-                    Hs.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Hs.get(j).forceDoublet.get(k)), p.deltaPlacement));
+            Intégrateur.calculerForces(Atomes); //Aller chercher la force
+            //Déplacer tout les atomes et les doublets d'un petit bond en direction de F
+            for (int j = 0; j < Atomes.size(); j++) {
+                Atomes.get(j).position.addi(V3.mult(V3.norm(Atomes.get(j).Force),p.deltaPlacement));
+                for (int k = 0; k < Atomes.get(j).forceDoublet.size(); k++) {
+                    Atomes.get(j).positionDoublet.get(k).addi(V3.mult(V3.norm(Atomes.get(j).forceDoublet.get(k)), p.deltaPlacement));
                 }
-                Hs.get(j).ÉvaluerContraintes();
+                Atomes.get(j).ÉvaluerContraintes(); //S'assurer d'évaluer les contraintes
             }
-
+            //Mettre à jour la barre de progression
             boucleDessin.progressionPlacement = 100.0*(double)i/(double)p.itérationsPlacementInitial;
-            try {Thread.sleep(1);} catch (Exception e) {}
         }
 
+        //Initialiser le fichier d'analyse
         try{
-            fileWriter = new FileWriter(fichierAnalyse, Charset.forName("UTF-8"));
-            fileWriter.write("Molécules: ;" + totalMolécules+ "; Atomes: ;" + Hs.size()+"; Température Initiale (°C): ;" + p.TempératureInitiale + "; Solution : ;" + énoncerMolécules(Hs) + "; Intégrateur : ;" + p.modèleIntégrateur.name() + ";\n");
+            fileWriter = new FileWriter(fichierAnalyse, Charset.forName("UTF-8")); //Créeravec un encodage UTF-8 (nécessaire pour dessiner les accents)
+            //Un .csv est comme un excel. Chaque ligne correspond à la ligne et les colones sont séparées par des « ; ». Par la suite, Excel peut importer un .csv et faire un tableau plus complexe.
+            //Ajouter de l'information d'en-tête.
+            fileWriter.write("Molécules: ;" + totalMolécules+ "; Atomes: ;" + Atomes.size()+"; Température Initiale (°C): ;" + p.TempératureInitiale + "; Solution : ;" + énoncerMolécules(Atomes) + "; Intégrateur : ;" + p.modèleIntégrateur.name() + ";\n");
+            //Ajouter les noms des colonnes de données.
             fileWriter.write("chrono (s); MPS; temps (fs); Température (°C); Volume (m^3); Pression (kPa); Énergie Potentielle (JÅ); Énergie Cinétique (JÅ); Énergie Mécanique (JÅ);\n");
         }catch(Exception e){
             e.printStackTrace();
@@ -225,99 +242,102 @@ public class App {
 
     public static void simulation(){
         System.out.println("Début de la simulation.");
-        p.mode = Paramètres.Mode.SIM;
+        p.mode = Paramètres.Mode.SIM; //Mettre le programme en mode simulation
 
-        départ = System.currentTimeMillis();
-        chrono = System.currentTimeMillis()-départ;
+        départ = System.currentTimeMillis(); //stocker le temps de départ de la simulation
         //try{
-            while (chrono < (int)(228000.0*p.tempsSim) && !p.répéter) {
+            //Boucle de simulation
+            //Continuer tant qu'on n'a pas dépassé le temps alloué à la simulation et que le programme n'est pas en mode FIN_SIM ou FIN_PROGRAME
+            while (chrono < p.simDurée && !p.répéter && p.mode != Paramètres.Mode.FIN_SIM && p.mode != Paramètres.Mode.FIN_PROGRAME) {
 
+                //Si la fil de dessin a planté ou qu'il n'est pas encore créé, l'initialiser
                 if(!thread.isAlive()){
-                    //boucleDessin = new BoucleDessin();
                     thread = new Thread(boucleDessin);
-                    p.mode = Paramètres.Mode.INIT;
-                    boucleDessin.Hs = (ArrayList<Atome>)Hs.clone();
-                    boucleDessin.init = true;
+                    boucleDessin.Hs = (ArrayList<Atome>)Atomes.clone();
+                    boucleDessin.ini = true;
                     boucleDessin.indexe.clear();
                     thread.start();
                 }
                 
-                double T = 0.0; //Température moyenne
-                /* double mailmanresonant =0; */
-                boucleDessin.MisesÀJours++;
+                boucleDessin.MisesÀJours++; //Mettre à jour le nombre de mises à jours faites par échantillonages
                 
-                for (int i = 0; i < Hs.size(); i++) {
-                    Hs.get(i).miseÀJourLiens();    //Créer/Détruire les liens.
+                for (int i = 0; i < Atomes.size(); i++) {
+                    Atomes.get(i).miseÀJourLiens();    // Créer/Détruire les liens.
                 }
                 
-                Intégrateur.Iter(Hs, p.dt);
-                temps += p.dt;
+                Intégrateur.Iter(Atomes, p.dt); //Déplacer les atomes d'un pas de simulation
+                temps += p.dt; //Mettre à jour le temps de simulation
                 
-                chrono = System.currentTimeMillis()-départ;
+                chrono = System.currentTimeMillis()-départ; //Mettre à jour le chrono
                 //try {Thread.sleep(10);} catch (Exception e) {}
             }
         //}catch(Exception e){
-        //    e.printStackTrace();
+        //    e.printStackTrace(); //Les try_catch ralentissent beaucoup la simulation
         //}
-        p.mode = Paramètres.Mode.FIN;
-        Intégrateur.tuerFils();
+        p.mode = Paramètres.Mode.FIN_SIM; //Si on sort de la boucle, mettre le mode du programme à FIN_SIM
+        Intégrateur.tuerFils(); //Arrêter les fils d'exécutions
         //try {Thread.sleep(1000);} catch (Exception e) {}
     }
 
-    public static void analyse(int MisesÀJours){
-        AnalyseTexte[0] = "====== Analyse ====== " + Intégrateur.modèle.name();
-        double DeltaTD=0;
+    public static void analyse(int MisesÀJours, long analyseChrono){
+        AnalyseTexte[0] = "====== Analyse | " + Intégrateur.modèle.name() + " ======="; //En-tête de l'analyse + nom de l'intégrateur
+        double DeltaTD; //Temps en seconde entre chaque mise à jour.
         if (MisesÀJours==0){
             DeltaT=Long.MAX_VALUE;
             DeltaTD=Double.POSITIVE_INFINITY;
         } else {
-            DeltaT = (System.currentTimeMillis()-départ-chrono)/MisesÀJours;
-            DeltaTD = (double)(System.currentTimeMillis()-départ-chrono)/(double)MisesÀJours;
+            DeltaT = (System.currentTimeMillis()-départ-analyseChrono)/MisesÀJours;
+            DeltaTD = (double)(System.currentTimeMillis()-départ-analyseChrono)/(double)MisesÀJours;
         }
 
-        AnalyseTexte[1] = "chrono: " + chrono/1000 + "s";
-        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1/(DeltaTD/1000.0));
-
+        AnalyseTexte[1] = "chrono: " + analyseChrono/1000 + "s"; //temps réel de la simulation
+        AnalyseTexte[2] = "MPS: " + String.format("%.03f",1.0/(DeltaTD/1000.0)); //Mises à jours de la simulation par secondes
+        //Temps de la simulation en fs + rapidité de la simulation en fs/s
         AnalyseTexte[3] = "temps : " + String.format("%.03f", temps*Math.pow(10.0,15.0)) + " fs, rapidité : " + String.format("%.03f", (p.dt*Math.pow(10.0,15.0))/(DeltaTD/1000.0)) + " fs/s";
 
-        double température = Atome.Température(Hs);
-        AnalyseTexte[4] = "Température: " + String.format("%.0f",( température-273.15)) + "°C";
+        double température = Atome.Température(Atomes); //Obtenir la température du système
+        AnalyseTexte[4] = "Température: " + String.format("%.0f",( température-273.15)) + "°C"; //Afficher la température du système
 
+        //Calculer le volume approximatif de la solution en calculant une BEAA
         Vecteur3D max = new Vecteur3D(-Double.MAX_VALUE);
         Vecteur3D min = new Vecteur3D(Double.MAX_VALUE);
-        for (int i = 0; i < Hs.size(); i++) {
-            max.x = Math.max(Hs.get(i).position.x + Hs.get(i).rayonCovalent, max.x);
-            max.y = Math.max(Hs.get(i).position.y + Hs.get(i).rayonCovalent, max.y);
-            max.z = Math.max(Hs.get(i).position.z + Hs.get(i).rayonCovalent, max.z);
+        for (int i = 0; i < Atomes.size(); i++) {
+            max.x = Math.max(Atomes.get(i).position.x + Atomes.get(i).rayonCovalent, max.x);
+            max.y = Math.max(Atomes.get(i).position.y + Atomes.get(i).rayonCovalent, max.y);
+            max.z = Math.max(Atomes.get(i).position.z + Atomes.get(i).rayonCovalent, max.z);
 
-            min.x = Math.min(Hs.get(i).position.x - Hs.get(i).rayonCovalent, min.x);
-            min.y = Math.min(Hs.get(i).position.y - Hs.get(i).rayonCovalent, min.y);
-            min.z = Math.min(Hs.get(i).position.z - Hs.get(i).rayonCovalent, min.z);
+            min.x = Math.min(Atomes.get(i).position.x - Atomes.get(i).rayonCovalent, min.x);
+            min.y = Math.min(Atomes.get(i).position.y - Atomes.get(i).rayonCovalent, min.y);
+            min.z = Math.min(Atomes.get(i).position.z - Atomes.get(i).rayonCovalent, min.z);
         }
 
         double volume = (max.x-min.x)*(max.y-min.y)*(max.z-min.z);
-        AnalyseTexte[5] = "Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3";
-        double pression = Hs.size()*Atome.R*température/volume;
+        AnalyseTexte[5] = "Volume: " + String.format("%.3E",volume*Math.pow(10.0,-30.0)) + " m^3"; //Afficher le volume de la solution
+        //double pression = Hs.size()*Atome.R*température/volume;
         
-
-        double Ek = 0;
-        double Ep = 0;
-        for (int i = 0; i < Hs.size(); i++) {
-            Hs.get(i).potentiel = 0;
+        //Calculer l'énergie du système
+        double Ek = 0; //Énergie cinétique
+        double Ep = 0; //Énergie mécanique
+        //Réinitialiser l'énergie potentielle de chaque atome
+        for (int i = 0; i < Atomes.size(); i++) {
+            Atomes.get(i).potentiel = 0;
         }
-        for (int i = 0; i < Hs.size(); i++) {
-            Ek += Math.pow(Hs.get(i).vélocité.longueur(),2.0)*Hs.get(i).m*0.5;
-            Atome.évaluerÉnergiePotentielle(Hs.get(i),p.PotentielMorseDécalé);
+        //Additionner l'énergie cinétique et calculer l'énergie potentielle. Ep est modifié par d'autres atomes, alors on ne peut pas simplement calculer et additionner en même temps, car il se pourrait qu'un atome modife Ep d'un atome qu'on a déjà passé. On ne calculerais alors pas cette contribution.
+        for (int i = 0; i < Atomes.size(); i++) {
+            Ek += Math.pow(Atomes.get(i).vélocité.longueur(),2.0)*Atomes.get(i).m*0.5;
+            Atome.évaluerÉnergiePotentielle(Atomes.get(i),p.PotentielMorseDécalé);
         }
-        for (int i = 0; i < Hs.size(); i++) {
-            Ep += Hs.get(i).potentiel;
+        //Additionner l'énergie potentielle de chaque atome.
+        for (int i = 0; i < Atomes.size(); i++) {
+            Ep += Atomes.get(i).potentiel;
         }
-        double dist = Vecteur3D.distance(Hs.get(0).position, Hs.get(1).position);
         Ek *= 2.0; //TODO #40 Figurer pourquoi Ek doit être multiplié par 2.
 
-        //double pression = Ek/(volume);
+        //Calculer la pression à partir de Ek
+        double pression = Ek/(volume);
+        AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
 
-        //AnalyseTexte[6] = "Pression: " + String.format("%.3E",pression) + " kPa";
+        //Imprimer les énergies et leur variations
         AnalyseTexte[7] = "Énergie potentielle: " + String.format("%.5E",Ep) + " JÅ " + (AnalyseValeurs[7]-Ep<0.0?"▲":"▼");
         AnalyseValeurs[7] = Ep;
         AnalyseTexte[8] = "Énergie cinétique: " + String.format("%.5E",Ek) + " JÅ " + (AnalyseValeurs[8]-Ek<0.0?"▲":"▼");
@@ -325,54 +345,65 @@ public class App {
         AnalyseTexte[9] = "Énergie mécanique: " + String.format("%.5E",Ek+Ep) + " JÅ " + (AnalyseValeurs[9]-(Ep+Ek)<0.0?"▲":"▼");
         AnalyseValeurs[9] = Ek+Ep;
 
-        AnalyseTexte[10] = énoncerMolécules(Hs);                         //Lister les pourcentages de présence de chaques molécules dans la simulation
+        AnalyseTexte[10] = énoncerMolécules(Atomes); //Lister les pourcentages de présence de chaques molécules dans la simulation
 
+        //Écrire l'analyse dans le fichier sortant.
         try {
-            fileWriter.write(chrono + ";" + String.format("%.03f",1/(DeltaTD/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + température + ";" + volume + ";" + pression + ";" + Ep + ";" + Ek + ";" + (Ep+Ek) + ";\n");
+            fileWriter.write(analyseChrono + ";" + String.format("%.03f",1/(DeltaTD/1000.0)) + ";" + String.format("%.03f", temps*Math.pow(10.0,15.0)) + ";" + température + ";" + volume + ";" + pression + ";" + Ep + ";" + Ek + ";" + (Ep+Ek) + ";\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
+    //Code exécuté en parallèle de la simulation pour la dessiner et l'analyser
     private static class BoucleDessin implements Runnable{
         private static Graphics2D g;
         private static JFrame frame;
 
-        public volatile int MisesÀJours = 0;
-        public volatile double progressionPlacement = 0.0;
+        public volatile int MisesÀJours = 0; //Nombre de mises à jours depuis le dernier échantillons d'analyse
+        public volatile double progressionPlacement = 0.0; //Pourcentage de progression du placement des atomes dans leur minimum d'énergie potentielle
 
-        public volatile boolean init = false;
-
-        public volatile ArrayList<Atome> Hs = new ArrayList<>();
-        public volatile ArrayList<Integer> indexe = new ArrayList<>();
+        public volatile boolean ini = false; //Indique si la boucle de dessin a besoin d'être initalisée
+ 
+        public volatile ArrayList<Atome> Hs = new ArrayList<>(); //Liste des Atomes de la simulation
+        public volatile ArrayList<Integer> indexe = new ArrayList<>(); //Liste des Atomes ordonnés selon la profondeure.
+        
+        private long analyseChrono; //Temps de la simulation en temps rééel, en s.
 
         @Override
         public void run(){
             System.out.println("Thread de dessin : " + Thread.currentThread().getName());
             BufferedImage b = new BufferedImage(p.TailleX, p.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
             g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
-            JLabel image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
+            JLabel image = null; //Créer un objet Image pour l'écran
             frame = new JFrame();                //Initialiser l'écran
-            frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
-            frame.add(image);                           //Ajouter l'objet Image à l'écran
-            frame.setVisible(true);                   //Afficher la fenêtre
-            init = false;
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //Indique que le programme s'arrêtera lorsque la fenêtre se fermera
 
-            long mailman = System.currentTimeMillis(); //utilisé pour projeter dans terminal
+            ini = true;
+
+            long postier = System.currentTimeMillis(); //Indique le temps depuis la dernière analyse.
             while (true) {
-                if(p.mode == Paramètres.Mode.ENTRE_DEUX || p.mode == Paramètres.Mode.AJOUT_MOL || p.mode == Paramètres.Mode.FIN) {
+                //Si le mode du programme est en ajout de molécules ou en terminaison, mettre le dessin sur pause.
+                if(p.mode == Paramètres.Mode.AJOUT_MOL || p.mode == Paramètres.Mode.FIN_SIM) {
                     continue;
                 }
-                if(init){
+                //Si la simulation a besoin d'être réinitialisée.
+                if(ini){
                     b = new BufferedImage(p.TailleX, p.TailleY,BufferedImage.TYPE_4BYTE_ABGR);    //Initialiser l'image de dessin des atomes
                     g = (Graphics2D) b.getGraphics();   //Initialiser le contexte graphique
-
+                    
+                    //Si l'image existe déjà, la retirer de l'écran
+                    if(image != null){
+                        frame.remove(image);
+                    }
                     image = new JLabel(new ImageIcon(b)); //Créer un objet Image pour l'écran
-                    frame = new JFrame();                //Initialiser l'écran
+                    //frame = new JFrame();                //Initialiser l'écran
                     frame.setSize(p.TailleX + 100,p.TailleY + 100); //Taille de la fenêtre
                     frame.add(image);                           //Ajouter l'objet Image à l'écran
                     frame.setVisible(true);                   //Afficher la fenêtre
+                    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+                    //Indiquer des paramètres de dessins de haute qualité
                     g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -382,8 +413,9 @@ public class App {
                     g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-                    init = false;
+                    
+                    ini = false;
+                    break;
                 }
 
                 g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
@@ -411,23 +443,29 @@ public class App {
                     DessinerAtome(g,Hs.get(indexe.get(i)), Hs);
                 }
 
-                if (System.currentTimeMillis()-mailman > p.tempsAttenteAnalyse && p.mode == Paramètres.Mode.SIM){
-                    mailman = System.currentTimeMillis();
-                    analyse(MisesÀJours);
-                    MisesÀJours = 0;
+                //Exécuter l'analyse toutes les p.analyseÉchantillonsIntervalles millisecondes, uniquement si le programme est en mode simulation
+                if (System.currentTimeMillis()-postier > p.analyseÉchantillonsIntervalles && p.mode == Paramètres.Mode.SIM){
+                    analyse(MisesÀJours,analyseChrono); //Exécuter l'analyse
+                    postier = System.currentTimeMillis(); //réinitialiser le postier
+                    analyseChrono = System.currentTimeMillis()-départ; //Mettre à jour le temps réel en secondes.
+                    MisesÀJours = 0; //Réinitialiser le nombre de mises à jours.
                 }
 
+                //Dessiner le texte d'analyse
+                //Dessiner l'arrière-plan
                 g.setColor(new Color(50,50,50,200));
                 g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
+                //Dessiner le texte
                 g.setColor(Color.WHITE);
                 if(p.mode == Paramètres.Mode.SIM){
+                    //Si on est en mode simulation, dessiner le texte d'analyse
                     for (int i = 0; i < AnalyseTexte.length; i++) {
                         if(AnalyseTexte[i] != null){
                             g.drawString(AnalyseTexte[i], 5, (i+1)*15);
                         }
                     }
-                }else if(p.mode == Paramètres.Mode.INIT){
-                    
+                }else if(p.mode == Paramètres.Mode.INI){
+                    //Si on est en mode initialisation, dessiner la barre de progression de l'initialisation
                     g.setColor(new Color(50,50,50,200));
                     g.fillRect(0, 0, 220, AnalyseTexte.length*15+10);
                     g.setColor(Color.WHITE);
@@ -436,15 +474,15 @@ public class App {
                 }
 
                 SwingUtilities.updateComponentTreeUI(frame);    //Mise à jour de l'affichage
-                try {Thread.sleep(30);} catch (Exception e) {}
+                try {Thread.sleep(30);} catch (Exception e) {} //Ajouter une petite attente pour garder le dessin à 30 FPS et ne pas prendre trop de ressources.
             }
         }
     }
     
     /**Dessine une boite représentant le domaine de simulation à  l'écran */
     public static void DessinerBoite(Graphics2D g){
-        double multPersZBoiteLoin=(FOVBoite/(p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + FOVetBoite));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
-        double multPersZBoiteProche=(FOVBoite/(-p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + FOVetBoite)); //Multiplicateur de profondeur de la face avant
+        double multPersZBoiteLoin=(p.FOV/(p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + p.FOV));    //Multiplicateur de profondeur de la face arrière (Forme la perspective)
+        double multPersZBoiteProche=(p.FOV/(-p.TailleZ/(2*p.Zoom)+p.TailleZ/(2.0*p.Zoom) + p.FOV)); //Multiplicateur de profondeur de la face avant
         g.setStroke(new BasicStroke());
         g.setColor(Color.MAGENTA);  //Couleur de la boîte
         int TailleX = p.TailleX;
@@ -545,13 +583,13 @@ public class App {
      */
     public static void DessinerAtome(Graphics2D g, Atome A, ArrayList<Atome> B){
 
-        int FOV = p.FOV;
-        double Zoom = p.Zoom;
+        float FOV = p.FOV;
+        float Zoom = p.Zoom;
         int TailleX = p.TailleX;
         int TailleY = p.TailleY;
         int TailleZ = p.TailleZ;
 
-        double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + FOVet)); //Multiplicateur de profondeur (forme la perspective)
+        double multPersZ=(FOV*Zoom/(A.position.z+TailleZ/(2.0*Zoom) + p.FOV)); //Multiplicateur de profondeur (forme la perspective)
 
         //Dessin des doublets en avant de l'atome
         double ER = 0.1*multPersZ; //Rayon 2D du doublet
@@ -604,7 +642,7 @@ public class App {
             
             if(A.liaisonIndexe.get(i) != -1 && !A.liaisonType.get(i)){
                 // Si c'est une liaison sigma
-                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + FOVet)); //Profondeur du dexième atome
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + p.FOV)); //Profondeur du dexième atome
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLACK);        //Couleur de la liaison
                 //Dessiner la liaison
@@ -612,7 +650,7 @@ public class App {
             
             }else if(A.liaisonIndexe.get(i) != -1 && A.liaisonType.get(i)){
                 //Si c'est une liaison pi
-                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + FOVet));   // Profondeur du deuxième atome
+                double multPersZB = (FOV*Zoom/(B.get(A.liaisonIndexe.get(i)).position.z+TailleZ/(2.0*Zoom) + p.FOV));   // Profondeur du deuxième atome
                 g.setStroke(new BasicStroke());
                 g.setColor(Color.BLUE);         //Couleur de la liaison
                 //Dessiner la liaison
