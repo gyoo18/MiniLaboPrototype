@@ -10,16 +10,15 @@ public class Paramètres {
 
     public enum Mode{
         SIM,
-        INIT,
+        INI,
         FIN_SIM,
-        ENTRE_DEUX,
         AJOUT_MOL,
         FIN_PROGRAME
     }
 
     private static Paramètres paramètres;
 
-    public volatile Mode mode = Mode.INIT;
+    public volatile Mode mode = Mode.INI;
 
     public String dossierAnalyse = System.getProperty("user.dir") + "\\";
 
