@@ -415,7 +415,6 @@ public class App {
                     g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
                     
                     ini = false;
-                    break;
                 }
 
                 g.setColor(new Color(00, 100, 100, 100));   //Couleur de l'arrière-plan
